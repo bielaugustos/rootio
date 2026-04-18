@@ -10,7 +10,7 @@
   --neo-blue: #60A5FA;
   --neo-green: #34D399;
   --neo-white: #fff;
-  --neo-bg: #FFFBEB;
+  --neo-bg: #fef3c8;
 }
 
 .page {
@@ -42,80 +42,87 @@
     padding: 32px 20px;
     gap: 16px;
   }
-  
+
   .card {
     padding: 16px 14px;
     gap: 12px;
   }
-  
+
   .logoImg {
     width: 36px !important;
   }
-  
+
   .logoWrap {
     padding: 6px 0;
   }
-  
-  .toggleBtn {
-    padding: 8px 0;
-    font-size: 11px;
-  }
-  
+
   .input {
     padding: 10px;
     font-size: 13px;
   }
-  
+
   .label {
     font-size: 10px;
   }
-  
+
   .submitBtn {
     padding: 10px;
     font-size: 12px;
     letter-spacing: 0.5px;
   }
-  
+
   .skipBtn {
     padding: 8px;
     font-size: 11px;
     letter-spacing: 0.5px;
   }
-  
+
+  .signupContainer {
+    padding: 8px;
+  }
+
+  .signupText {
+    font-size: 11px;
+  }
+
+  .signupLink {
+    font-size: 11px;
+  }
+
   .privacyAlert {
     padding: 8px;
     font-size: 10px;
     gap: 6px;
   }
-  
+
   .privacyAlert svg {
     width: 14px;
     height: 14px;
   }
-  
+
   .forgotBtn {
     padding: 6px 10px;
     font-size: 10px;
   }
-  
+
   .divider {
     font-size: 10px;
     gap: 8px;
   }
-  
+
   .backBtn {
     font-size: 12px;
   }
-  
+
   .eyeBtn {
     padding: 4px;
   }
-  
+
   .eyeBtn svg {
     width: 14px;
     height: 14px;
   }
-  
+
   .error, .success {
     font-size: 11px;
     padding: 8px 10px;
@@ -144,35 +151,26 @@
   height: auto;
 }
 
-/* ── Toggle Neobrutalism ── */
-.toggle {
-  display: flex;
-  border: var(--neo-border);
-  background: var(--neo-white);
+/* ── Header ── */
+.header {
+  text-align: left;
+  margin-bottom: 4px;
 }
 
-.toggleBtn {
-  flex: 1;
-  padding: 12px 0;
-  font-size: 14px;
-  font-weight: 700;
-  font-family: var(--font-body);
-  background: var(--neo-white);
-  color: #666;
-  border: none;
-  cursor: pointer;
-  transition: all .1s;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.toggleBtn:hover {
-  background: #f9f9f9;
-}
-
-.toggleActive {
-  background: var(--neo-yellow);
+.title {
+  font-size: 16px;
+  font-weight: 400;
   color: #000;
+  margin: 0 0 4px 0;
+  font-family: 'Geist', system-ui, -apple-system, sans-serif;
+}
+
+.subtitle {
+  font-size: 16px;
+  color: #666;
+  margin: 0;
+  line-height: 1.4;
+  font-family: 'Geist', system-ui, -apple-system, sans-serif;
 }
 
 /* ── Formulário ── */
@@ -192,19 +190,18 @@
   font-size: 12px;
   font-weight: 600;
   color: #333;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
 }
 
 .input {
   width: 100%;
   padding: 14px 16px;
   font-size: 16px;
-  font-family: var(--font-body);
-  border: var(--neo-border);
+  font-family: 'Geist', system-ui, -apple-system, sans-serif;
+  border: 2px solid #000;
   background: var(--neo-white);
   color: #000;
-  box-shadow: var(--neo-shadow-sm);
+  box-shadow: none;
   transition: all .1s;
   box-sizing: border-box;
   border-radius: 4px;
@@ -216,7 +213,7 @@
 
 .input:focus {
   outline: none;
-  box-shadow: var(--neo-shadow);
+  box-shadow: none;
 }
 
 /* Neobrutalism Error */
@@ -247,11 +244,10 @@
   justify-content: center;
   padding: 14px;
   font-size: 14px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
   border: var(--neo-border);
-  background: var(--neo-yellow);
+  background: #FEBF00;
   color: #000;
   box-shadow: var(--neo-shadow);
   cursor: pointer;
@@ -324,7 +320,6 @@
   color: #666;
   font-size: 12px;
   font-weight: 600;
-  text-transform: uppercase;
 }
 .divider::before,
 .divider::after {
@@ -341,8 +336,7 @@
   padding: 12px;
   font-size: 13px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
   border: var(--neo-border);
   background: var(--neo-white);
   color: #333;
@@ -350,26 +344,62 @@
   cursor: pointer;
   border-radius: 4px;
 }
-.skipBtn:hover {
-  background: var(--neo-yellow-light);
+
+/* ── Cadastre-se Link ── */
+.signupContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+}
+
+.signupText {
+  font-size: 13px;
+  color: #666;
+  font-family: 'Geist', system-ui, -apple-system, sans-serif;
+}
+
+.signupLink {
+  padding: 0;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  border: none;
+  background: none;
+  color: #666;
+  cursor: pointer;
+  text-decoration: underline;
+  text-align: center;
+  font-family: 'Geist', system-ui, -apple-system, sans-serif;
+}
+.signupLink:hover {
+  background: #FEBF00;
+  color: #000;
+}
+
+/* ── Label Row ── */
+.labelRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
 }
 
 /* ── Esqueceu senha ── */
 .forgotBtn {
-  background: var(--neo-yellow-light);
-  border: var(--neo-border);
-  color: #333;
+  background: none;
+  border: none;
+  color: #666;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 400;
   cursor: pointer;
-  padding: 10px 16px;
-  box-shadow: var(--neo-shadow-sm);
-  display: block;
-  text-align: center;
-  border-radius: 4px;
+  padding: 0;
+  text-decoration: underline;
+  transition: color .15s;
 }
 .forgotBtn:hover {
-  background: var(--neo-yellow);
+  color: #000;
 }
 
 /* ── Privacy ── */

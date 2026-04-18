@@ -1,6 +1,6 @@
 // src/pages/Login.jsx
 // ══════════════════════════════════════════════════════
-// IOROOT — Tela de Login / Cadastro
+// Rootio — Tela de Login / Cadastro
 // Estilo visual alinhado com o brandbook.
 // "Continuar sem conta" mantém o fluxo offline.
 // ══════════════════════════════════════════════════════
@@ -149,34 +149,31 @@ export default function Login({ onSkip }) {
           <img src="/icons/logo.png" alt="Rootio" className={styles.logoImg} />
         </div>
 
-        {/* Toggle login / cadastro (não mostra no modo reset) */}
-        {!isReset && (
-          <div className={styles.toggle}>
-            <button
-              type="button"
-              className={`${styles.toggleBtn} ${!isSignup ? styles.toggleActive : ""}`}
-              onClick={() => {
-                setMode("login");
-                setError("");
-              }}
-            >
-              Entrar
-            </button>
-            <button
-              type="button"
-              className={`${styles.toggleBtn} ${isSignup ? styles.toggleActive : ""}`}
-              onClick={() => {
-                setMode("signup");
-                setError("");
-              }}
-            >
-              Criar conta
-            </button>
+        {/* Título e subtítulo - só mostra no modo login */}
+        {mode === "login" && (
+          <div className={styles.header}>
+            <h2 className={styles.title}>Entre na sua conta</h2>
+            <p className={styles.subtitle}>Entre com seu email abaixo para fazer login</p>
           </div>
         )}
 
         {/* Formulário */}
         <form className={styles.form} onSubmit={handleSubmit}>
+          {isSignup && (
+            <button
+              type="button"
+              className={styles.backBtn}
+              onClick={() => {
+                setMode("login");
+                setError("");
+                setSuccess("");
+              }}
+            >
+              <PiArrowLeftBold size={16} />
+              Voltar
+            </button>
+          )}
+
           {isReset && (
             <button
               type="button"
@@ -249,7 +246,22 @@ export default function Login({ onSkip }) {
 
           {!isReset && (
             <div className={styles.field}>
-              <label className={styles.label}>Senha</label>
+              <div className={styles.labelRow}>
+                <label className={styles.label}>Senha</label>
+                {mode === "login" && (
+                  <button
+                    type="button"
+                    className={styles.forgotBtn}
+                    onClick={() => {
+                      setMode("reset");
+                      setError("");
+                      setSuccess("");
+                    }}
+                  >
+                    Esqueceu a senha?
+                  </button>
+                )}
+              </div>
               <div className={styles.passwordWrap}>
                 <input
                   className={styles.input}
@@ -289,30 +301,27 @@ export default function Login({ onSkip }) {
           </button>
         </form>
 
-        {/* Link esqueceu senha (só mostra no modo login) */}
-        {mode === "login" && (
-          <button
-            type="button"
-            className={styles.forgotBtn}
-            onClick={() => {
-              setMode("reset");
-              setError("");
-              setSuccess("");
-            }}
-          >
-            Esqueceu a senha?
-          </button>
-        )}
-
-        {/* Divider */}
-        <div className={styles.divider}>
-          <span>ou</span>
-        </div>
-
         {/* Continuar sem conta */}
         <button type="button" className={styles.skipBtn} onClick={onSkip}>
-          Usar sem conta (modo local)
+          Entrar sem conta (Teste gratuito)
         </button>
+
+        {/* Cadastre-se - só mostra no modo login */}
+        {mode === "login" && (
+          <div className={styles.signupContainer}>
+            <span className={styles.signupText}>Não tem uma conta?</span>
+            <button
+              type="button"
+              className={styles.signupLink}
+              onClick={() => {
+                setMode("signup");
+                setError("");
+              }}
+            >
+              Cadastre-se
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Alert de privacidade - card separado fora do card principal */}

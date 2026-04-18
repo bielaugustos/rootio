@@ -15,8 +15,8 @@
   --gold-dk:   #b08000;  /* dourado escuro */
   --gold-lt:   #ffe080;  /* dourado claro */
   --shadow:    #111;
-  --font-body:    'Inter', system-ui, -apple-system, sans-serif;
-  --font-display: 'Space Grotesk', 'Inter', sans-serif;
+  --font-body:    'Geist', system-ui, -apple-system, sans-serif;
+  --font-display: 'Geist', 'Geist', sans-serif;
   --fb:        13px;
   --radius:    4px;
 }
