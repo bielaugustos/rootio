@@ -1539,7 +1539,7 @@ function PlansCard() {
                 borderRadius: 4,
               }}
             >
-              {isPro ? "ATUAL" : "推荐"}
+              {isPro ? "ATUAL" : "Ativo"}
             </span>
           </div>
           <div
@@ -1553,7 +1553,7 @@ function PlansCard() {
             Pro
           </div>
           <div style={{ fontSize: 11, color: "var(--ink)", marginBottom: 8 }}>
-            R$ 9,90<span style={{ fontSize: 10 }}>/mês</span>
+            R$ 12,90<span style={{ fontSize: 10 }}>/mês</span>
           </div>
           <div
             style={{
@@ -1994,7 +1994,7 @@ export default function Profile({ onNavigate }) {
                 Migrar dados locais
               </span>
               {!can("data_migration") && (
-                <p className={styles.settingsGroupDesc}>Plano Pro necessárIO</p>
+                <p className={styles.settingsGroupDesc}>Plano Pro necessário</p>
               )}
             </div>
             {!can("data_migration") && (
@@ -2036,7 +2036,7 @@ export default function Profile({ onNavigate }) {
             </p>
             <div style={{ display: "flex", gap: 8 }}>
               <a
-                href="https://instagram.com/rootIOverso"
+                href="https://instagram.com/rootioverso"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ color: "var(--ink2)", textDecoration: "none" }}
@@ -2044,7 +2044,7 @@ export default function Profile({ onNavigate }) {
                 <PiInstagramLogoFill size={18} />
               </a>
               <a
-                href="https://linkedin.com/company/rootIOverso"
+                href="https://linkedin.com/company/rootio"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ color: "var(--ink2)", textDecoration: "none" }}
@@ -2072,7 +2072,7 @@ export default function Profile({ onNavigate }) {
         style={{ display: "flex", justifyContent: "center", padding: "16px 0" }}
       >
         <img
-          src="/icons/icon-yellow.svg"
+          src="/icons/logo.png"
           alt="Rootio"
           width={40}
           height={40}

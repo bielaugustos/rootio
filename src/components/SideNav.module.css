@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════
-   SIDEBAR NAV — SideNav
+   SIDEBAR NAV — NEOBRUTALISM STYLE
    Oculto no mobile.
    768px+: 220px com ícones + rótulos.
    Colapsado: 64px com apenas ícones.
@@ -19,14 +19,11 @@
     position: sticky;
     top: 0;
     overflow: hidden;
-    border-right: 0.5px solid var(--border);
-    background: var(--bg);
-    padding: 14px 0 12px;
+    border-right: 3px solid var(--nb-black);
+    background: var(--nb-white);
+    padding: 16px 0 14px;
     z-index: 150;
-    transition:
-      width        0.28s cubic-bezier(0.4, 0, 0.2, 1),
-      background   0.3s,
-      border-color 0.3s;
+    transition: all 0.2s ease;
   }
 }
 
@@ -38,41 +35,42 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 0 14px 14px;
-  border-bottom: 1.5px solid var(--border);
-  margin-bottom: 8px;
+  padding: 0 14px 16px;
+  border-bottom: 3px solid var(--nb-black);
+  margin-bottom: 10px;
   overflow: hidden;
   flex-shrink: 0;
   min-height: 52px;
-  transition: border-color 0.3s, padding 0.28s;
+  transition: all 0.2s ease;
 }
 
 .logo {
   font-family: var(--font-display);
-  font-size: 21px;
+  font-size: 22px;
   font-weight: 800;
   letter-spacing: 1.5px;
-  color: var(--ink);
+  color: var(--nb-black);
   white-space: nowrap;
   flex-shrink: 0;
-  transition: color 0.3s, opacity 0.2s;
+  text-transform: uppercase;
 }
 
 /* Logo oculta no sidebar — streak visível */
 .logo   { display: none; }
 .streak {
-  background: var(--gold);
-  border: 1.5px solid var(--border);
-  border-radius: 20px;
-  padding: 2px 8px;
-  font-size: 10px;
+  background: var(--nb-pink);
+  border: 3px solid var(--nb-black);
+  border-radius: 0;
+  padding: 4px 10px;
+  font-size: 11px;
   font-weight: 700;
-  color: #111;
+  color: var(--nb-white);
   display: flex;
   align-items: center;
-  gap: 3px;
+  gap: 4px;
   white-space: nowrap;
-  animation: streakPopIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  box-shadow: 2px 2px 0 var(--nb-black);
+  animation: streakPopIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 @keyframes streakPopIn {
@@ -88,8 +86,8 @@
 .nav {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 0 8px;
+  gap: 4px;
+  padding: 0 10px;
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
@@ -100,22 +98,30 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 9px 10px;
+  padding: 10px 12px;
   margin: 0 4px;
-  border-radius: 8px;
+  border: 2px solid transparent;
   text-decoration: none;
-  color: var(--ink);
+  color: var(--nb-black);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
   -webkit-tap-highlight-color: transparent;
-  transition: background 0.14s, color 0.14s, transform 0.12s;
+  transition: all 0.15s ease;
   position: relative;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.link:hover  { background: var(--surface); }
-.link:active { transform: scale(0.97); }
+.link:hover {
+  background: var(--nb-yellow);
+  border-color: var(--nb-black);
+  transform: translate(-2px, -2px);
+  box-shadow: 3px 3px 0 var(--nb-black);
+}
+
+.link:active { transform: scale(0.98); }
 
 /* Resets para <button> no Safari/Apple */
 button.link {
@@ -126,16 +132,18 @@ button.link {
   border: none;
   outline: none;
   box-shadow: none;
-  color: var(--ink);
+  color: var(--nb-black);
   font-family: inherit;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
 }
 
 .link.active {
-  background: var(--gold);
-  color: #111;
+  background: var(--nb-purple);
+  color: var(--nb-white);
+  border: 2px solid var(--nb-black);
+  box-shadow: 3px 3px 0 var(--nb-black);
 }
 
 /* ── Ícone hamburguer → ../ ── */
@@ -322,3 +330,46 @@ html[data-theme='glass'] .link.active {
 }
 html[data-theme='glass'] .brand   { border-bottom-color: rgba(255, 255, 255, 0.45); }
 html[data-theme='glass'] .divider { background: rgba(255, 255, 255, 0.45); }
+
+/* Dark mode */
+[data-theme='dark'] .side {
+  background: #1A1A1A;
+  border-color: #FFFFFF;
+}
+
+[data-theme='dark'] .brand {
+  border-color: #FFFFFF;
+}
+
+[data-theme='dark'] .logo {
+  color: #FFFFFF;
+}
+
+[data-theme='dark'] .streak {
+  background: var(--nb-pink);
+  border-color: #FFFFFF;
+  box-shadow: 2px 2px 0 #FFFFFF;
+  color: #FFFFFF;
+}
+
+[data-theme='dark'] .link {
+  color: #FFFFFF;
+}
+
+[data-theme='dark'] .link:hover {
+  background: var(--nb-yellow);
+  border-color: #FFFFFF;
+  box-shadow: 3px 3px 0 #FFFFFF;
+  color: #000000;
+}
+
+[data-theme='dark'] .link.active {
+  background: var(--nb-purple);
+  border-color: #FFFFFF;
+  box-shadow: 3px 3px 0 #FFFFFF;
+  color: #FFFFFF;
+}
+
+[data-theme='dark'] .divider {
+  background: #FFFFFF;
+}

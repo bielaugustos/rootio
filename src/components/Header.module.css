@@ -5,38 +5,53 @@
   z-index: 100;
   text-align: center;
   /* padding-top soma a safe-area-inset-top para não ficar sob notch/Dynamic Island */
-  padding: calc(13px + env(safe-area-inset-top, 0px)) 16px 9px;
-  border-bottom: 2.5px solid var(--border);
+  padding: calc(14px + env(safe-area-inset-top, 0px)) 16px 10px;
+  border-bottom: 3px solid var(--nb-black);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  background: var(--bg);
-  transition: background 0.3s, border-color 0.3s;
+  gap: 12px;
+  background: var(--nb-bg);
+  transition: all 0.15s ease;
 }
 
 .logo {
-  color: var(--ink);
+  color: var(--nb-black);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
+  background: var(--nb-yellow);
+  border: 3px solid var(--nb-black);
+  box-shadow: 3px 3px 0 var(--nb-black);
+  transition: all 0.15s ease;
+}
+
+.logo:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 var(--nb-black);
+}
+
+.logo:active {
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0 var(--nb-black);
 }
 
 .streakPill {
-  background: var(--gold);
-  border-radius: 20px;
-  padding: 2px 10px;
-  font-size: 11px;
+  background: var(--nb-pink);
+  border-radius: 0;
+  padding: 4px 12px;
+  font-size: 12px;
   font-weight: 700;
-  color: #111;
+  color: var(--nb-white);
   display: flex;
   align-items: center;
   gap: 4px;
-  box-shadow: 2px 2px 0 var(--shadow);
-  animation: streakPopIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  border: 3px solid var(--nb-black);
+  box-shadow: 3px 3px 0 var(--nb-black);
+  animation: streakPopIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 @keyframes streakPopIn {
@@ -48,5 +63,29 @@
 
 /* Oculta o Header quando a SideNav está visível */
 @media (min-width: 768px) { .header { display: none; } }
+
+/* Dark mode */
+[data-theme='dark'] .header {
+  background: var(--nb-bg);
+  border-color: #FFFFFF;
+}
+
+[data-theme='dark'] .logo {
+  background: var(--nb-yellow);
+  border-color: #FFFFFF;
+  box-shadow: 3px 3px 0 #FFFFFF;
+  color: #000000;
+}
+
+[data-theme='dark'] .logo:hover {
+  box-shadow: 5px 5px 0 #FFFFFF;
+}
+
+[data-theme='dark'] .streakPill {
+  background: var(--nb-pink);
+  border-color: #FFFFFF;
+  box-shadow: 3px 3px 0 #FFFFFF;
+  color: #FFFFFF;
+}
 
 

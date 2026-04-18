@@ -1,13 +1,7 @@
 /*
-  NAVBAR FIXA — position: fixed
+  NAVBAR FIXA — NEOBRUTALISM STYLE
   ==============================
-  fixed remove o elemento do fluxo do documento
-  e o ancora à viewport. Independente da quantidade
-  de conteúdo na tela, fica sempre no fundo.
-
-  Consequência: o conteúdo passa "por baixo" da nav.
-  Solução: padding-bottom no .nex-app compensa a altura
-  da nav (≈ 60px) para o último item nunca ficar tapado.
+  Neobrutalism navigation with bold borders
 */
 .nav {
   position: fixed;
@@ -21,16 +15,17 @@
 
   z-index: 200;
 
-  border-top: 2.5px solid var(--border);
+  border-top: 3px solid var(--nb-black);
   display: flex;
   justify-content: space-around;
   align-items: center;
-  padding: 7px 0 5px;
-  background: var(--bg);
-  transition: background 0.3s, border-color 0.3s;
+  padding: 8px 0 6px;
+  background: var(--nb-white);
+  transition: all 0.15s ease;
+  box-shadow: 0 -4px 0 var(--nb-black);
 
   /* iOS home indicator */
-  padding-bottom: max(5px, env(safe-area-inset-bottom));
+  padding-bottom: max(6px, env(safe-area-inset-bottom));
 }
 
 /* Ajusta max-width junto com o container do app */
@@ -43,20 +38,52 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 3px;
   text-decoration: none;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
-  color: var(--ink);
-  padding: 3px 4px;
-  border-radius: 4px;
+  color: var(--nb-black);
+  padding: 6px 8px;
+  border: 2px solid transparent;
   min-width: 0;
-  transition: color 0.15s, background 0.15s;
+  transition: all 0.15s ease;
   -webkit-tap-highlight-color: transparent;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.btn:hover  { background: var(--surface); }
-.btn.active { color: var(--gold-dk); }
+.btn:hover {
+  background: var(--nb-yellow);
+  border-color: var(--nb-black);
+  transform: translate(-2px, -2px);
+  box-shadow: 2px 2px 0 var(--nb-black);
+}
+
+.btn.active {
+  background: var(--nb-pink);
+  color: var(--nb-white);
+  border: 2px solid var(--nb-black);
+  box-shadow: 2px 2px 0 var(--nb-black);
+}
+
+/* ══════════════════════════════════════
+   MOBILE: Only show icons, hide text labels
+   ══════════════════════════════════════ */
+@media (max-width: 480px) {
+  .btn {
+    padding: 8px 10px;
+    gap: 0;
+  }
+  
+  .btn span:last-child {
+    display: none;
+  }
+  
+  .btn svg {
+    width: 24px;
+    height: 24px;
+  }
+}
 
 /* ══════════════════════════════════════
    STATS — animação de entrada e saída
@@ -181,4 +208,34 @@
 @keyframes iconGlow {
   0%,100% { filter:none; }
   50%     { filter:drop-shadow(0 0 5px var(--gold)); }
+}
+
+/* Dark mode */
+[data-theme='dark'] .nav {
+  background: #1A1A1A;
+  border-color: #FFFFFF;
+  box-shadow: 0 -4px 0 #FFFFFF;
+}
+
+[data-theme='dark'] .btn {
+  color: #FFFFFF;
+}
+
+[data-theme='dark'] .btn:hover {
+  background: var(--nb-yellow);
+  border-color: #FFFFFF;
+  box-shadow: 2px 2px 0 #FFFFFF;
+  color: #000000;
+}
+
+[data-theme='dark'] .btn.active {
+  background: var(--nb-purple);
+  border-color: #FFFFFF;
+  box-shadow: 2px 2px 0 #FFFFFF;
+  color: #FFFFFF;
+}
+
+[data-theme='dark'] .newDot {
+  background: var(--nb-yellow);
+  border-color: #1A1A1A;
 }
