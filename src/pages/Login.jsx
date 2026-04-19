@@ -31,6 +31,17 @@ export default function Login({ onSkip }) {
     await new Promise(r => setTimeout(r, 1000));
     setLoading(false);
     // Simulate login success for demo; in real app this would call signIn with biometrics
+    
+    // Verificar se usuário já tem dados no app (hábitos ou metas financeiras)
+    const hasExistingData = 
+      localStorage.getItem('nex_habits') || 
+      localStorage.getItem('nex_fin_goals');
+    
+    // Se já tem dados, marca onboarding como feito para não perder dados existentes
+    if (hasExistingData && !localStorage.getItem('ior_onboarding_done')) {
+      localStorage.setItem('ior_onboarding_done', 'true');
+    }
+    
     const onboardingDone = localStorage.getItem('ior_onboarding_done');
     if (!onboardingDone) {
       navigate('/onboarding');
@@ -60,7 +71,16 @@ export default function Login({ onSkip }) {
         else setError(msg);
         return;
       }
-      // Login successful - redirect based on onboarding status
+      // Login successful - verificar se usuário já tem dados antes de redirecionar
+      const hasExistingData = 
+        localStorage.getItem('nex_habits') || 
+        localStorage.getItem('nex_fin_goals');
+      
+      // Se já tem dados, marca onboarding como feito para não perder dados existentes
+      if (hasExistingData && !localStorage.getItem('ior_onboarding_done')) {
+        localStorage.setItem('ior_onboarding_done', 'true');
+      }
+      
       const onboardingDone = localStorage.getItem('ior_onboarding_done');
       if (!onboardingDone) {
         navigate('/onboarding');

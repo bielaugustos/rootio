@@ -102,9 +102,14 @@ function HeroCard({ allPoints, streak, daysActive }) {
   const [userName, setUserName] = useState(() =>
     loadStorage("nex_username", "../"),
   );
-  const [userAvatar, setUserAvatar] = useState(() =>
-    loadStorage("nex_avatar", "🧑"),
-  );
+  const [userAvatar, setUserAvatar] = useState(() => {
+    const avatar = loadStorage("nex_avatar", "🧑");
+    // Se for um objeto (do onboarding), extrai o emoji
+    if (typeof avatar === "object" && avatar?.emoji) {
+      return avatar.emoji;
+    }
+    return avatar;
+  });
   const [editing, setEditing] = useState(false);
   const [tempName, setTempName] = useState(userName);
   const [showPicker, setShowPicker] = useState(false);
