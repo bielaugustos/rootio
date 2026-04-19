@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   PiFingerprintBold,
   PiEnvelopeBold,
@@ -8,12 +9,13 @@ import {
   PiArrowLeftBold,
   PiLockKeyBold,
   PiFingerprint,
-} from "react-icons/pi";
+  } from "react-icons/pi";
 import { signIn, signUp, resetPassword } from "../services/supabase";
 
 import styles from "./Login.module.css";
 
 export default function Login({ onSkip }) {
+  const navigate = useNavigate();
   const [mode, setMode] = useState("welcome");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,6 +30,13 @@ export default function Login({ onSkip }) {
     setLoading(true);
     await new Promise(r => setTimeout(r, 1000));
     setLoading(false);
+    // Simulate login success for demo; in real app this would call signIn with biometrics
+    const onboardingDone = localStorage.getItem('ior_onboarding_done');
+    if (!onboardingDone) {
+      navigate('/onboarding');
+    } else {
+      navigate('/');
+    }
   }
 
   async function handleSubmit(e) {
@@ -50,6 +59,13 @@ export default function Login({ onSkip }) {
           setError("E-mail ou senha incorretos.");
         else setError(msg);
         return;
+      }
+      // Login successful - redirect based on onboarding status
+      const onboardingDone = localStorage.getItem('ior_onboarding_done');
+      if (!onboardingDone) {
+        navigate('/onboarding');
+      } else {
+        navigate('/');
       }
     } finally {
       setLoading(false);

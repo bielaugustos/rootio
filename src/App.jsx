@@ -1,5 +1,5 @@
 // src/App.jsx
-import { useState, useLayoutEffect, useRef, useEffect } from 'react'
+import { useState, useLayoutEffect, useRef, useEffect, useCallback } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import { AppProvider }   from './context/AppContext'
 import { AuthProvider, useAuth } from './context/AuthContext'
@@ -14,6 +14,7 @@ import { hasLocalData }   from './services/syncService'
 import { useIsDesktop }  from './hooks/useIsDesktop'
 import Login          from './pages/Login'
 import ResetPassword  from './pages/ResetPassword'
+import Onboarding     from './pages/Onboarding'
 import Home           from './pages/Home'
 import Habits         from './pages/Habits'
 import Finance        from './pages/Finance'
@@ -86,6 +87,7 @@ function Layout() {
 
 // Controla se mostra Login ou o app
 function AppShell() {
+  const navigate = useNavigate()
   const { loading, isLoggedIn, user, profile } = useAuth()
   const [skipped, setSkipped] = useState(
     () => localStorage.getItem('ior_auth_skipped') === 'true'
@@ -95,6 +97,12 @@ function AppShell() {
   const [showMigration,    setShowMigration]     = useState(false)
   const [migrationChecked, setMigrationChecked]  = useState(false)
   const prevLoggedIn = useRef(null)
+
+  const handleSkip = useCallback(() => {
+    localStorage.setItem('ior_auth_skipped', 'true')
+    setSkipped(true)
+    navigate('/')
+  }, [navigate])
 
   // useLayoutEffect roda antes da pintura — evita flash do Layout antes do splash
   useLayoutEffect(() => {
@@ -136,55 +144,62 @@ function AppShell() {
     if (!isLoggedIn) setMigrationChecked(false)
   }, [isLoggedIn, migrationChecked, profile, user])
 
-  if (loading) return null
+  // Redireciona para onboarding se primeiro login e onboarding não completed
+  useEffect(() => {
+    if (!loading && isLoggedIn) {
+      const onboardingDone = localStorage.getItem('ior_onboarding_done')
+      if (!onboardingDone && window.location.pathname !== '/onboarding') {
+        navigate('/onboarding', { replace: true })
+      }
+    }
+  }, [isLoggedIn, loading, navigate])
 
-  return (
-    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-      <AppProvider>
-        {!isLoggedIn && showPaywall && (
-          <MigrationModal
-            mode="paywall"
-            onDone={() => {
-              localStorage.setItem('nex_paywall_at', String(Date.now()))
-              setShowPaywall(false)
-            }}
-          />
-        )}
-        {isLoggedIn && showMigration && (
-          <MigrationModal
-            userId={user.id}
-            mode="migrate"
-            onDone={() => setShowMigration(false)}
-          />
-        )}
-        {loginTransition && (
-          <>
-            <Navigate to="/" replace />
-            <SplashScreen onDone={() => setLoginTransition(false)} />
-          </>
-        )}
-        <Routes>
+   if (loading) return null
+
+   return (
+     <AppProvider>
+       {!isLoggedIn && showPaywall && (
+         <MigrationModal
+           mode="paywall"
+           onDone={() => {
+             localStorage.setItem('nex_paywall_at', String(Date.now()))
+             setShowPaywall(false)
+           }}
+         />
+       )}
+       {isLoggedIn && showMigration && (
+         <MigrationModal
+           userId={user.id}
+           mode="migrate"
+           onDone={() => setShowMigration(false)}
+         />
+       )}
+       {loginTransition && (
+         <>
+           <Navigate to="/" replace />
+           <SplashScreen onDone={() => setLoginTransition(false)} />
+         </>
+       )}
+       <Routes>
           {/* Páginas autônomas (sem Layout) - sempre acessíveis */}
-          <Route path="/login" element={<Login onSkip={() => {
-            localStorage.setItem('ior_auth_skipped', 'true')
-            setSkipped(true)
-          }}/>} />
+          <Route path="/login" element={<Login onSkip={handleSkip} />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+
+          {/* Onboarding - em desenvolvimento, acessível sem login; em prod, só logado */}
+          {(import.meta.env.DEV || isLoggedIn) && (
+            <Route path="/onboarding" element={<Onboarding />} />
+          )}
 
           {/* App principal com Layout - requer autenticação ou skip */}
           {isLoggedIn || skipped ? (
             <Route path="/*" element={<Layout />} />
           ) : (
-            <Route path="/*" element={<Login onSkip={() => {
-              localStorage.setItem('ior_auth_skipped', 'true')
-              setSkipped(true)
-            }}/>} />
+            <Route path="/*" element={<Login onSkip={handleSkip} />} />
           )}
-        </Routes>
-      </AppProvider>
-    </BrowserRouter>
-  )
-}
+       </Routes>
+     </AppProvider>
+   )
+ }
 
 export default function App() {
   const [splashDone, setSplashDone] = useState(false)
@@ -192,7 +207,9 @@ export default function App() {
     <>
       {!splashDone && <SplashScreen onDone={() => setSplashDone(true)} />}
       <AuthProvider>
-        <AppShell />
+        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <AppShell />
+        </BrowserRouter>
       </AuthProvider>
     </>
   )

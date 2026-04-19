@@ -576,4 +576,54 @@ src/
 ---
 
 *Última atualização: Abril 2026*
-*Versão: 2.0.0*
+*Versão: 0.3.0*
+
+<!-- card 1 
+
+<div class="spec-body stretch">
+            <div class="hero" style="border:0;box-shadow:none;margin:0;width:100%">
+              <div class="kicker">▶ PRÓXIMA AÇÃO</div>
+              <h3>Meditar<br>10 minutos</h3>
+              <p>Alta prioridade · hábito diário · ritual da manhã</p>
+              <button class="nb-btn nb-btn--primary nb-btn--block" style="width:100%"><span>Concluir agora</span>→</button>
+            </div>
+          </div>
+<div class="hero" style="border:0;box-shadow:none;margin:0;width:100%">
+              <div class="kicker">▶ PRÓXIMA AÇÃO</div>
+              <h3>Meditar<br>10 minutos</h3>
+              <p>Alta prioridade · hábito diário · ritual da manhã</p>
+              <button class="nb-btn nb-btn--primary nb-btn--block" style="width:100%"><span>Concluir agora</span>→</button>
+            </div>
+<div class="kicker">▶ PRÓXIMA AÇÃO</div>
+<h3>Meditar<br>10 minutos</h3>
+<p>Alta prioridade · hábito diário · ritual da manhã</p>
+<button class="nb-btn nb-btn--primary nb-btn--block" style="width:100%"><span>Concluir agora</span>→</button>
+<<pseudo>></<pseudo>>
+<div class="hero" style="border:0;box-shadow:none;margin:0;width:100%">
+              <div class="kicker">▶ PRÓXIMA AÇÃO</div>
+              <h3>Meditar<br>10 minutos</h3>
+              <p>Alta prioridade · hábito diário · ritual da manhã</p>
+              <button class="nb-btn nb-btn--primary nb-btn--block" style="width:100%"><span>Concluir agora</span>→</button>
+            </div>
+<div class="spec-body stretch">
+            <div class="hero" style="border:0;box-shadow:none;margin:0;width:100%">
+              <div class="kicker">▶ PRÓXIMA AÇÃO</div>
+              <h3>Meditar<br>10 minutos</h3>
+              <p>Alta prioridade · hábito diário · ritual da manhã</p>
+              <button class="nb-btn nb-btn--primary nb-btn--block" style="width:100%"><span>Concluir agora</span>→</button>
+            </div>
+          </div> -->
+
+
+
+
+
+
+
+
+
+
+<!-- talvez o problema não seja sempre chegar a uma pergunta e uma solução, mas sim criar uma conexão com suas raizes -->
+
+<!-- tela de carreira - deve conter como ingrediente principal api para exemplificar profissoes com cbo incluso como sua descricao / deve conter uma vasta lista de profissoes e as habilidades de exemplo, junto com os aprendizados relacionados ao que estudar para a profissão e por onde começar -->
+<!-- tela de projetos - deve conter como ingrediente principal a escolha de como conduzir um projeto de vida, seja simples apenas com marcos e filtros de conclusão por meio de uma lista com checkbox, avançado como um backlog de scrum onde pode se criar vários sprints e esses sprints conterem tarefas e a possibilidade de comentar como geral/daily/retro, padrão como uma visualização em kanban em colunas, cosmos como uma tela de busca onde por texto ou por imagens é possivel buscar ou criar um projeto escrevendo algo e visualizando na tela o que for mencionado-->
