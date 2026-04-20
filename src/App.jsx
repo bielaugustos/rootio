@@ -155,16 +155,21 @@ function AppShell() {
   useEffect(() => {
     if (!loading) {
       const onboardingDone = localStorage.getItem('ior_onboarding_done')
-      const shouldShowOnboarding = !onboardingDone && 
-        window.location.pathname !== '/onboarding' && 
-        window.location.pathname !== '/login' &&
-        window.location.pathname !== '/reset-password'
+      const authSkipped = localStorage.getItem('ior_auth_skipped') === 'true'
+      const publicRoutes = ['/login', '/onboarding', '/reset-password']
+      const isPublicRoute = publicRoutes.includes(window.location.pathname)
       
-      if (shouldShowOnboarding) {
+      // Atualiza estado skipped se mudou no localStorage (ex: onboarding completado)
+      if (authSkipped !== skipped) {
+        setSkipped(authSkipped)
+      }
+      
+      // Se não está em rota pública e onboarding não foi feito, redireciona para onboarding
+      if (!onboardingDone && !isPublicRoute) {
         navigate('/onboarding', { replace: true })
       }
     }
-  }, [loading, navigate])
+  }, [loading, navigate, skipped])
 
    if (loading) return null
 

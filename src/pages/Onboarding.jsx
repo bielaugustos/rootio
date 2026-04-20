@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "../context/AppContext";
 import { signOut } from "../services/supabase";
+import { SplashScreen } from "../components/SplashScreen";
 import styles from "./Onboarding.module.css";
 
 const GOALS = [
@@ -57,6 +58,7 @@ export default function Onboarding() {
   const navigate = useNavigate();
   const { addHabit } = useApp();
   const [currentStep, setCurrentStep] = useState(1);
+  const [showSplash, setShowSplash] = useState(false);
   const [selectedGoals, setSelectedGoals] = useState([]);
   const [firstHabit, setFirstHabit] = useState({
     name: "Meditar",
@@ -214,7 +216,10 @@ export default function Onboarding() {
 
   const handleGoHome = () => {
     completeOnboarding();
-    navigate("/");
+    setShowSplash(true);
+    setTimeout(() => {
+      navigate("/");
+    }, 1350);
   };
 
   const handleActivateNotifications = async () => {
@@ -222,7 +227,10 @@ export default function Onboarding() {
       await Notification.requestPermission();
     }
     completeOnboarding();
-    navigate("/");
+    setShowSplash(true);
+    setTimeout(() => {
+      navigate("/");
+    }, 1350);
   };
 
   const completeOnboarding = () => {
@@ -296,6 +304,14 @@ export default function Onboarding() {
     localStorage.removeItem("ior_onboarding_choices");
     localStorage.removeItem("ior_avatar");
     localStorage.removeItem("ior_username");
+
+    // Dispara evento customizado para notificar mudanças
+    console.log('Onboarding completo - dados salvos:', {
+      username: localStorage.getItem('nex_username'),
+      avatar: localStorage.getItem('nex_avatar'),
+      onboardingDone: localStorage.getItem('ior_onboarding_done')
+    });
+    window.dispatchEvent(new Event('onboarding_completed'));
   };
 
   const formatCurrency = (value) => {
@@ -670,13 +686,16 @@ export default function Onboarding() {
   };
 
   return (
-    <div className={`${styles.page} ${currentStep === 1 ? styles.step1Page : ''} ${currentStep === 6 ? styles.step6Page : ''}`}>
-      {currentStep === 1 && renderStep1()}
-      {currentStep === 2 && renderStep2()}
-      {currentStep === 3 && renderStep3()}
-      {currentStep === 4 && renderStep4()}
-      {currentStep === 5 && renderStep5()}
-      {currentStep === 6 && renderStep6()}
-    </div>
+    <>
+      {showSplash && <SplashScreen onDone={() => setShowSplash(false)} />}
+      <div className={`${styles.page} ${currentStep === 1 ? styles.step1Page : ''} ${currentStep === 6 ? styles.step6Page : ''}`}>
+        {currentStep === 1 && renderStep1()}
+        {currentStep === 2 && renderStep2()}
+        {currentStep === 3 && renderStep3()}
+        {currentStep === 4 && renderStep4()}
+        {currentStep === 5 && renderStep5()}
+        {currentStep === 6 && renderStep6()}
+      </div>
+    </>
   );
 }

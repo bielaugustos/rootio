@@ -96,18 +96,22 @@ function Toggle({ on, onToggle, label }) {
 // ══════════════════════════════════════
 // HERO CARD
 // ══════════════════════════════════════
-function HeroCard({ allPoints, streak, daysActive }) {
+  function HeroCard({ allPoints, streak, daysActive }) {
   const level = calcLevel(allPoints);
   const { user, profile, reloadProfile } = useAuth();
-  const [userName, setUserName] = useState(() =>
-    loadStorage("nex_username", "../"),
-  );
+  const [userName, setUserName] = useState(() => {
+    const name = loadStorage("nex_username") || loadStorage("ior_username", "Amigo");
+    console.log('Profile HeroCard - nome inicial:', name);
+    return name;
+  });
   const [userAvatar, setUserAvatar] = useState(() => {
     const avatar = loadStorage("nex_avatar", "🧑");
     // Se for um objeto (do onboarding), extrai o emoji
     if (typeof avatar === "object" && avatar?.emoji) {
+      console.log('Profile HeroCard - avatar objeto:', avatar);
       return avatar.emoji;
     }
+    console.log('Profile HeroCard - avatar inicial:', avatar);
     return avatar;
   });
   const [editing, setEditing] = useState(false);
@@ -134,6 +138,66 @@ function HeroCard({ allPoints, streak, daysActive }) {
     return () => window.removeEventListener("nex_shop_changed", refresh);
   }, []);
 
+  // Sincroniza nome e avatar do localStorage quando onboarding é completado
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'nex_username' && e.newValue) {
+        setUserName(e.newValue);
+        setTempName(e.newValue);
+      }
+      if (e.key === 'ior_username' && e.newValue && !localStorage.getItem('nex_username')) {
+        setUserName(e.newValue);
+        setTempName(e.newValue);
+      }
+      if (e.key === 'nex_avatar' && e.newValue) {
+        setUserAvatar(e.newValue);
+      }
+    };
+
+    // Recarrega nome e avatar quando onboarding é completado
+    const handleOnboardingCompleted = () => {
+      const newName = localStorage.getItem('nex_username') || localStorage.getItem('ior_username', 'Amigo');
+      const newAvatar = localStorage.getItem('nex_avatar', '🌻');
+      console.log('Onboarding completado - atualizando Profile:', { newName, newAvatar });
+      setUserName(newName);
+      setTempName(newName);
+      setUserAvatar(newAvatar);
+    };
+
+    // Verifica dados na montagem inicial (caso o onboarding já tenha sido completado)
+    const checkOnboardingData = () => {
+      const storedName = localStorage.getItem('nex_username') || localStorage.getItem('ior_username');
+      const storedAvatar = localStorage.getItem('nex_avatar');
+      const onboardingDone = localStorage.getItem('ior_onboarding_done');
+      
+      console.log('Profile montado - verificando dados:', {
+        storedName,
+        storedAvatar,
+        onboardingDone
+      });
+
+      if (onboardingDone === 'true') {
+        if (storedName) {
+          setUserName(storedName);
+          setTempName(storedName);
+        }
+        if (storedAvatar) {
+          setUserAvatar(storedAvatar);
+        }
+      }
+    };
+
+    // Verifica dados imediatamente ao montar
+    checkOnboardingData();
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('onboarding_completed', handleOnboardingCompleted);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('onboarding_completed', handleOnboardingCompleted);
+    };
+  }, []);
+
   async function handleSave() {
     const name = tempName.trim() || "../";
     setUserName(name);
@@ -158,15 +222,42 @@ function HeroCard({ allPoints, streak, daysActive }) {
     toast("Avatar atualizado!");
   }
 
+  // Formatar o mês de criação em maiúsculas abreviado
+  const getCreationMonth = () => {
+    const createdAt = profile?.created_at || user?.created_at;
+    if (!createdAt) {
+      return "DESDE AGORA";
+    }
+    try {
+      const date = new Date(createdAt);
+      return date
+        .toLocaleDateString("pt-BR", { month: "short" })
+        .toUpperCase();
+    } catch {
+      return "DESDE AGORA";
+    }
+  };
+
+  // Criar handle @nome
+  const handleName = userName.replace(/\s+/g, "").toLowerCase();
+
   return (
-    <div className="card">
-      <div className={styles.hero}>
-        <div className={styles.avatarWrap}>
+    <div className="nb-card sun" style={{ padding: "14px" }}>
+      <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+        <div className={styles.avatarContainer}>
           <button
             type="button"
-            className={styles.avatarBtn}
+            className={styles.avatarButton}
             onClick={() => setShowPicker((p) => !p)}
             aria-label="Trocar avatar"
+            style={{ 
+              width: "64px", 
+              height: "64px", 
+              fontSize: "32px",
+              background: "var(--white)",
+              border: "3px solid var(--ink)",
+              flexShrink: 0
+            }}
           >
             <span className={styles.avatarEmoji}>{userAvatar}</span>
           </button>
@@ -185,47 +276,69 @@ function HeroCard({ allPoints, streak, daysActive }) {
             </div>
           )}
         </div>
-
-        {editing ? (
-          <div className={styles.nameEdit}>
-            <input
-              autoFocus
-              className={`input ${styles.nameInput}`}
-              value={tempName}
-              maxLength={24}
-              placeholder="Seu nome"
-              onChange={(e) => setTempName(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleSave();
-                if (e.key === "Escape") setEditing(false);
-              }}
-            />
-            <button
-              type="button"
-              className={`btn btn-primary ${styles.saveNameBtn}`}
-              onClick={handleSave}
-            >
-              <PiCheckBold size={13} />
-            </button>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          {editing ? (
+            <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+              <input
+                autoFocus
+                className="input"
+                value={tempName}
+                maxLength={24}
+                placeholder="Seu nome"
+                onChange={(e) => setTempName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSave();
+                  if (e.key === "Escape") setEditing(false);
+                }}
+                style={{
+                  fontSize: "18px",
+                  fontWeight: 900,
+                  padding: "2px 6px",
+                  width: "100%",
+                  lineHeight: 1
+                }}
+              />
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleSave}
+                style={{ padding: "4px 8px", fontSize: "11px" }}
+              >
+                <PiCheckBold size={11} />
+              </button>
+            </div>
+          ) : (
+            <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+              <span className="display" style={{ fontSize: "18px", fontWeight: 900, textTransform: "uppercase", lineHeight: 1 }}>{userName}</span>
+              <button
+                type="button"
+                className={styles.editNameBtn}
+                onClick={() => {
+                  setTempName(userName);
+                  setEditing(true);
+                }}
+              >
+                <PiPencilSimpleBold size={11} />
+              </button>
+            </div>
+          )}
+          <div className="mono" style={{ 
+            fontSize: "10px", 
+            color: "var(--ink)", 
+            marginTop: "3px", 
+            textTransform: "uppercase",
+            letterSpacing: "0.14em"
+          }}>
+            @{handleName} · {getCreationMonth()}
           </div>
-        ) : (
-          <div className={styles.nameRow}>
-            <span className={styles.heroName}>{userName}</span>
-            <button
-              type="button"
-              className={styles.editNameBtn}
-              onClick={() => {
-                setTempName(userName);
-                setEditing(true);
-              }}
-            >
-              <PiPencilSimpleBold size={13} />
-            </button>
+          <div style={{ display: "flex", gap: "5px", marginTop: "6px" }}>
+            <span className="nb-tag ik" style={{ fontSize: "9px", padding: "2px 6px" }}>
+              NV {level.value}
+            </span>
+            <div className="ticker" style={{ fontSize: "10px", padding: "2px 6px" }}>
+              {allPoints} IO
+            </div>
           </div>
-        )}
-
-        <div className={styles.heroLevel} style={{ color: level.color }}>
-          <level.Icon size={14} /> {level.name}
         </div>
       </div>
     </div>

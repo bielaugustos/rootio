@@ -18,23 +18,153 @@
   to   { opacity: 1; transform: translateY(0);   }
 }
 
-/* Hero */
+/* Profile Card - New Design */
+.profileCard {
+  background: var(--white);
+  border-radius: 12px;
+  padding: 9px;
+  border: 2px solid var(--border);
+  box-shadow: 2px 2px 0 var(--shadow);
+}
+
+.avatarContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  z-index: 60;
+}
+
+.avatarButton {
+  width: 50px;
+  height: 50px;
+  background: #fff;
+  border: 3px solid var(--ink);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: transform .15s;
+  padding: 0;
+  box-shadow: 2px 2px 0 var(--shadow);
+}
+
+.avatarButton:hover {
+  transform: scale(1.05);
+}
+
+.avatarEmoji {
+  font-size: 26px;
+  line-height: 1;
+  user-select: none;
+}
+
+.avatarPicker {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  transform: translateX(0);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  background: var(--white);
+  border: 2.5px solid var(--border);
+  border-radius: 4px;
+  padding: 10px;
+  box-shadow: 4px 4px 0 var(--shadow);
+  z-index: 200;
+  min-width: 180px;
+}
+
+.emojiOpt {
+  aspect-ratio: 1;
+  font-size: 22px;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  background: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .1s, border-color .1s;
+}
+
+.emojiOpt:hover {
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+.emojiSel {
+  border-color: var(--gold-dk);
+  background: var(--gold);
+}
+
+.profileName {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.profileHandle {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: #92400e;
+  margin-top: 2px;
+}
+
+.editNameBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--ink3);
+  padding: 4px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  transition: background .1s;
+}
+
+.editNameBtn:hover {
+  background: var(--surface);
+}
+
+.nameInput {
+  width: 100%;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.saveNameBtn {
+  padding: 6px 10px;
+}
+
+.levelTag {
+  font-size: 7px;
+  font-weight: 700;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--ink2);
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.ioTicker {
+  font-size: 8px;
+  padding: 2px 5px;
+  background: var(--gold);
+  border: 1px solid var(--gold-dk);
+  color: var(--ink);
+  border-radius: 3px;
+  font-weight: 700;
+}
+
+/* Legacy Hero styles - keeping for compatibility */
 .hero { display: flex; flex-direction: column; align-items: center; padding: 12px 0 8px; gap: 8px; }
 .avatarWrap { position: relative; display: flex; flex-direction: column; align-items: center; z-index: 60; }
-.avatarBtn { width: 72px; height: 72px; border-radius: 50%; border: none; background: var(--gold); display: flex; align-items: center; justify-content: center; box-shadow: 3px 3px 0 var(--shadow); cursor: pointer; transition: transform .15s; }
-.avatarBtn:hover { transform: scale(1.05); }
-.avatarEmoji { font-size: 36px; line-height: 1; user-select: none; }
-.avatarPicker { position: absolute; top: calc(100% + 6px); left: 50%; transform: translateX(-50%); display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; background: var(--white); border: 2.5px solid var(--border); border-radius: 4px; padding: 10px; box-shadow: 4px 4px 0 var(--shadow); z-index: 200; min-width: 180px; }
-.emojiOpt { aspect-ratio: 1; font-size: 22px; border: 2px solid transparent; border-radius: 4px; cursor: pointer; background: none; display: flex; align-items: center; justify-content: center; transition: background .1s, border-color .1s; }
-.emojiOpt:hover { background: var(--surface); border-color: var(--border); }
-.emojiSel { border-color: var(--gold-dk); background: var(--gold); }
 .nameRow { display: flex; align-items: center; gap: 6px; }
 .heroName { font-size: 18px; font-weight: 700; color: var(--ink); }
-.editNameBtn { background: none; border: none; cursor: pointer; color: var(--ink3); padding: 4px; border-radius: 3px; display: flex; align-items: center; transition: background .1s; }
-.editNameBtn:hover { background: var(--surface); }
-.nameEdit { display: flex; align-items: center; gap: 6px; }
-.nameInput { width: 180px; text-align: center; font-size: 16px; font-weight: 700; }
-.saveNameBtn { padding: 6px 10px; }
 .heroLevel { font-size: 14px; font-weight: 700; }
 
 /* Stats grid */
