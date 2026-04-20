@@ -1,0 +1,16 @@
+.nb-ticker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  text-transform: uppercase;
+  border: var(--bw) solid var(--ink);
+  box-shadow: var(--sh);
+  border-radius: 0;
+}
+.nb-ticker--md { font-size: 13px; padding: 6px 12px; }
+.nb-ticker--sm { font-size: 10px; padding: 3px 8px; }
+
+.nb-ticker--default { background: var(--ink);   color: var(--sun); }
+.nb-ticker--amber   { background: var(--amber); color: #fff; }

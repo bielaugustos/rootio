@@ -15,7 +15,6 @@ import {
   PiFlameFill,
   PiHouseBold,          PiHouseFill,
   PiCheckSquareBold,    PiCheckSquareFill,
-  PiCurrencyDollarBold, PiCurrencyDollarFill,
   PiUserCircleBold,     PiUserCircleFill,
   PiChartBarBold,       PiChartBarFill,
   PiBriefcaseBold,
@@ -27,12 +26,40 @@ import { useStats }            from '../hooks/useStats'
 import { useUnlockableItem }   from '../hooks/useNav'
 import styles from './SideNav.module.css'
 
+// Custom Finance Icon SVG
+function FinanceIcon({ size = 20 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 18 18" fill="none">
+      <path d="M9 2v14M4 6h8M3 11h10" stroke="currentColor" strokeWidth="2" strokeLinecap="square"></path>
+    </svg>
+  );
+}
+
+// Wrapper for finance icon to handle active/inactive states
+function FinanceIconWrapper({ size }) {
+  return <FinanceIcon size={size} />;
+}
+
+// Custom Experience Icon SVG
+function ExperienceIcon({ size = 20 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 18 18" fill="none">
+      <path d="M5 2h8l-1 8H6L5 2zM4 14h10M9 10v4" stroke="currentColor" strokeWidth="2" strokeLinecap="square" fill="none"></path>
+    </svg>
+  );
+}
+
+// Wrapper for experience icon to handle active/inactive states
+function ExperienceIconWrapper({ size }) {
+  return <ExperienceIcon size={size} />;
+}
+
 // ── Itens de navegação ──
 
 const BASE_NAV = [
   { to: '/',        label: 'Hoje',     Icon: PiHouseBold,          IconA: PiHouseFill          },
   { to: '/habits',  label: 'Hábitos',  Icon: PiCheckSquareBold,    IconA: PiCheckSquareFill    },
-  { to: '/finance', label: 'Finanças', Icon: PiCurrencyDollarBold, IconA: PiCurrencyDollarFill },
+  { to: '/finance', label: 'Finanças', Icon: FinanceIconWrapper,  IconA: FinanceIconWrapper  },
 ]
 
 const PROFILE_ITEM = {
@@ -41,7 +68,7 @@ const PROFILE_ITEM = {
 }
 
 const UNLOCKABLE = [
-  { id: 'util_progress', to: '/progress', label: 'Experiência', Icon: PiChartBarBold,     IconA: PiChartBarFill     },
+  { id: 'util_progress', to: '/progress', label: 'Experiência', Icon: ExperienceIconWrapper, IconA: ExperienceIconWrapper },
   { id: 'util_career',   to: '/career',   label: 'Carreira',    Icon: PiBriefcaseBold,    IconA: PiBriefcaseBold    },
   { id: 'util_projects', to: '/projects', label: 'Projetos',    Icon: PiRocketLaunchBold, IconA: PiRocketLaunchBold },
   { id: 'util_mentor',   to: '/mentor',   label: 'Mentor',      Icon: PiRobotBold,        IconA: PiRobotBold        },

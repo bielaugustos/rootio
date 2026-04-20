@@ -20,9 +20,9 @@
 
 /* Profile Card - New Design */
 .profileCard {
-  background: var(--white);
+  background: var(--sun);
   border-radius: 12px;
-  padding: 9px;
+  padding: 14px;
   border: 2px solid var(--border);
   box-shadow: 2px 2px 0 var(--shadow);
 }
@@ -76,6 +76,15 @@
   box-shadow: 4px 4px 0 var(--shadow);
   z-index: 200;
   min-width: 180px;
+}
+
+@media (min-width: 768px) {
+  .avatarPicker {
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+  }
 }
 
 .emojiOpt {
@@ -167,11 +176,48 @@
 .heroName { font-size: 18px; font-weight: 700; color: var(--ink); }
 .heroLevel { font-size: 14px; font-weight: 700; }
 
-/* Stats grid */
-.statsGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0 0; }
+/* Stats grid - Legacy (Progress.jsx) */
+.statsGrid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin: 10px 0 0; }
 .pstat { background: var(--white); border: 2px solid var(--border); border-radius: 3px; padding: 10px 6px; text-align: center; box-shadow: 2px 2px 0 var(--shadow); }
 .pstatVal { font-size: 20px; font-weight: 700; color: var(--ink); font-family: var(--font-display); }
 .pstatLbl { font-size: 10px; color: var(--ink3); margin-top: 2px; font-weight: 700; }
+
+/* Stats grid - New for Profile (3 colunas) */
+.statsGridNew {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.pstatNew {
+  background: var(--white);
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+  box-shadow: 2px 2px 0 var(--shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.pstatValNew {
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--ink);
+  font-family: var(--font-display);
+  line-height: 1;
+}
+
+.pstatLblNew {
+  font-size: 11px;
+  color: var(--ink3);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
 
 /* XP bar */
 .xpSection { margin-top: 10px; }
@@ -220,10 +266,36 @@
 .settingLabel { flex: 1; font-size: 13px; font-weight: 700; color: var(--ink); }
 
 /* Toggle switch */
-.toggleTrack { position: relative; width: 42px; height: 24px; border-radius: 12px; border: 2px solid var(--border); cursor: pointer; background: var(--white); transition: background .2s, border-color .2s; box-shadow: 1px 1px 0 var(--shadow); flex-shrink: 0; }
-.toggleOn { background: var(--gold); border-color: var(--gold-dk); }
-.toggleThumb { position: absolute; top: 3px; left: 3px; width: 14px; height: 14px; border-radius: 50%; background: var(--ink3); transition: left .2s, background .2s; pointer-events: none; }
-.thumbOn { left: 21px; background: #111; }
+.nbSwitchWrapper { display: flex; flex-direction: column; gap: 6px; align-items: center; }
+.nbSwitchLabel { font-size: 11px; font-weight: 700; color: var(--ink3); }
+.nbSwitch { 
+  width: 56px; 
+  height: 28px; 
+  border: 2px solid var(--ink); 
+  background: var(--ink); 
+  position: relative; 
+  cursor: pointer; 
+  border-radius: 4px;
+}
+.nbSwitch i { 
+  position: absolute; 
+  top: 2px; 
+  left: 2px; 
+  width: 22px; 
+  height: 22px; 
+  background: #fff; 
+  border: none;
+  border-radius: 2px;
+  transition: all .14s; 
+}
+.nbSwitchOn { 
+  background: var(--amber); 
+  border-color: var(--amber);
+}
+.nbSwitchOn i { 
+  left: calc(100% - 24px); 
+  background: var(--gold-dk);
+}
 
 /* Dados */
 .dataRow { display: flex; gap: 8px; }

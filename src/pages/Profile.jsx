@@ -25,6 +25,7 @@ import {
   PiPaletteBold,
   PiChartBarBold,
   PiMedalBold,
+  PiFireBold,
   PiBriefcaseBold,
   PiCaretDownBold,
   PiRocketLaunchBold,
@@ -58,6 +59,8 @@ import { ThemePersonalizer } from "../components/ThemePersonalizer";
 import { toast } from "../components/Toast";
 import { playPurchaseDirect, playClickDirect } from "../hooks/useSound";
 import { usePlan } from "../hooks/usePlan";
+import { NbSwitch } from "../components/nb/NbSwitch";
+import { ProfileHero } from "../components/ProfileHero";
 import styles from "./Profile.module.css";
 
 // Constantes importadas
@@ -74,22 +77,27 @@ import { FREE_FEATURES, PRO_EXTRAS } from "../constants/planConstants";
 // HELPERS
 // ══════════════════════════════════════
 
-// ══════════════════════════════════════
-// TOGGLE
-// ══════════════════════════════════════
-function Toggle({ on, onToggle, label }) {
+// Helper to remove quotes from username
+function cleanUsername(name) {
+  if (!name) return name;
+  return name.replace(/^"|"$/g, '');
+}
+
+// Custom Finance Icon SVG
+function FinanceIcon({ size = 16 }) {
   return (
-    <div
-      className={`${styles.toggleTrack} ${on ? styles.toggleOn : ""}`}
-      onClick={onToggle}
-      role="switch"
-      aria-checked={on}
-      aria-label={label}
-      tabIndex={0}
-      onKeyDown={(e) => e.key === "Enter" && onToggle()}
-    >
-      <div className={`${styles.toggleThumb} ${on ? styles.thumbOn : ""}`} />
-    </div>
+    <svg width={size} height={size} viewBox="0 0 18 18" fill="none">
+      <path d="M9 2v14M4 6h8M3 11h10" stroke="currentColor" strokeWidth="2" strokeLinecap="square"></path>
+    </svg>
+  );
+}
+
+// Custom Experience Icon SVG
+function ExperienceIcon({ size = 16 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 18 18" fill="none">
+      <path d="M5 2h8l-1 8H6L5 2zM4 14h10M9 10v4" stroke="currentColor" strokeWidth="2" strokeLinecap="square" fill="none"></path>
+    </svg>
   );
 }
 
@@ -101,8 +109,10 @@ function Toggle({ on, onToggle, label }) {
   const { user, profile, reloadProfile } = useAuth();
   const [userName, setUserName] = useState(() => {
     const name = loadStorage("nex_username") || loadStorage("ior_username", "Amigo");
-    console.log('Profile HeroCard - nome inicial:', name);
-    return name;
+    // Remove any quotes that might be wrapped around the name
+    const cleanedName = name ? name.replace(/^"|"$/g, '') : "Amigo";
+    console.log('Profile HeroCard - nome inicial:', cleanedName);
+    return cleanedName;
   });
   const [userAvatar, setUserAvatar] = useState(() => {
     const avatar = loadStorage("nex_avatar", "🧑");
@@ -142,12 +152,14 @@ function Toggle({ on, onToggle, label }) {
   useEffect(() => {
     const handleStorageChange = (e) => {
       if (e.key === 'nex_username' && e.newValue) {
-        setUserName(e.newValue);
-        setTempName(e.newValue);
+        const cleanedName = cleanUsername(e.newValue);
+        setUserName(cleanedName);
+        setTempName(cleanedName);
       }
       if (e.key === 'ior_username' && e.newValue && !localStorage.getItem('nex_username')) {
-        setUserName(e.newValue);
-        setTempName(e.newValue);
+        const cleanedName = cleanUsername(e.newValue);
+        setUserName(cleanedName);
+        setTempName(cleanedName);
       }
       if (e.key === 'nex_avatar' && e.newValue) {
         setUserAvatar(e.newValue);
@@ -156,7 +168,8 @@ function Toggle({ on, onToggle, label }) {
 
     // Recarrega nome e avatar quando onboarding é completado
     const handleOnboardingCompleted = () => {
-      const newName = localStorage.getItem('nex_username') || localStorage.getItem('ior_username', 'Amigo');
+      const rawName = localStorage.getItem('nex_username') || localStorage.getItem('ior_username', 'Amigo');
+      const newName = cleanUsername(rawName);
       const newAvatar = localStorage.getItem('nex_avatar', '🌻');
       console.log('Onboarding completado - atualizando Profile:', { newName, newAvatar });
       setUserName(newName);
@@ -166,7 +179,8 @@ function Toggle({ on, onToggle, label }) {
 
     // Verifica dados na montagem inicial (caso o onboarding já tenha sido completado)
     const checkOnboardingData = () => {
-      const storedName = localStorage.getItem('nex_username') || localStorage.getItem('ior_username');
+      const rawName = localStorage.getItem('nex_username') || localStorage.getItem('ior_username');
+      const storedName = cleanUsername(rawName);
       const storedAvatar = localStorage.getItem('nex_avatar');
       const onboardingDone = localStorage.getItem('ior_onboarding_done');
       
@@ -309,7 +323,7 @@ function Toggle({ on, onToggle, label }) {
             </div>
           ) : (
             <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-              <span className="display" style={{ fontSize: "18px", fontWeight: 900, textTransform: "uppercase", lineHeight: 1 }}>{userName}</span>
+              <span className="display" style={{ fontSize: "18px", fontWeight: 900, lineHeight: 1 }}>{userName}</span>
               <button
                 type="button"
                 className={styles.editNameBtn}
@@ -329,7 +343,7 @@ function Toggle({ on, onToggle, label }) {
             textTransform: "uppercase",
             letterSpacing: "0.14em"
           }}>
-            @{handleName} · {getCreationMonth()}
+            {handleName} · {getCreationMonth()}
           </div>
           <div style={{ display: "flex", gap: "5px", marginTop: "6px" }}>
             <span className="nb-tag ik" style={{ fontSize: "9px", padding: "2px 6px" }}>
@@ -436,12 +450,11 @@ function RewardsShop({
               </div>
               <div>
                 {isOwned && item.toggle ? (
-                  <Toggle
-                    on={item.id === "util_calendar" ? calVisible : true}
-                    onToggle={
+                  <NbSwitch
+                    checked={item.id === "util_calendar" ? calVisible : true}
+                    onCheckedChange={
                       item.id === "util_calendar" ? toggleCal : undefined
                     }
-                    label={item.name}
                   />
                 ) : isOwned ? (
                   <span
@@ -1743,6 +1756,50 @@ function PlansCard() {
 }
 
 // ══════════════════════════════════════
+// STATS GRID - 3 COLUNAS
+// ══════════════════════════════════════
+function StatsGrid() {
+  const { habits } = useApp();
+  const { streak } = useStats(useApp().history);
+  const { allPoints } = useHabits();
+  const level = calcLevel(allPoints);
+
+  // Calcular % de hábitos completados hoje
+  const today = new Date().getDay();
+  const hoje = habits.filter((h) => h.days?.includes(today) ?? true);
+  const pctHabitos = hoje.length
+    ? Math.round((hoje.filter((h) => h.done).length / hoje.length) * 100)
+    : 0;
+
+  // Contar badges desbloqueadas
+  const conquistas = loadStorage("io_achievements", []);
+  const badgesCount = conquistas.filter((c) => c.unlocked).length;
+
+  // Data de ingresso
+  const dataCadastro = loadStorage("io_signup_date", "") || "ABR 24";
+
+  return (
+    <div className={styles.statsGridNew}>
+      <div className={styles.pstatNew}>
+        <PiFireBold size={20} color="var(--ink)" />
+        <span className={styles.pstatValNew}>{streak}</span>
+        <span className={styles.pstatLblNew}>Streak</span>
+      </div>
+      <div className={styles.pstatNew}>
+        <PiChartBarBold size={20} color="var(--ink)" />
+        <span className={styles.pstatValNew}>{pctHabitos}%</span>
+        <span className={styles.pstatLblNew}>Hábitos</span>
+      </div>
+      <div className={styles.pstatNew}>
+        <PiMedalBold size={20} color="var(--ink)" />
+        <span className={styles.pstatValNew}>{badgesCount}</span>
+        <span className={styles.pstatLblNew}>Badges</span>
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════
 // PROFILE — PÁGINA PRINCIPAL
 // ══════════════════════════════════════
 export default function Profile({ onNavigate }) {
@@ -1829,7 +1886,8 @@ export default function Profile({ onNavigate }) {
 
   return (
     <div className={styles.page}>
-      <HeroCard allPoints={allPoints} streak={streak} daysActive={daysActive} />
+      <ProfileHero />
+      <StatsGrid />
 
       {/* Grupo 1: Conta + Plano Pro */}
       <div className={styles.settingsGroup}>
@@ -1940,10 +1998,9 @@ export default function Profile({ onNavigate }) {
             <span className={styles.settingsGroupLabel}>Sons de feedback</span>
             <p className={styles.settingsGroupDesc}>Ativar sons do app</p>
           </div>
-          <Toggle
-            on={soundOn}
-            onToggle={() => setSoundOn((s) => !s)}
-            label="Sons"
+          <NbSwitch
+            checked={soundOn}
+            onCheckedChange={() => setSoundOn((s) => !s)}
           />
         </div>
       </div>
@@ -2033,15 +2090,14 @@ export default function Profile({ onNavigate }) {
           onClick={() => toggleNavItem("util_progress")}
         >
           <span className={styles.settingIcon}>
-            <PiChartBarBold size={16} />
+            <ExperienceIcon size={16} />
           </span>
           <span className={styles.settingsGroupLabel}>
             Experiência na navegação
           </span>
-          <Toggle
-            on={ownedItems.has("util_progress")}
-            onToggle={() => toggleNavItem("util_progress")}
-            label="Experiência"
+          <NbSwitch
+            checked={ownedItems.has("util_progress")}
+            onCheckedChange={() => toggleNavItem("util_progress")}
           />
         </div>
         <div
@@ -2052,10 +2108,9 @@ export default function Profile({ onNavigate }) {
             <PiSparkleBold size={16} />
           </span>
           <span className={styles.settingsGroupLabel}>Mentor na navegação</span>
-          <Toggle
-            on={ownedItems.has("util_mentor")}
-            onToggle={() => toggleNavItem("util_mentor")}
-            label="Mentor"
+          <NbSwitch
+            checked={ownedItems.has("util_mentor")}
+            onCheckedChange={() => toggleNavItem("util_mentor")}
           />
         </div>
         <div
@@ -2063,15 +2118,14 @@ export default function Profile({ onNavigate }) {
           onClick={() => toggleNavItem("util_career")}
         >
           <span className={styles.settingIcon}>
-            <PiBriefcaseBold size={16} />
+            <FinanceIcon size={16} />
           </span>
           <span className={styles.settingsGroupLabel}>
             Carreira na navegação
           </span>
-          <Toggle
-            on={ownedItems.has("util_career")}
-            onToggle={() => toggleNavItem("util_career")}
-            label="Carreira"
+          <NbSwitch
+            checked={ownedItems.has("util_career")}
+            onCheckedChange={() => toggleNavItem("util_career")}
           />
         </div>
         <div
@@ -2084,10 +2138,9 @@ export default function Profile({ onNavigate }) {
           <span className={styles.settingsGroupLabel}>
             Projetos na navegação
           </span>
-          <Toggle
-            on={ownedItems.has("util_projects")}
-            onToggle={() => toggleNavItem("util_projects")}
-            label="Projetos"
+          <NbSwitch
+            checked={ownedItems.has("util_projects")}
+            onCheckedChange={() => toggleNavItem("util_projects")}
           />
         </div>
         <div

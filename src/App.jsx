@@ -16,6 +16,7 @@ import Login          from './pages/Login'
 import ResetPassword  from './pages/ResetPassword'
 import Onboarding     from './pages/Onboarding'
 import Home           from './pages/Home'
+import Hoje           from './pages/Hoje'
 import Habits         from './pages/Habits'
 import Finance        from './pages/Finance'
 import Progress       from './pages/Progress'
@@ -65,7 +66,8 @@ function Layout() {
         <OfflineBanner />
         <main>
           <Routes>
-            <Route path="/"          element={<Home />} />
+            <Route path="/"          element={<Hoje />} />
+            <Route path="/home"      element={<Home />} />
             <Route path="/habits"    element={<Habits />} />
             <Route path="/finance"   element={<Finance />} />
             <Route path="/progress"  element={<Progress />} />

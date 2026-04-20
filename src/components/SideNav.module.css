@@ -86,7 +86,7 @@
 .nav {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 8px;
   padding: 0 10px;
   flex: 1;
   overflow-y: auto;
@@ -110,8 +110,6 @@
   -webkit-tap-highlight-color: transparent;
   transition: all 0.15s ease;
   position: relative;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .link:hover {
@@ -268,7 +266,7 @@ button.link {
 ══════════════════════════════════════ */
 @media (min-width: 1024px) {
   .nav {
-    gap: 8px;
+    gap: 12px;
   }
   
   .link {

@@ -1,0 +1,21 @@
+.nb-input {
+  width: 100%;
+  background: #fff;
+  border: var(--bw) solid var(--ink);
+  padding: 10px 12px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: var(--sh);
+  outline: none;
+  border-radius: 0;
+  color: var(--ink);
+  transition: transform .08s, box-shadow .08s;
+}
+.nb-input:focus {
+  background: var(--sun);
+  box-shadow: 5px 5px 0 0 var(--ink);
+  transform: translate(-1px, -1px);
+}
+.nb-input::placeholder { color: var(--mute); font-weight: 400; }
+.nb-input:disabled { opacity: .45; cursor: not-allowed; }

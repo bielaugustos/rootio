@@ -4,7 +4,7 @@ import { Taskbar } from './Taskbar'
 import { StartMenu } from './StartMenu'
 import { DesktopIcon } from './DesktopIcon'
 import { Widget } from './Widget'
-import { PiHouseBold, PiCheckCircleBold, PiCurrencyDollarBold, PiBriefcaseBold, PiRocketLaunchBold, PiRobotBold, PiChartLineUpBold, PiUserBold, PiGearBold, PiXBold, PiClockBold, PiChartBarBold } from 'react-icons/pi'
+import { PiHouseBold, PiCheckCircleBold, PiBriefcaseBold, PiRocketLaunchBold, PiRobotBold, PiChartLineUpBold, PiUserBold, PiGearBold, PiXBold, PiClockBold, PiChartBarBold } from 'react-icons/pi'
 import { useUnlockableItem } from '../../hooks/useNav'
 import Home from '../../pages/Home'
 import Habits from '../../pages/Habits'
@@ -15,6 +15,24 @@ import Profile from '../../pages/Profile'
 import Career from '../../pages/Career'
 import Projects from '../../pages/Projects'
 import styles from './Desktop.module.css'
+
+// Custom Finance Icon SVG
+function FinanceIcon({ size = 24 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 18 18" fill="none">
+      <path d="M9 2v14M4 6h8M3 11h10" stroke="currentColor" strokeWidth="2" strokeLinecap="square"></path>
+    </svg>
+  );
+}
+
+// Custom Experience Icon SVG
+function ExperienceIcon({ size = 24 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 18 18" fill="none">
+      <path d="M5 2h8l-1 8H6L5 2zM4 14h10M9 10v4" stroke="currentColor" strokeWidth="2" strokeLinecap="square" fill="none"></path>
+    </svg>
+  );
+}
 
 // ══════════════════════════════════════
 // MAPA DE COMPONENTES
@@ -36,11 +54,11 @@ const PAGE_COMPONENTS = {
 const APPS = [
   { id: 'home', name: 'Início', icon: PiHouseBold, component: 'Home' },
   { id: 'habits', name: 'Hábitos', icon: PiCheckCircleBold, component: 'Habits' },
-  { id: 'finance', name: 'Finanças', icon: PiCurrencyDollarBold, component: 'Finance' },
+  { id: 'finance', name: 'Finanças', icon: FinanceIcon, component: 'Finance' },
   { id: 'career', name: 'Carreira', icon: PiBriefcaseBold, component: 'Career' },
   { id: 'projects', name: 'Projetos', icon: PiRocketLaunchBold, component: 'Projects' },
   { id: 'mentor', name: 'Mentor IA', icon: PiRobotBold, component: 'Mentor' },
-  { id: 'progress', name: 'Progresso', icon: PiChartLineUpBold, component: 'Progress' },
+  { id: 'progress', name: 'Progresso', icon: ExperienceIcon, component: 'Progress' },
   { id: 'profile', name: 'Perfil', icon: PiUserBold, component: 'Profile' },
 ]
 
