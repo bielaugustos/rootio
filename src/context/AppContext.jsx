@@ -60,6 +60,11 @@ function migrateHabit(h) {
     freq: h.freq ?? 'diario',
     days: Array.isArray(h.days) ? h.days : [0,1,2,3,4,5,6],
     archived: h.archived ?? false,
+    subtasks: h.subtasks ?? [],
+    notes: h.notes ?? '',
+    estMins: h.estMins ?? null,
+    deadline: h.deadline ?? null,
+    createdAt: h.createdAt ?? new Date().toISOString().slice(0, 10),
   }
 }
 

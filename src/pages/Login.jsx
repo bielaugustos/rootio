@@ -161,7 +161,7 @@ export default function Login({ onSkip }) {
               onClick={onSkip}
               disabled={loading}
             >
-              <span>CONTINUAR SEM LOGIN</span>
+              <span>CONTINUAR SEM CONTA</span>
               <PiArrowRightBold size={18} />
             </button>
 

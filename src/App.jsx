@@ -101,7 +101,13 @@ function AppShell() {
   const handleSkip = useCallback(() => {
     localStorage.setItem('ior_auth_skipped', 'true')
     setSkipped(true)
-    navigate('/')
+    // Check if onboarding is completed
+    const onboardingDone = localStorage.getItem('ior_onboarding_done')
+    if (onboardingDone) {
+      navigate('/')
+    } else {
+      navigate('/onboarding')
+    }
   }, [navigate])
 
   // useLayoutEffect roda antes da pintura — evita flash do Layout antes do splash
@@ -144,15 +150,21 @@ function AppShell() {
     if (!isLoggedIn) setMigrationChecked(false)
   }, [isLoggedIn, migrationChecked, profile, user])
 
-  // Redireciona para onboarding se primeiro login e onboarding não completed
+  // Redireciona para onboarding se primeiro acesso e onboarding não completado
+  // Apenas verifica se está em uma rota que não seja login ou onboarding
   useEffect(() => {
-    if (!loading && isLoggedIn) {
+    if (!loading) {
       const onboardingDone = localStorage.getItem('ior_onboarding_done')
-      if (!onboardingDone && window.location.pathname !== '/onboarding') {
+      const shouldShowOnboarding = !onboardingDone && 
+        window.location.pathname !== '/onboarding' && 
+        window.location.pathname !== '/login' &&
+        window.location.pathname !== '/reset-password'
+      
+      if (shouldShowOnboarding) {
         navigate('/onboarding', { replace: true })
       }
     }
-  }, [isLoggedIn, loading, navigate])
+  }, [loading, navigate])
 
    if (loading) return null
 
@@ -185,15 +197,16 @@ function AppShell() {
           <Route path="/login" element={<Login onSkip={handleSkip} />} />
           <Route path="/reset-password" element={<ResetPassword />} />
 
-          {/* Onboarding - em desenvolvimento, acessível sem login; em prod, só logado */}
-          {(import.meta.env.DEV || isLoggedIn) && (
-            <Route path="/onboarding" element={<Onboarding />} />
-          )}
+          {/* Onboarding - acessível para novos usuários (logados ou não) */}
+          <Route path="/onboarding" element={<Onboarding />} />
 
           {/* App principal com Layout - requer autenticação ou skip */}
-          {isLoggedIn || skipped ? (
+          {(isLoggedIn || skipped) && (
             <Route path="/*" element={<Layout />} />
-          ) : (
+          )}
+          
+          {/* Login fallback - só mostra se não estiver nas rotas públicas */}
+          {!isLoggedIn && !skipped && (
             <Route path="/*" element={<Login onSkip={handleSkip} />} />
           )}
        </Routes>
