@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import {
   NbCard, NbHeroCard, NbHabitRow, NbProgress,
-  NbWeekStrip, NbTicker, NbTag, NbButton, NbLevelMeter
+  NbWeekStrip, NbTicker, NbTag, NbButton, NbLevelMeter,
+  NbAppBar, NbBottomNav
 } from '../components/nb'
 import './Hoje.css'
 
@@ -40,20 +41,18 @@ export default function Hoje() {
   })
 
   return (
-    <div className="hoje-page">
+    <div className="page">
+      <NbAppBar
+        title="Hoje"
+        end={
+          <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+            <NbTicker value={`${MOCK_ECONOMY.saldo_io} IO`} size="sm" />
+            <div style={{ width:28, height:28, background:'#fff', border:'2px solid #111', display:'flex', alignItems:'center', justifyContent:'center', fontSize:16 }}>🌻</div>
+          </div>
+        }
+      />
 
-      {/* AppBar */}
-      <header className="nb-appbar">
-        <div className="nb-appbar__logo">IO</div>
-        <span className="nb-appbar__title display">Hoje</span>
-        <div className="nb-appbar__end">
-          <NbTicker value={`${MOCK_ECONOMY.saldo_io} IO`} size="sm" />
-          <div className="nb-avatar">🌻</div>
-        </div>
-      </header>
-
-      {/* Conteúdo */}
-      <main className="hoje-content">
+      <main className="page-content">
 
         {/* Label do dia */}
         <div>
@@ -160,14 +159,6 @@ export default function Hoje() {
 
       </main>
 
-      {/* Bottom nav */}
-      <nav className="nb-bottomnav">
-        {['Hoje','Hábitos','$','Prog.','Perfil'].map((label, i) => (
-          <a key={label} className={i === 0 ? 'active' : ''}>
-            {label}
-          </a>
-        ))}
-      </nav>
     </div>
   )
 }

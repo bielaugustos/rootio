@@ -1,0 +1,22 @@
+.nb-appbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: #fff;
+  border-bottom: var(--bw) solid var(--ink);
+}
+.nb-appbar__logo {
+  width: 26px;
+  height: 26px;
+  border: 2px solid var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.nb-appbar__title { font-size: 14px; }
+.nb-appbar__end { margin-left: auto; display: flex; align-items: center; gap: 6px; }

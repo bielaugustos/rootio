@@ -1,0 +1,6 @@
+.nb-dot {
+  display: inline-block;
+  border: 2px solid var(--ink);
+  border-radius: 0;
+  flex-shrink: 0;
+}

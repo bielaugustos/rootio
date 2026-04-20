@@ -1,0 +1,32 @@
+.nb-bottom-nav {
+  display: flex;
+  background: #fff;
+  border-top: var(--bw) solid var(--ink);
+  padding: 3px;
+  gap: 2px;
+}
+.nb-bottom-nav__tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 6px 2px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--mute);
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  background: none;
+  border-radius: 0;
+  transition: background .08s, color .08s;
+}
+.nb-bottom-nav__tab--active {
+  background: var(--amber);
+  color: #fff;
+  border-color: var(--ink);
+}

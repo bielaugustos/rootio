@@ -1,0 +1,32 @@
+.nb-chat {
+  padding: 8px 12px;
+  border: 2px solid var(--ink);
+  border-radius: 0;
+  max-width: 85%;
+}
+.nb-chat--mentor {
+  background: var(--paper-2);
+  color: var(--ink);
+  align-self: flex-start;
+}
+.nb-chat--user {
+  background: var(--ink);
+  color: #fff;
+  align-self: flex-end;
+  margin-left: auto;
+}
+.nb-chat__from {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  margin: 0 0 3px;
+}
+.nb-chat--mentor .nb-chat__from { color: var(--mute); }
+.nb-chat--user   .nb-chat__from { color: var(--sun); }
+.nb-chat__text {
+  font-size: 13px;
+  line-height: 1.4;
+  margin: 0;
+}

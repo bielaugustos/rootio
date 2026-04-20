@@ -1,0 +1,13 @@
+.nb-stamp {
+  display: inline-block;
+  padding: 6px 14px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  border: var(--bw) solid var(--ink);
+  box-shadow: var(--sh);
+  border-radius: 0;
+  line-height: 1;
+}

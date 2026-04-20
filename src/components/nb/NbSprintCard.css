@@ -1,0 +1,25 @@
+.nb-sprint-card {
+  background: var(--paper-2);
+  border: var(--bw2) solid var(--ink);
+  box-shadow: var(--sh-lg);
+  padding: 16px;
+  border-radius: 0;
+}
+.nb-sprint-card--clickable { cursor: pointer; }
+.nb-sprint-card--clickable:hover {
+  transform: translate(-1px,-1px);
+  box-shadow: 7px 7px 0 0 var(--ink);
+}
+.nb-sprint-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.nb-sprint-card__name { margin: 0 0 4px; font-size: 18px; }
+.nb-sprint-card__desc { font-size: 12px; color: var(--mute); margin: 0 0 12px; }
+.nb-sprint-card__footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+}

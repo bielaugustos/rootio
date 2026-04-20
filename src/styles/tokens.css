@@ -90,3 +90,67 @@ html, body {
 .ml-auto     { margin-left: auto; }
 .min-w-0     { min-width: 0; }
 .truncate    { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ── Animações ──────────────────────────────────────────────── */
+
+/* Entrada suave de baixo para cima */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.anim-slide-up { animation: slideUp .25s ease both; }
+
+/* Fade in */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.anim-fade-in { animation: fadeIn .2s ease both; }
+
+/* Scale in — conquista desbloqueada */
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(.7); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.anim-scale-in { animation: scaleIn .2s cubic-bezier(.34,1.4,.64,1) both; }
+
+/* Stamp in — selos (+10 IO) */
+@keyframes stampIn {
+  0%   { opacity: 0; transform: scale(.6) rotate(-8deg); }
+  70%  { transform: scale(1.08) rotate(-2deg); }
+  100% { opacity: 1; transform: scale(1) rotate(-4deg); }
+}
+.anim-stamp-in { animation: stampIn .35s cubic-bezier(.34,1.4,.64,1) both; }
+
+/* Pulso — ticker IO ganhando pontos */
+@keyframes pulse {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+.anim-pulse { animation: pulse .3s ease both; }
+
+/* Wiggle — hover de card clicável */
+@keyframes wiggle {
+  0%   { transform: rotate(0deg); }
+  20%  { transform: rotate(-2deg); }
+  60%  { transform: rotate(2deg); }
+  100% { transform: rotate(0deg); }
+}
+.anim-wiggle { animation: wiggle .25s ease both; }
+
+/* Stagger helpers — aplique ao pai */
+.stagger > * { animation-delay: calc(var(--i, 0) * 60ms); }
+
+/* Delay utilities */
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+
+/* Transition padrão dos botões e cards clicáveis */
+.nb-btn,
+.nb-card--clickable,
+.nb-shop-item,
+.nb-sprint-card--clickable {
+  transition: transform .08s ease, box-shadow .08s ease;
+}

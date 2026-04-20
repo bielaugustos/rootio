@@ -1,0 +1,41 @@
+.nb-equipped__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.nb-equipped__trocar {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--ink);
+}
+.nb-equipped__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.nb-equipped__slot {
+  border: 2px solid var(--ink);
+  padding: 8px;
+  text-align: center;
+  background: #fff;
+  border-radius: 0;
+}
+.nb-equipped__slot--empty {
+  border-style: dashed;
+  color: var(--mute);
+}
+.nb-equipped__slot-icon  { display: block; font-size: 24px; }
+.nb-equipped__slot-label {
+  display: block;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  margin-top: 3px;
+}

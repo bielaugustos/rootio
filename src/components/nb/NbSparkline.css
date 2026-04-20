@@ -1,0 +1,13 @@
+.nb-spark-wrap { width: 100%; }
+.nb-spark-svg  { display: block; }
+.nb-spark-labels {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--mute);
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  margin-top: 4px;
+}
