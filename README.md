@@ -2,8 +2,6 @@
 
 Uma solução SaaS de desenvolvimento pessoal que integra rastreamento de hábitos, gestão financeira, planejamento de carreira e mentoria com inteligência artificial. Arquitetura offline-first com sincronização em nuvem opcional, proporcionando privacidade máxima e acessibilidade universal.
 
-![Rootio Preview](public/icons/preview.webp)
-
 ---
 
 ## Visão Geral do Produto
@@ -168,4 +166,4 @@ Recarregamento da Aplicação
 
 Este projeto é propriedade exclusiva. Todos os direitos reservados.
 
-© 2024 Rootio. Todos os direitos reservados.
+© 2026 Rootio | Ioverso. Todos os direitos reservados.

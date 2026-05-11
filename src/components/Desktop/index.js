@@ -1,6 +1,0 @@
-export { Desktop } from './Desktop'
-export { WindowManager } from './WindowManager'
-export { Taskbar } from './Taskbar'
-export { StartMenu } from './StartMenu'
-export { DesktopIcon } from './DesktopIcon'
-export { Widget } from './Widget'
