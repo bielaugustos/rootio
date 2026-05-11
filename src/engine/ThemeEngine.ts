@@ -21,13 +21,13 @@ export class ThemeEngine {
 
   private async _init(): Promise<void> {
     try {
+      const db = await getDB()
       // Check localStorage first (for onboarding preference)
       const localTheme = localStorage.getItem('theme') as Mode | null
       if (localTheme && (localTheme === 'light' || localTheme === 'dark')) {
         this.mode = localTheme
         localStorage.removeItem('theme') // Clean up
       } else {
-        const db = await getDB()
         const savedMode = await db.get('theme-meta', 'mode')
         this.mode = (savedMode?.value as Mode) ?? this.getSystemMode()
       }
@@ -35,7 +35,7 @@ export class ThemeEngine {
       await this.applyPersistedGlobalTokens()
       await this.applyAllPersistedComponentTokens()
       window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-        if (!localTheme && !db) this.setMode(e.matches ? 'dark' : 'light')
+        if (!localTheme) this.setMode(e.matches ? 'dark' : 'light')
       })
     } catch (error) {
       console.warn('ThemeEngine initialization failed, using defaults:', error)

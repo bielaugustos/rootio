@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react'
-import { ThemeContext } from './ThemeContextDef'
+import { ThemeContext, type Mode } from './ThemeContextDef'
 import { themeEngine } from './ThemeEngine'
 
 const defaultValue = {
