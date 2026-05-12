@@ -53,7 +53,7 @@ export function Modal({ open, title, onClose, children, footer }: ModalProps) {
           background: 'var(--secondary-background)',
           border: 'var(--border-width, 2px) solid var(--border)',
           borderRadius: 'var(--radius-base)',
-          boxShadow: 'var(--shadow-x, 4px) var(--shadow-y, 4px) 0 var(--border)',
+          boxShadow: 'var(--shadow-x, 4px) var(--shadow-y, 4px) 0 var(--shadow-color)',
           width: '100%',
           maxWidth: 480,
           maxHeight: '90vh',
@@ -74,7 +74,7 @@ export function Modal({ open, title, onClose, children, footer }: ModalProps) {
           {title && (
             <h3 style={{
               fontSize: 16,
-              fontWeight: 700,
+              fontWeight: 600,
               color: 'var(--t1)',
               fontFamily: 'var(--font-sans)',
             }}>
@@ -94,7 +94,7 @@ export function Modal({ open, title, onClose, children, footer }: ModalProps) {
               borderRadius: 'var(--radius-sm)',
               cursor: 'pointer',
               fontSize: 14,
-              fontWeight: 700,
+              fontWeight: 500,
               color: 'var(--foreground)',
               boxShadow: '2px 2px 0 var(--border)',
               transition: 'transform 0.15s, box-shadow 0.15s',

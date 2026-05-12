@@ -6,7 +6,7 @@ const variantStyles: Record<ToastVariant, { background: string; color: string; b
     background: 'var(--secondary-background)',
     color: 'var(--foreground)',
     border: 'var(--border)',
-    shadow: 'var(--border)',
+    shadow: 'var(--shadow-color)',
   },
   success: {
     background: '#d4edda',
@@ -24,7 +24,7 @@ const variantStyles: Record<ToastVariant, { background: string; color: string; b
     background: 'var(--main)',
     color: 'var(--main-foreground)',
     border: 'var(--border)',
-    shadow: 'var(--border)',
+    shadow: 'var(--shadow-color)',
   },
 }
 
@@ -50,7 +50,7 @@ function ToastElement({ item, onRemove }: { item: ToastItem; onRemove: (id: stri
         borderRadius: 'var(--radius-base)',
         boxShadow: `var(--shadow-x, 4px) var(--shadow-y, 4px) 0 ${v.shadow}`,
         fontSize: 14,
-        fontWeight: 600,
+        fontWeight: 400,
         fontFamily: 'var(--font-sans)',
         minWidth: 260,
         maxWidth: 380,

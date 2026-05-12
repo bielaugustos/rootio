@@ -14,7 +14,7 @@ export interface PillProps {
 }
 
 const variants: Record<string, { bg: string; color: string; border: string; shadow: string }> = {
-  default: { bg: 'var(--secondary-background)', color: 'var(--t1)',        border: 'var(--border)', shadow: 'var(--border)' },
+  default: { bg: 'var(--secondary-background)', color: 'var(--t1)',        border: 'var(--border)', shadow: 'var(--shadow-color)' },
   habit:   { bg: 'var(--c-habit)',               color: 'var(--c-habit-t)', border: 'var(--c-habit-b)', shadow: 'var(--c-habit-b)' },
   goal:    { bg: 'var(--c-goal)',                color: 'var(--c-goal-t)',  border: 'var(--c-goal-b)', shadow: 'var(--c-goal-b)' },
   task:    { bg: 'var(--c-task)',                color: 'var(--c-task-t)',  border: 'var(--c-task-b)', shadow: 'var(--c-task-b)' },
@@ -55,7 +55,7 @@ export function Pill({
         // Same sizing as the filter buttons in HabitsPage
         padding: size === 'sm' ? '5px 12px' : '5px 14px',
         fontSize: 12,
-        fontWeight: 700,
+        fontWeight: 400,
         fontFamily: 'var(--font-sans)',
         cursor: 'pointer',
         borderRadius: 'var(--radius-sm)',

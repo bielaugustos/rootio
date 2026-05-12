@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
 import { toggleSubtask, getHabitStreak, type Habit } from '../../engine'
+import type { TimeValue } from '../../components/TimePicker'
 import { LIST_COLORS, LIST_LABELS } from './habitConstants'
 import { Checkbox } from '../../components/Checkbox'
 import { Button } from '../../components/Button'
 import { Pill } from '../../components/Pill'
 import { Badge } from '../../components/Badge'
-import { HistoricoPanel } from './HistoricoPanel'
+
 import { LembretePanel } from './LembretePanel'
 import { TimerPanel } from './panels/TimerPanel'
 import { AnexosPanel } from './panels/AnexosPanel'
@@ -20,6 +21,9 @@ interface HabitCardProps {
   onToggle: (id: string) => void
   onEdit: (habit: Habit) => void
   onRefresh: () => void
+  onOpenHistorico?: (habit: Habit) => void
+  onCloseHistorico?: () => void
+  isHistoricoOpen?: boolean
   isMobile?: boolean
 }
 
@@ -71,7 +75,7 @@ function GoalPanels({ habit }: { habit: Habit }) {
                     <div style={{ height: '100%', width: `${pct}%`, background: done ? '#22c55e' : 'var(--c-goal, #F59E0B)', borderRadius: 3, transition: 'width 0.4s' }} />
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: done ? '#22c55e' : 'var(--c-goal, #F59E0B)' }}>
+                    <span style={{ fontSize: 11, fontWeight: 500, color: done ? '#22c55e' : 'var(--c-goal, #F59E0B)' }}>
                       {unit} {current.toLocaleString('pt-BR')}
                     </span>
                     <span style={{ fontSize: 11, color: 'var(--t3)' }}>
@@ -80,7 +84,7 @@ function GoalPanels({ habit }: { habit: Habit }) {
                   </div>
 
                   {done && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: '#22c55e' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 500, color: '#22c55e' }}>
                       <i className="ph ph-check-circle" style={{ fontSize: 14 }} />
                       Meta concluída! 🎉
                     </div>
@@ -99,7 +103,7 @@ function GoalPanels({ habit }: { habit: Habit }) {
   )
 }
 
-export function HabitCard({ habit, onToggle, onEdit, onRefresh, isMobile }: HabitCardProps) {
+export function HabitCard({ habit, onToggle, onEdit, onRefresh, onOpenHistorico, onCloseHistorico, isHistoricoOpen, isMobile }: HabitCardProps) {
   const [expanded, setExpanded] = useState(false)
   const [detailsExpanded, setDetailsExpanded] = useState(false)
   const [streak, setStreak] = useState(0)
@@ -110,11 +114,18 @@ export function HabitCard({ habit, onToggle, onEdit, onRefresh, isMobile }: Habi
   const hasProgress = habit.list === 'goal' && (habit.goal_target ?? 0) > 0
   const hasDetails = (habit.tags ?? []).length > 0 || !!habit.notes?.trim()
 
-  const formatTimeWithAmPm = (time: string) => {
-    const [hour, minute] = time.split(':').map(Number)
-    const period = hour >= 12 ? 'PM' : 'AM'
-    const hour12 = hour % 12 || 12
-    return `${hour12}:${minute.toString().padStart(2, '0')} ${period}`
+  const formatTimeWithAmPm = (time: string | TimeValue | null | undefined) => {
+    if (!time) return ''
+    let hours: number, minutes: number
+    if (typeof time === 'string') {
+      [hours, minutes] = time.split(':').map(Number)
+    } else {
+      hours = time.hours
+      minutes = time.minutes
+    }
+    const period = hours >= 12 ? 'PM' : 'AM'
+    const hour12 = hours % 12 || 12
+    return `${hour12}:${minutes.toString().padStart(2, '0')} ${period}`
   }
 
   useEffect(() => {
@@ -156,14 +167,14 @@ export function HabitCard({ habit, onToggle, onEdit, onRefresh, isMobile }: Habi
 
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{
-            fontSize: 15, fontWeight: 600, color: 'var(--t1)',
+            fontSize: 13, fontWeight: 500, fontFamily: 'var(--font-sans)', color: 'var(--t1)',
             textDecoration: habit.done ? 'line-through' : 'none',
             whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
           }}>
             {habit.name}
           </div>
           <div style={{ display: 'flex', gap: 6, marginTop: 3, flexWrap: 'wrap', alignItems: 'center' }}>
-            <Badge label={habit.list === 'habit' ? 'hábito' : habit.list === 'task' ? 'tarefa' : habit.list === 'goal' ? 'meta' : habit.list === 'event' ? 'evento' : LIST_LABELS[habit.list]} variant="default" style={habit.list === 'habit' ? { background: '#FEF3C7', color: 'black' } : habit.list === 'task' ? { background: '#6FB8FF', color: 'black' } : habit.list === 'goal' ? { color: 'black' } : habit.list === 'event' ? { background: '#9B7BFF', color: 'black' } : undefined} />
+            <Badge label={habit.list === 'habit' ? 'Hábito' : habit.list === 'task' ? 'Tarefa' : habit.list === 'goal' ? 'Meta' : habit.list === 'event' ? 'Evento' : LIST_LABELS[habit.list]} variant="default" style={habit.list === 'habit' ? { background: '#FEF3C7', color: 'black' } : habit.list === 'task' ? { background: '#6FB8FF', color: 'black' } : habit.list === 'goal' ? { color: 'black' } : habit.list === 'event' ? { background: '#9B7BFF', color: 'black' } : undefined} />
             {habit.pts > 0 && <Badge label={`+${habit.pts} IO`} variant="destructive" />}
             {/* Streak dots */}
             <div style={{ display: 'flex', gap: 2, alignItems: 'center' }}>
@@ -213,7 +224,7 @@ export function HabitCard({ habit, onToggle, onEdit, onRefresh, isMobile }: Habi
                 <div style={{ flex: 1, height: 4, background: 'var(--b2)', borderRadius: 2, overflow: 'hidden' }}>
                   <div style={{ height: '100%', width: `${pct}%`, background: 'var(--c-goal, #F59E0B)', borderRadius: 2, transition: 'width 0.4s' }} />
                 </div>
-                <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--c-goal, #F59E0B)', flexShrink: 0 }}>{pct}%</span>
+                <span style={{ fontSize: 10, fontWeight: 500, color: 'var(--c-goal, #F59E0B)', flexShrink: 0 }}>{pct}%</span>
               </div>
             )
           })()}
@@ -230,7 +241,7 @@ export function HabitCard({ habit, onToggle, onEdit, onRefresh, isMobile }: Habi
                 borderRadius: 4, transition: 'width 0.3s',
               }} />
             </div>
-      <span style={{ fontSize: 10, fontWeight: 700, color: doneSubtasks === habit.subtasks.length && habit.list === 'task' ? '#7CE577' : doneSubtasks === habit.subtasks.length ? '#22c55e' : 'var(--main)', flexShrink: 0 }}>
+      <span style={{ fontSize: 10, fontWeight: 500, color: doneSubtasks === habit.subtasks.length && habit.list === 'task' ? '#7CE577' : doneSubtasks === habit.subtasks.length ? '#22c55e' : 'var(--main)', flexShrink: 0 }}>
         {doneSubtasks}/{habit.subtasks.length}
       </span>
           </div>
@@ -256,8 +267,11 @@ export function HabitCard({ habit, onToggle, onEdit, onRefresh, isMobile }: Habi
 
                 {habit.list === 'habit' && (
                   <>
-                    <HistoricoPanel habit={habit} isMobile={isMobile} onRefresh={onRefresh} />
-                     <LembretePanel habit={habit} onRefresh={onRefresh} />
+                    <Pill label="Histórico" variant="habit" size="sm" selected={isHistoricoOpen}
+                      icon={<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/></svg>}
+                      onClick={() => isHistoricoOpen ? onCloseHistorico?.() : onOpenHistorico?.(habit)}
+                    />
+                    <LembretePanel habit={habit} onRefresh={onRefresh} />
                   </>
                 )}
 
@@ -290,7 +304,7 @@ export function HabitCard({ habit, onToggle, onEdit, onRefresh, isMobile }: Habi
                   display: 'flex', alignItems: 'center', gap: 6,
                   paddingBottom: 6,
                 }}>
-                  <span style={{ fontSize: 11, color: 'var(--t3)', fontWeight: 600 }}>
+                  <span style={{ fontSize: 11, color: 'var(--t3)', fontWeight: 400 }}>
                     {doneSubtasks}/{habit.subtasks.length} subtarefas
                   </span>
                 </div>
@@ -300,7 +314,7 @@ export function HabitCard({ habit, onToggle, onEdit, onRefresh, isMobile }: Habi
                       onClick={async () => { await toggleSubtask(habit.id, sub.id); onRefresh() }}
                       style={{
                         width: 18, height: 18, borderRadius: 4,
-                        border: `1.5px solid ${sub.done ? 'var(--main)' : 'var(--b2)'}`,
+                        border: sub.done ? '1.5px solid var(--main)' : '1.5px solid var(--b2)',
                         background: sub.done ? 'var(--main)' : 'transparent',
                         cursor: 'pointer', fontSize: 9, color: 'var(--main-foreground)',
                         flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -337,7 +351,7 @@ export function HabitCard({ habit, onToggle, onEdit, onRefresh, isMobile }: Habi
                   display: 'flex', alignItems: 'center', gap: 6,
                   background: 'transparent', border: 'none',
                   cursor: 'pointer', fontSize: 8, color: 'var(--t3)',
-                  fontFamily: 'var(--font-sans)', fontWeight: 700,
+                  fontFamily: 'var(--font-sans)', fontWeight: 500,
                 }}
               >
                 <i className={`ph ${detailsExpanded ? 'ph-caret-up' : 'ph-caret-down'}`} style={{ fontSize: 8 }} />
@@ -370,7 +384,7 @@ export function HabitCard({ habit, onToggle, onEdit, onRefresh, isMobile }: Habi
                         <span
                           key={tag}
                           style={{
-                            fontSize: 9, fontWeight: 700, padding: '2px 7px',
+                            fontSize: 9, fontWeight: 500, padding: '2px 7px',
                             background: 'var(--background)',
                             border: 'none',
                             borderRadius: 'var(--radius-sm)', color: 'var(--t1)',
@@ -392,16 +406,16 @@ export function HabitCard({ habit, onToggle, onEdit, onRefresh, isMobile }: Habi
           <div style={{ padding: '8px 16px', borderTop: '1px solid var(--b2)', display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
             <Badge label={(() => {
               const dayNames = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sab']
-              if (habit.days.length === 7) return 'repetir'
+              if (habit.days.length === 7) return 'Repetir'
               return habit.days.map(d => dayNames[d]).join(', ')
             })()} variant="default" id={`repetition-${habit.id}`} />
             {habit.reminder_enabled && habit.reminder_time && <Badge label={formatTimeWithAmPm(habit.reminder_time)} variant="secondary" id={`reminder-${habit.id}`} />}
             {habit.est_mins != null && habit.est_mins > 0 && <Badge label={`Tempo: ${habit.est_mins}min`} style={{ background: '#9B7BFF', color: 'white' }} id={`time-${habit.id}`} />}
-            <Badge label={habit.priority === 'baixa' ? 'baixa' : habit.priority === 'media' ? 'média' : 'alta'} style={{
+            <Badge label={habit.priority === 'baixa' ? 'Baixa' : habit.priority === 'media' ? 'Média' : 'Alta'} style={{
               background: habit.priority === 'alta' ? 'var(--coral)' : habit.priority === 'media' ? 'var(--amber-2)' : 'var(--grass)',
               color: 'black'
             }} id={`priority-${habit.id}`} />
-            {(habit.tags ?? []).map(tag => <Badge key={tag} label={tag} variant="outline" id={`tag-${habit.id}-${tag}`} />)}
+            {(habit.tags ?? []).map(tag => <Badge key={tag} label={tag.charAt(0).toUpperCase() + tag.slice(1)} variant="outline" id={`tag-${habit.id}-${tag}`} />)}
           </div>
 
         </div>

@@ -114,10 +114,8 @@ const closeForm = () => { setFormOpen(false); setAportPreview(0) }
         <div style={{ flex: 1, minWidth: formOpen && !isMobile ? 500 : 'auto' }}>
           <div style={{ display: 'flex', alignItems: isMobile ? 'stretch' : 'flex-start', justifyContent: 'space-between', marginBottom: 24, gap: 12, flexDirection: isMobile ? 'column' : 'row' }}>
             <div>
-              <h1 style={{ fontSize: 28, fontWeight: 900, color: 'var(--t1)', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 10 }}>
-                <i className="ph ph-wallet" style={{ fontSize: 26 }} /> Carteira
-              </h1>
-              <p style={{ color: 'var(--t2)', fontSize: 15 }}>Finanças, metas e reserva de emergência.</p>
+              <h1 style={{ fontFamily: 'var(--font-title)', fontSize: 28, color: 'var(--t1)', marginBottom: 4 }}>Carteira</h1>
+              <p style={{ color: 'var(--t3)', fontSize: 14, marginBottom: 24 }}>Finanças, metas e reserva de emergência.</p>
             </div>
             <Button
               onClick={formOpen ? closeForm : () => {
@@ -143,13 +141,13 @@ const closeForm = () => { setFormOpen(false); setAportPreview(0) }
                 onClick={() => { setTab(t.id); if (formOpen) closeForm() }}
                 style={{
                   display: 'inline-flex', alignItems: 'center', gap: 6,
-                  padding: '5px 14px', fontSize: 12, fontWeight: 700,
+                  padding: '5px 14px', fontSize: 12, fontWeight: 500,
                   cursor: 'pointer', borderRadius: 'var(--radius-sm)',
                   fontFamily: 'var(--font-sans)',
                   border: `var(--border-width) solid ${tab === t.id ? 'var(--border)' : 'var(--b2)'}`,
                   background: tab === t.id ? 'var(--main)' : 'var(--secondary-background)',
                   color: tab === t.id ? 'var(--main-foreground)' : 'var(--t2)',
-                  boxShadow: tab === t.id ? 'none' : 'var(--shadow-x) var(--shadow-y) 0 var(--border)',
+                  boxShadow: tab === t.id ? 'none' : 'var(--shadow-x) var(--shadow-y) 0 var(--shadow-color)',
                   transform: tab === t.id ? 'translate(var(--shadow-x), var(--shadow-y))' : 'none',
                   transition: 'all 0.1s',
                 }}

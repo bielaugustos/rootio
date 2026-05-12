@@ -31,7 +31,9 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { Habit } from '../../engine/habitDB'
 import { getHabitStreak, getHabitLast7Days, updateHabit } from '../../engine/habitDB'
-import { Pill } from '../../components/Pill'
+// import { Pill } from '../../components/Pill'
+// import { Button } from '../../components/Button'
+// import { Badge } from '../../components/Badge'
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -90,7 +92,7 @@ function StreakDotGrid({
       {/* Day labels row */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 3 }}>
         {DAY_LABELS.map((l, i) => (
-          <div key={i} style={{ fontSize: 9, fontWeight: 700, color: 'var(--t3)', textAlign: 'center' }}>
+          <div key={i} style={{ fontSize: 9, fontWeight: 500, color: 'var(--t3)', textAlign: 'center' }}>
             {l}
           </div>
         ))}
@@ -130,7 +132,7 @@ function StreakDotGrid({
       </div>
       {/* Streak summary */}
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 2 }}>
-        <span style={{ fontSize: 22, fontWeight: 900, color: 'var(--t1)', lineHeight: 1 }}>
+        <span style={{ fontSize: 22, fontWeight: 700, color: 'var(--t1)', lineHeight: 1 }}>
           {streak}
         </span>
         <span style={{ fontSize: 12, color: 'var(--t3)' }}>
@@ -159,6 +161,10 @@ function SessionLogItem({
   const [insight,        setInsight]        = useState(log.insight)
   const [mins,           setMins]           = useState(log.mins)
 
+  // handleEdit removed — replaced by inline setter
+
+  // Handlers de edição de tempo e insight são inlines nos callbacks
+
   return (
     <div style={{
       padding: '10px 12px',
@@ -177,11 +183,11 @@ function SessionLogItem({
           border: '1.5px solid var(--border)',
           flexShrink: 0,
         }} />
-        <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--t2)', flex: 1 }}>
+        <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--t2)', flex: 1 }}>
           {formatDate(log.date)}
           {isToday && (
             <span style={{
-              marginLeft: 6, fontSize: 9, fontWeight: 700, padding: '1px 5px',
+              marginLeft: 6, fontSize: 9, fontWeight: 500, padding: '1px 5px',
               background: 'var(--main)', border: '1px solid var(--border)',
               borderRadius: 3,
             }}>hoje</span>
@@ -203,7 +209,7 @@ function SessionLogItem({
             onKeyDown={e => e.key === 'Enter' && (setEditingMins(false), onUpdate({ mins }))}
             autoFocus
             style={{
-              width: 60, fontSize: 11, fontWeight: 700, fontFamily: 'var(--font-mono)',
+              width: 60, fontSize: 11, fontWeight: 500, fontFamily: 'var(--font-mono)',
               border: '2px solid var(--border)', borderRadius: 4, padding: '2px 6px',
               background: 'var(--bg2)', color: 'var(--t1)', textAlign: 'right',
             }}
@@ -213,7 +219,7 @@ function SessionLogItem({
             onClick={() => setEditingMins(true)}
             title="Editar tempo"
             style={{
-              fontSize: 11, fontWeight: 700, fontFamily: 'var(--font-mono)',
+              fontSize: 11, fontWeight: 500, fontFamily: 'var(--font-mono)',
               padding: '2px 8px', border: '1.5px solid var(--b2)',
               borderRadius: 4, background: 'var(--bg3)', color: 'var(--t2)',
               cursor: 'pointer',
@@ -280,13 +286,17 @@ function RetroEntry({
   const [mins,     setMins]     = useState(0)
   const [insight,  setInsight]  = useState('')
 
+  const handleAdd = () => {
+    onAdd({ date: selected, mins, insight, retroativo: true })
+    onClose()
+  }
+
   if (options.length === 0) {
     return (
       <div style={{ padding: '16px', textAlign: 'center', fontSize: 13, color: 'var(--t3)' }}>
         Nenhum dia retroativo disponível nos últimos 7 dias.
-      </div>
-    )
-  }
+            </div>
+           )}
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '16px 0 0' }}>
@@ -297,15 +307,15 @@ function RetroEntry({
 
       {/* Date picker */}
       <div>
-        <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 6 }}>Dia</div>
+        <div style={{ fontSize: 10, fontWeight: 500, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 6 }}>Dia</div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
           {options.map(d => (
             <button
               key={d}
               onClick={() => setSelected(d)}
               style={{
-                padding: '5px 10px', fontSize: 11, fontWeight: 600,
-                border: `2px solid ${selected === d ? 'var(--border)' : 'var(--b2)'}`,
+                padding: '5px 10px', fontSize: 11, fontWeight: 400,
+                border: selected === d ? '2px solid var(--border)' : '2px solid var(--b2)',
                 borderRadius: 'var(--radius-sm)',
                 background: selected === d ? 'var(--main)' : 'var(--bg3)',
                 color: 'var(--t1)', cursor: 'pointer',
@@ -321,7 +331,7 @@ function RetroEntry({
 
       {/* Mins */}
       <div>
-        <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 6 }}>
+        <div style={{ fontSize: 10, fontWeight: 500, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 6 }}>
           Tempo de sessão (min)
         </div>
         <div style={{ display: 'flex', gap: 5 }}>
@@ -330,8 +340,8 @@ function RetroEntry({
               key={m}
               onClick={() => setMins(m)}
               style={{
-                padding: '4px 10px', fontSize: 11, fontWeight: 600,
-                border: `1.5px solid ${mins === m ? 'var(--border)' : 'var(--b2)'}`,
+                padding: '4px 10px', fontSize: 11, fontWeight: 400,
+                border: mins === m ? '1.5px solid var(--border)' : '1.5px solid var(--b2)',
                 borderRadius: 'var(--radius-sm)',
                 background: mins === m ? 'var(--main)' : 'var(--bg3)',
                 cursor: 'pointer', color: 'var(--t1)',
@@ -345,7 +355,7 @@ function RetroEntry({
 
       {/* Insight */}
       <div>
-        <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 6 }}>
+        <div style={{ fontSize: 10, fontWeight: 500, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 6 }}>
           Insight (opcional)
         </div>
         <textarea
@@ -363,19 +373,16 @@ function RetroEntry({
 
       <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', paddingTop: 4 }}>
         <button onClick={onClose} style={{
-          padding: '7px 16px', fontSize: 12, fontWeight: 700,
+          padding: '7px 16px', fontSize: 12, fontWeight: 500,
           border: '2px solid var(--border)', borderRadius: 'var(--radius-sm)',
           background: 'var(--bg2)', cursor: 'pointer', color: 'var(--t1)',
         }}>
           Cancelar
         </button>
         <button
-          onClick={() => {
-            onAdd({ date: selected, mins, insight, retroativo: true })
-            onClose()
-          }}
+          onClick={handleAdd}
           style={{
-            padding: '7px 16px', fontSize: 12, fontWeight: 700,
+            padding: '7px 16px', fontSize: 12, fontWeight: 500,
             border: '2px solid var(--border)', borderRadius: 'var(--radius-sm)',
             background: 'var(--main)', cursor: 'pointer', color: 'var(--t1)',
             boxShadow: '2px 2px 0 var(--border)',
@@ -394,20 +401,20 @@ export function HistoricoPanel({
   habit,
   onRefresh,
 }: {
-  habit:     Habit
-  isMobile?: boolean
+  habit:     Habit,
+  isMobile?: boolean,
   onRefresh: () => void
 }) {
-  const [open,       setOpen]       = useState(false)
   const [streak,     setStreak]     = useState(0)
   const [days7,      setDays7]      = useState<{ date: string; done: boolean }[]>([])
   const [logs,       setLogs]       = useState<SessionLog[]>([])
   const [showRetro,  setShowRetro]  = useState(false)
   const [saving,     setSaving]     = useState(false)
 
+  const handleEdit = () => setShowRetro(!showRetro)
+
   // Load streak + last 7 days
   useEffect(() => {
-    if (!open) return
     Promise.all([
       getHabitStreak(habit.id),
       getHabitLast7Days(habit.id),
@@ -415,8 +422,8 @@ export function HistoricoPanel({
       setStreak(s)
       setDays7(d)
 
-      // Build session logs from history — merge with saved logs on habit
-      const savedLogs: SessionLog[] = (habit as any).session_logs ?? []
+       // Build session logs from history — merge with saved logs on habit
+       const savedLogs: SessionLog[] = habit.session_logs ?? []
       const today = todayISO()
 
       // Ensure today's log exists if habit is done
@@ -427,15 +434,15 @@ export function HistoricoPanel({
         setLogs(savedLogs)
       }
     })
-  }, [open, habit.id, habit.done])
+  }, [habit.id, habit.done, habit.session_logs, habit.est_mins])
 
   // Persist logs to habit
-  const persistLogs = useCallback(async (next: SessionLog[]) => {
-    setSaving(true)
-    await updateHabit(habit.id, { ...(habit as any), session_logs: next })
-    setSaving(false)
-    onRefresh()
-  }, [habit, onRefresh])
+   const persistLogs = useCallback(async (next: SessionLog[]) => {
+     setSaving(true)
+     await updateHabit(habit.id, { ...habit, session_logs: next })
+     setSaving(false)
+     onRefresh()
+   }, [habit, onRefresh])
 
   const handleLogUpdate = (date: string, delta: Partial<SessionLog>) => {
     const next = logs.map(l => l.date === date ? { ...l, ...delta } : l)
@@ -459,30 +466,13 @@ export function HistoricoPanel({
 
   return (
     <div>
-      <Pill
-        label="Histórico"
-        variant="default"
-        size="sm"
-        selected={open}
-        onClick={() => setOpen(o => !o)}
-        id="pill-historico"
-        icon={
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-            <circle cx="12" cy="12" r="10"/>
-            <polyline points="12 6 12 12 16 14"/>
-          </svg>
-        }
-      />
-
-      {open && (
-        <div style={{
-          marginTop: 12,
-          border: '2px solid var(--border)',
-          borderRadius: 'var(--radius-base)',
-          background: 'var(--bg2)',
-          overflow: 'hidden',
-          boxShadow: '4px 4px 0 var(--border)',
-        }}>
+      <div style={{
+        border: '2px solid var(--border)',
+        borderRadius: 'var(--radius-base)',
+        background: 'var(--bg2)',
+        overflow: 'hidden',
+        boxShadow: '4px 4px 0 var(--border)',
+      }}>
           {/* ── Header ── */}
           <div style={{
             padding: '10px 14px',
@@ -490,24 +480,24 @@ export function HistoricoPanel({
             background: 'var(--bg3)',
             display: 'flex', alignItems: 'center', gap: 8,
           }}>
-            <span style={{ fontSize: 13, fontWeight: 700, flex: 1 }}>Histórico</span>
+            <span style={{ fontSize: 13, fontWeight: 500, flex: 1 }}>Histórico</span>
             {saving && <span style={{ fontSize: 10, color: 'var(--t3)' }}>salvando...</span>}
-            <button
-              onClick={() => setShowRetro(true)}
-              style={{
-                fontSize: 11, fontWeight: 700, padding: '4px 10px',
-                border: '2px solid var(--border)', borderRadius: 'var(--radius-sm)',
-                background: 'var(--bg2)', cursor: 'pointer', color: 'var(--t1)',
-                boxShadow: '2px 2px 0 var(--border)',
-              }}
-            >
-              ↩ Entrada retroativa
-            </button>
+        <button
+          onClick={handleEdit}
+          style={{
+            fontSize: 10, padding: '2px 6px',
+            border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)',
+            background: 'var(--bg2)', color: 'var(--t2)',
+            cursor: 'pointer',
+          }}
+        >
+          Editar
+        </button>
           </div>
 
           {/* ── Dot grid ── */}
           <div style={{ padding: '14px 14px 10px' }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 8 }}>
+            <div style={{ fontSize: 10, fontWeight: 500, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 8 }}>
               Últimas 4 semanas
             </div>
             <StreakDotGrid days7={days7} streak={streak} />
@@ -516,9 +506,12 @@ export function HistoricoPanel({
           {/* ── Session logs ── */}
           {visibleLogs.length > 0 && (
             <div style={{ padding: '0 14px 14px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 2 }}>
-                Sessões recentes
+              <div style={{ fontSize: 10, fontWeight: 500, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 2 }}>
+                 Sessões recentes
               </div>
+
+
+
               {visibleLogs.map(log => (
                 <SessionLogItem
                   key={log.date}
@@ -545,8 +538,7 @@ export function HistoricoPanel({
               />
             </div>
           )}
-        </div>
-      )}
+      </div>
     </div>
   )
 }

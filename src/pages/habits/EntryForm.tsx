@@ -8,6 +8,7 @@ import { Input } from '../../components/Input'
 import { Slider } from '../../components/Slider'
 import { TimeRangeSlider } from '../../components/TimeRangeSlider'
 import { TimePicker } from '../../components/TimePicker'
+import type { TimeValue } from '../../components/TimePicker'
 import { LIST_COLORS, PRIORITY_COLORS } from './habitConstants'
 
 function TabButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: ReactNode }) {
@@ -20,9 +21,9 @@ function TabButton({ active, onClick, children }: { active: boolean; onClick: ()
         borderRadius: 'var(--radius-sm)',
         background: active ? 'var(--main)' : 'var(--secondary-background)',
         color: active ? '#000' : 'var(--t2)',
-        cursor: 'pointer', fontSize: 12, fontWeight: 700,
+        cursor: 'pointer', fontSize: 12, fontWeight: 500,
         textTransform: 'uppercase', letterSpacing: '0.05em',
-        boxShadow: active ? 'none' : 'var(--shadow-x) var(--shadow-y) 0 var(--border)',
+        boxShadow: active ? 'none' : 'var(--shadow-x) var(--shadow-y) 0 var(--shadow-color)',
         transition: 'all 0.1s',
       }}
       onMouseEnter={e => {
@@ -42,7 +43,7 @@ function FormLabel({ children, tooltip }: { children: ReactNode; tooltip?: strin
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
       <span style={{
-        fontSize: 10, fontWeight: 700, color: 'var(--t3)',
+        fontSize: 10, fontWeight: 500, color: 'var(--t3)',
         textTransform: 'uppercase', letterSpacing: '0.08em',
       }}>
         {children}
@@ -100,14 +101,14 @@ function AccordionSection({ id, label, children, openSections, setOpenSections }
           background: 'var(--secondary-background)',
           border: '2px solid var(--border)',
           borderRadius: 'var(--radius-base)',
-          cursor: 'pointer', fontSize: 12, fontWeight: 700,
+          cursor: 'pointer', fontSize: 12, fontWeight: 500,
           fontFamily: 'var(--font-sans)', color: 'var(--t1)',
           textTransform: 'uppercase', letterSpacing: '0.05em',
-          boxShadow: isOpen ? 'none' : 'var(--shadow-x) var(--shadow-y) 0 var(--border)',
+          boxShadow: isOpen ? 'none' : 'var(--shadow-x) var(--shadow-y) 0 var(--shadow-color)',
           transition: 'all 0.1s',
         }}
         onMouseEnter={e => { e.currentTarget.style.transform = 'translate(var(--shadow-x), var(--shadow-y))'; e.currentTarget.style.boxShadow = 'none' }}
-        onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = isOpen ? 'none' : 'var(--shadow-x) var(--shadow-y) 0 var(--border)' }}
+        onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = isOpen ? 'none' : 'var(--shadow-x) var(--shadow-y) 0 var(--shadow-color)' }}
       >
         <i className={`ph ${isOpen ? 'ph-caret-down' : 'ph-caret-right'}`} style={{ fontSize: 14 }} />
         {label}
@@ -157,10 +158,10 @@ interface EntryFormProps {
 }
 
 const labelStyle: CSSProperties = {
-  fontSize: 10, fontWeight: 700, color: 'var(--t3)',
+  fontSize: 10, fontWeight: 500, color: 'var(--t3)',
   textTransform: 'uppercase', letterSpacing: '0.08em',
   marginBottom: 8, display: 'block',
-  fontFamily: '"DM Sans", var(--font-sans)',
+  fontFamily: 'var(--font-sans)',
 }
 
 export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: EntryFormProps) {
@@ -197,6 +198,15 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
 
   const set = (key: keyof Habit, value: unknown) =>
     setForm(f => ({ ...f, [key]: value }))
+
+  const parseTime = (time: string | TimeValue | null | undefined): TimeValue | null => {
+    if (!time) return null
+    if (typeof time === 'string') {
+      const [h, m] = time.split(':').map(Number)
+      return { hours: h, minutes: m }
+    }
+    return time
+  }
 
   const habitSuggestions: Record<string, string[]> = {
     habilidade: ['Estudar 30min/dia', 'Praticar projetos pessoais', 'Ler artigos técnicos'],
@@ -352,8 +362,8 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
                   borderRadius: 'var(--radius-sm)',
                   background: isActive ? 'var(--main)' : 'var(--bg2)',
                   color: isActive ? 'var(--main-foreground)' : 'var(--t1)',
-                  cursor: 'pointer', fontSize: 13, fontWeight: 700,
-                  fontFamily: '"DM Sans", var(--font-sans)',
+                  cursor: 'pointer', fontSize: 13, fontWeight: 500,
+                  fontFamily: 'var(--font-sans)',
                   boxShadow: isActive ? 'none' : '2px 2px 0 var(--border)',
                   transform: isActive ? 'translate(2px, 2px)' : 'none',
                   transition: 'transform 0.08s, box-shadow 0.08s',
@@ -408,8 +418,8 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
                     borderRadius: 'var(--radius-sm)',
                     background: 'var(--bg2)',
                     color: 'var(--t1)',
-                    cursor: 'pointer', fontSize: 13, fontWeight: 700,
-                    fontFamily: '"DM Sans", var(--font-sans)',
+                    cursor: 'pointer', fontSize: 13, fontWeight: 500,
+                    fontFamily: 'var(--font-sans)',
                     whiteSpace: 'nowrap',
                     boxShadow: '2px 2px 0 var(--border)',
                     transition: 'transform 0.08s, box-shadow 0.08s',
@@ -523,7 +533,7 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
                       borderRadius: 'var(--radius-sm)',
                       background: 'var(--bg3)',
                       color: 'var(--t2)',
-                      cursor: 'pointer', fontSize: 12, fontWeight: 600,
+                      cursor: 'pointer', fontSize: 12, fontWeight: 400,
                       boxShadow: '2px 2px 0 var(--border)',
                       transition: 'all 0.1s',
                     }}
@@ -566,8 +576,8 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
                       border: '2px solid var(--border)',
                       background: isActive ? 'var(--main)' : 'var(--bg2)',
                       color: isActive ? 'var(--main-foreground)' : 'var(--t1)',
-                      cursor: 'pointer', fontSize: 13, fontWeight: 700,
-                      fontFamily: '"DM Sans", var(--font-sans)',
+                      cursor: 'pointer', fontSize: 13, fontWeight: 500,
+                      fontFamily: 'var(--font-sans)',
                       boxShadow: isActive ? 'none' : '2px 2px 0 var(--border)',
                       transform: isActive ? 'translate(2px, 2px)' : 'none',
                       transition: 'transform 0.08s, box-shadow 0.08s',
@@ -597,7 +607,7 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <i className="ph ph-bell ph-bold" style={{ fontSize: 18, color: 'var(--border)' }} />
-                <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--foreground)', fontFamily: 'var(--font-sans)' }}>
+                <span style={{ fontSize: 14, fontWeight: 400, color: 'var(--foreground)', fontFamily: 'var(--font-sans)' }}>
                   Lembrete
                 </span>
               </div>
@@ -614,9 +624,8 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
                   Horário
                 </span>
                   <TimePicker
-                    value={form.reminder_time || '08:00'}
-                    onChange={(time) => set('reminder_time', time)}
-                    id="reminder-time"
+                    value={parseTime(form.reminder_time) || { hours: 8, minutes: 0 }}
+                    onChange={(time) => set('reminder_time', time ? `${time.hours.toString().padStart(2,'0')}:${time.minutes.toString().padStart(2,'0')}` : null)}
                   />
                 </div>
               </>
@@ -659,7 +668,7 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
                       color: isActive ? 'var(--main-foreground)' : 'var(--t3)',
                       cursor: 'pointer',
                       opacity: isActive ? 1 : 0.6,
-                      boxShadow: isActive ? 'var(--shadow-x) var(--shadow-y) 0 var(--border)' : 'none',
+                      boxShadow: isActive ? 'var(--shadow-x) var(--shadow-y) 0 var(--shadow-color)' : 'none',
                       transition: 'all 0.1s',
                     }}
                     onMouseEnter={e => {
@@ -668,14 +677,14 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
                     }}
                     onMouseLeave={e => {
                       e.currentTarget.style.transform = 'none'
-                      e.currentTarget.style.boxShadow = isActive ? 'var(--shadow-x) var(--shadow-y) 0 var(--border)' : 'none'
+                      e.currentTarget.style.boxShadow = isActive ? 'var(--shadow-x) var(--shadow-y) 0 var(--shadow-color)' : 'none'
                     }}
                   >
                     <i className={`ph ${cat.icon}`} style={{
                       fontSize: 20,
                       fontVariationSettings: isActive ? "'FILL' 1" : "'FILL' 0",
                     }} />
-                    <span style={{ fontSize: 12, fontWeight: 700 }}>{cat.label}</span>
+                    <span style={{ fontSize: 12, fontWeight: 500 }}>{cat.label}</span>
                   </button>
                 )
               })}
@@ -706,7 +715,7 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
                       borderRadius: 'var(--radius-sm)',
                       background: isActive ? PRIORITY_COLORS[p] + '18' : 'transparent',
                       color: isActive ? PRIORITY_COLORS[p] : 'var(--t3)',
-                      cursor: 'pointer', fontSize: 12, fontWeight: 700,
+                      cursor: 'pointer', fontSize: 12, fontWeight: 500,
                       fontFamily: 'var(--font-sans)',
                       textTransform: 'capitalize',
                       borderBottom: isActive ? `2px solid ${PRIORITY_COLORS[p]}` : `2px solid transparent`,
@@ -773,7 +782,7 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
                     key={u}
                     onClick={() => set('goal_unit', u)}
                     style={{
-                      padding: '4px 12px', fontSize: 12, fontWeight: 700,
+                      padding: '4px 12px', fontSize: 12, fontWeight: 500,
                       borderRadius: 'var(--radius-sm)', cursor: 'pointer',
                       fontFamily: 'var(--font-sans)',
                       background: form.goal_unit === u ? 'var(--main)' : 'var(--bg3)',
@@ -827,7 +836,7 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
                       key={p}
                       onClick={() => set('goal_period', form.goal_period === p ? null : p)}
                       style={{
-                        padding: '4px 14px', fontSize: 12, fontWeight: 700,
+                        padding: '4px 14px', fontSize: 12, fontWeight: 500,
                         borderRadius: 'var(--radius-sm)', cursor: 'pointer',
                         fontFamily: 'var(--font-sans)',
                         background: form.goal_period === p ? 'var(--main)' : 'var(--bg3)',
@@ -930,7 +939,7 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
                     border: `2px solid ${listColor.border}`,
                     borderRadius: 'var(--radius-sm)',
                     display: 'flex', alignItems: 'center', gap: 4,
-                    fontWeight: 600, fontFamily: 'var(--font-sans)',
+                    fontWeight: 400, fontFamily: 'var(--font-sans)',
                   }}>
                     {tag}
                     <button
@@ -1027,7 +1036,7 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
           boxShadow: '3px 3px 0 var(--border)',
           display: 'flex', flexDirection: 'column', gap: 2,
         }}>
-          <span style={{ fontSize: 20, fontWeight: 900, color: 'var(--t1)', lineHeight: 1.2 }}>
+          <span style={{ fontSize: 20, fontWeight: 700, color: 'var(--t1)', lineHeight: 1.2 }}>
             {doneTodayFiltered}/{totalFiltered}
           </span>
           <span style={{ fontSize: 10, color: 'var(--t3)', fontWeight: 500 }}>
@@ -1042,7 +1051,7 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
           boxShadow: '3px 3px 0 var(--border)',
           display: 'flex', flexDirection: 'column', gap: 2,
         }}>
-          <span style={{ fontSize: 20, fontWeight: 900, color: 'var(--t1)', lineHeight: 1.2 }}>
+          <span style={{ fontSize: 20, fontWeight: 700, color: 'var(--t1)', lineHeight: 1.2 }}>
             {streak ?? 0}d
           </span>
           <span style={{ fontSize: 10, color: 'var(--t3)', fontWeight: 500 }}>
@@ -1057,7 +1066,7 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
           boxShadow: '3px 3px 0 var(--border)',
           display: 'flex', flexDirection: 'column', gap: 2,
         }}>
-          <span style={{ fontSize: 20, fontWeight: 900, color: 'var(--t1)', lineHeight: 1.2 }}>
+          <span style={{ fontSize: 20, fontWeight: 700, color: 'var(--t1)', lineHeight: 1.2 }}>
             {filteredPct}%
           </span>
           <span style={{ fontSize: 10, color: 'var(--t3)', fontWeight: 500 }}>
@@ -1073,7 +1082,7 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
           display: 'flex', flexDirection: 'column', gap: 4,
           boxSizing: 'border-box',
         }}>
-          <span style={{ fontSize: 24, fontWeight: 900, color: '#ef4444', lineHeight: 1 }}>{altaCount}</span>
+          <span style={{ fontSize: 24, fontWeight: 700, color: '#ef4444', lineHeight: 1 }}>{altaCount}</span>
           <span style={{ fontSize: 11, color: 'var(--t3)', fontWeight: 500 }}>🔴 Crítico</span>
         </div>
         <div style={{
@@ -1085,7 +1094,7 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
           display: 'flex', flexDirection: 'column', gap: 4,
           boxSizing: 'border-box',
         }}>
-          <span style={{ fontSize: 24, fontWeight: 900, color: '#f59e0b', lineHeight: 1 }}>{mediaCount}</span>
+          <span style={{ fontSize: 24, fontWeight: 700, color: '#f59e0b', lineHeight: 1 }}>{mediaCount}</span>
           <span style={{ fontSize: 11, color: 'var(--t3)', fontWeight: 500 }}>🟡 Importante</span>
         </div>
         <div style={{
@@ -1097,7 +1106,7 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
           display: 'flex', flexDirection: 'column', gap: 4,
           boxSizing: 'border-box',
         }}>
-          <span style={{ fontSize: 24, fontWeight: 900, color: '#22c55e', lineHeight: 1 }}>{baixaCount}</span>
+          <span style={{ fontSize: 24, fontWeight: 700, color: '#22c55e', lineHeight: 1 }}>{baixaCount}</span>
           <span style={{ fontSize: 11, color: 'var(--t3)', fontWeight: 500 }}>🟢 Estratégico</span>
         </div>
       </div>

@@ -74,12 +74,13 @@ Cada agente tem um escopo bem definido e deve ser acionado conforme o contexto.
 
 | # | Prioridade | Tarefa | Status |
 |---|-----------|--------|--------|
-| 1 | 🔴 Crítico | Definir escopo do MVP: ocultar seções incompletas (Career, Finance, Mentor, Projects, Sprint, Shop) | Pendente |
+| 1 | 🔴 Crítico | Definir escopo do MVP: ocultar seções incompletas (Career, Finance, Mentor, Projects, Sprint, Shop) | Concluído |
 | 2 | 🔴 Crítico | Criar fluxo de Onboarding (3 telas: boas-vindas → perfil → primeiro hábito) | Pendente |
 | 3 | 🔴 Crítico | Substituir ícones/splash genéricos do Capacitor pelo branding Rootio | Pendente |
 | 4 | 🟡 Importante | Empty states com ilustrações em todas as seções ativas | Pendente |
 | 5 | 🟡 Importante | Tela de Login/Cadastro (UI apenas — integração é com @rootio-data) | Pendente |
-| 6 | 🟡 Importante | Push notifications UI: configuração de lembretes de hábitos | Pendente |
+| 6 | 🟡 Importante | Push notifications UI: configuração de lembretes de hábitos | Concluído |
+| 6.1 | 🟡 Importante | Slider: adicionar exemplos na /themes (newcomp Sllider.tsx) | Concluído |
 | 7 | 🟡 Importante | Revisar Feed: mudar de rede social para diário pessoal | Pendente |
 | 8 | 🟢 Estratégico | ShopPage: definir e implementar modelo freemium (UI de planos) | Pendente |
 | 9 | 🟢 Estratégico | CommandK: melhorar grupos e adicionar ações rápidas | Pendente |

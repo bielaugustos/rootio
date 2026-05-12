@@ -55,9 +55,9 @@ function StatCard({ label, value, icon, color = 'var(--t1)' }: { label: string; 
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
         <span style={{ fontSize: 13 }}>{icon}</span>
-        <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</span>
+        <span style={{ fontSize: 10, fontWeight: 500, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</span>
       </div>
-      <span style={{ fontSize: 22, fontWeight: 900, fontFamily: 'var(--font-mono)', color, lineHeight: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{value}</span>
+      <span style={{ fontSize: 22, fontWeight: 700, fontFamily: 'var(--font-mono)', color, lineHeight: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{value}</span>
     </div>
   )
 }
@@ -153,7 +153,7 @@ function TabJornada({ streak, historyDays }: TabJornadaProps) {
         }}>
           <span style={{ fontSize: 24, flexShrink: 0 }}>⚠️</span>
           <div>
-            <div style={{ fontSize: 14, fontWeight: 900, color: '#ef4444', marginBottom: 2 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: '#ef4444', marginBottom: 2 }}>
               Penalidade ativa — {penaltySteps} casa{penaltySteps > 1 ? 's' : ''} perdida{penaltySteps > 1 ? 's' : ''}
             </div>
             <div style={{ fontSize: 12, color: 'var(--t2)', lineHeight: 1.5 }}>
@@ -186,7 +186,7 @@ function TabJornada({ streak, historyDays }: TabJornadaProps) {
           </div>
           <div style={{
             position: 'absolute', bottom: -6, left: '50%', transform: 'translateX(-50%)',
-            fontSize: 9, fontWeight: 900, padding: '1px 8px',
+            fontSize: 9, fontWeight: 700, padding: '1px 8px',
             background: avatar.aura, color: '#fff',
             borderRadius: 'var(--radius-sm)', whiteSpace: 'nowrap',
             border: '1.5px solid var(--border)',
@@ -195,22 +195,22 @@ function TabJornada({ streak, historyDays }: TabJornadaProps) {
           </div>
         </div>
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 11, color: 'var(--t3)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>
+          <div style={{ fontSize: 11, color: 'var(--t3)', fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>
             Localização atual
           </div>
-          <div style={{ fontSize: 18, fontWeight: 900, color: 'var(--t1)', marginBottom: 4 }}>
+          <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--t1)', marginBottom: 4 }}>
             {currentArea.icon} {currentArea.name}
           </div>
           {nextArea ? (
             <div style={{ fontSize: 12, color: 'var(--t3)' }}>
-              <span style={{ color: avatar.aura, fontWeight: 700 }}>{daysToNext} dia{daysToNext !== 1 ? 's' : ''}</span> para {nextArea.icon} {nextArea.name}
+              <span style={{ color: avatar.aura, fontWeight: 500 }}>{daysToNext} dia{daysToNext !== 1 ? 's' : ''}</span> para {nextArea.icon} {nextArea.name}
             </div>
           ) : (
-            <div style={{ fontSize: 12, color: '#f59e0b', fontWeight: 700 }}>🏆 Área máxima desbloqueada!</div>
+            <div style={{ fontSize: 12, color: '#f59e0b', fontWeight: 500 }}>🏆 Área máxima desbloqueada!</div>
           )}
         </div>
         <div style={{ flexShrink: 0, textAlign: 'center' }}>
-          <div style={{ fontSize: 28, fontWeight: 900, fontFamily: 'var(--font-mono)', color: avatar.aura }}>{streak}</div>
+          <div style={{ fontSize: 28, fontWeight: 700, fontFamily: 'var(--font-mono)', color: avatar.aura }}>{streak}</div>
           <div style={{ fontSize: 10, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>dias</div>
         </div>
       </div>
@@ -223,7 +223,7 @@ function TabJornada({ streak, historyDays }: TabJornadaProps) {
       }}>
         <div style={{ padding: '10px 16px', background: 'var(--bg3)', borderBottom: '1px solid var(--b2)', display: 'flex', alignItems: 'center', gap: 6 }}>
           <span style={{ fontSize: 14 }}>🗺️</span>
-          <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--t2)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Mapa da Jornada</span>
+          <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--t2)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Mapa da Jornada</span>
         </div>
 
         {/* Progress road */}
@@ -266,11 +266,11 @@ function TabJornada({ streak, historyDays }: TabJornadaProps) {
                   <span style={{ fontSize: 22, flexShrink: 0 }}>{area.icon}</span>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: unlocked ? 'var(--t1)' : 'var(--t3)' }}>
+                      <span style={{ fontSize: 13, fontWeight: 500, color: unlocked ? 'var(--t1)' : 'var(--t3)' }}>
                         {area.name}
                       </span>
                       {isCurrent && (
-                        <span style={{ fontSize: 9, fontWeight: 900, padding: '1px 6px', background: area.color, color: '#fff', borderRadius: 'var(--radius-sm)', flexShrink: 0 }}>
+                        <span style={{ fontSize: 9, fontWeight: 700, padding: '1px 6px', background: area.color, color: '#fff', borderRadius: 'var(--radius-sm)', flexShrink: 0 }}>
                           AQUI
                         </span>
                       )}
@@ -279,7 +279,7 @@ function TabJornada({ streak, historyDays }: TabJornadaProps) {
                   </div>
                   <div style={{ flexShrink: 0, textAlign: 'right' }}>
                     {unlocked ? (
-                      <div style={{ fontSize: 11, fontWeight: 700, color: area.color }}>{area.reward}</div>
+                      <div style={{ fontSize: 11, fontWeight: 500, color: area.color }}>{area.reward}</div>
                     ) : (
                       <div style={{ fontSize: 10, color: 'var(--t3)' }}>
                         🔒 {area.requiredStreak}d
@@ -308,7 +308,7 @@ function TabJornada({ streak, historyDays }: TabJornadaProps) {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <i className="ph ph-calendar-blank" style={{ fontSize: 14, color: 'var(--t2)' }} />
-            <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--t2)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Últimos 7 dias</span>
+            <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--t2)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Últimos 7 dias</span>
           </div>
           {(() => {
             const perfectDays = Array.from({ length: 7 }).filter((_, i) => {
@@ -319,7 +319,7 @@ function TabJornada({ streak, historyDays }: TabJornadaProps) {
             }).length
             return perfectDays > 0 ? (
               <span style={{
-                fontSize: 11, fontWeight: 700, color: '#166534',
+                fontSize: 11, fontWeight: 500, color: '#166534',
                 background: '#dcfce7', border: '1.5px solid #22c55e',
                 borderRadius: 99, padding: '2px 10px',
               }}>
@@ -379,7 +379,7 @@ function TabJornada({ streak, historyDays }: TabJornadaProps) {
                     <i className={`ph ${icon}`} style={{ fontSize: 18, color: textColor }} />
                   )}
                   {!hasNoData && (
-                    <span style={{ fontSize: 10, fontWeight: 700, color: textColor, fontFamily: 'var(--font-mono)' }}>
+                    <span style={{ fontSize: 10, fontWeight: 500, color: textColor, fontFamily: 'var(--font-mono)' }}>
                       {pct}%
                     </span>
                   )}
@@ -435,7 +435,7 @@ function TabJornada({ streak, historyDays }: TabJornadaProps) {
         border: '2px dashed var(--b2)', borderRadius: 'var(--radius-base)',
         background: 'transparent',
       }}>
-        <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--t2)', marginBottom: 8 }}>📜 Regras da Jornada</div>
+        <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--t2)', marginBottom: 8 }}>📜 Regras da Jornada</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {[
             ['✅', 'Cada dia com hábitos completos avança 1 casa no mapa'],
@@ -524,12 +524,12 @@ export function ProgressPage() {
   const pctDia = Math.min(100, Math.round((ioToday / 200) * 100))
 
   const tabStyle = (t: Tab) => ({
-    flex: 1, padding: '7px 0', fontSize: 12, fontWeight: 700,
+    flex: 1, padding: '7px 0', fontSize: 12, fontWeight: 500,
     fontFamily: 'var(--font-sans)', cursor: 'pointer',
     border: `2px solid ${tab === t ? 'var(--border)' : 'var(--b2)'}`,
     background: tab === t ? 'var(--main)' : 'var(--secondary-background)',
     color: tab === t ? 'var(--main-foreground)' : 'var(--t2)',
-    boxShadow: tab === t ? 'none' : 'var(--shadow-x) var(--shadow-y) 0 var(--border)',
+    boxShadow: tab === t ? 'none' : 'var(--shadow-x) var(--shadow-y) 0 var(--shadow-color)',
     transform: tab === t ? 'translate(var(--shadow-x), var(--shadow-y))' : 'none',
     transition: 'all 0.1s',
     borderRadius: 'var(--radius-sm)',
@@ -571,15 +571,15 @@ export function ProgressPage() {
                   position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
                   alignItems: 'center', justifyContent: 'center',
                 }}>
-                  <span style={{ fontSize: 18, fontWeight: 900, fontFamily: 'var(--font-mono)', color: '#f59e0b', lineHeight: 1 }}>
+                  <span style={{ fontSize: 18, fontWeight: 700, fontFamily: 'var(--font-mono)', color: '#f59e0b', lineHeight: 1 }}>
                     {String(nivel).padStart(2, '0')}
                   </span>
                   <span style={{ fontSize: 8, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>nível</span>
                 </div>
               </div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 10, color: 'var(--t3)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Título atual</div>
-                <div style={{ fontSize: 20, fontWeight: 900, color: 'var(--t1)', marginBottom: 8 }}>{nivelLabel}</div>
+                <div style={{ fontSize: 10, color: 'var(--t3)', fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Título atual</div>
+                <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--t1)', marginBottom: 8 }}>{nivelLabel}</div>
                 <ProgressBar value={pct} color="#f59e0b" />
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
                   <span style={{ fontSize: 10, color: 'var(--t3)', fontFamily: 'var(--font-mono)' }}>{economy.xp_total} XP</span>
@@ -593,7 +593,7 @@ export function ProgressPage() {
             }}>
               <span style={{ fontSize: 11, color: 'var(--t3)' }}>PRÓXIMO: {labelNivel(nivel + 1)}</span>
               <span style={{
-                fontSize: 11, fontWeight: 700, padding: '2px 10px',
+                fontSize: 11, fontWeight: 500, padding: '2px 10px',
                 background: '#f59e0b18', color: '#f59e0b',
                 border: '1.5px solid #f59e0b', borderRadius: 'var(--radius-sm)',
                 fontFamily: 'var(--font-mono)',
@@ -618,11 +618,11 @@ export function ProgressPage() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <i className="ph ph-lightning" style={{ fontSize: 14, color: '#f59e0b' }} />
-                <span style={{ fontSize: 12, fontWeight: 600, color: '#92400e' }}>IO ganho hoje</span>
+                <span style={{ fontSize: 12, fontWeight: 400, color: '#92400e' }}>IO ganho hoje</span>
               </div>
               <span style={{ fontSize: 11, color: '#92400e', fontFamily: 'var(--font-mono)' }}>{ioToday} / 200</span>
             </div>
-            <div style={{ fontSize: 32, fontWeight: 900, fontFamily: 'var(--font-mono)', color: '#92400e', marginBottom: 8, lineHeight: 1 }}>+{ioToday}</div>
+            <div style={{ fontSize: 32, fontWeight: 700, fontFamily: 'var(--font-mono)', color: '#92400e', marginBottom: 8, lineHeight: 1 }}>+{ioToday}</div>
             <ProgressBar value={pctDia} color="#f59e0b" />
             <div style={{ fontSize: 11, color: '#92400e', marginTop: 6 }}>{200 - ioToday} IO disponíveis até o limite diário</div>
           </div>
@@ -630,7 +630,7 @@ export function ProgressPage() {
           {/* Desbloqueios */}
           <div style={{ border: '2px solid var(--border)', borderRadius: 'var(--radius-base)', overflow: 'hidden', boxShadow: '4px 4px 0 var(--border)' }}>
             <div style={{ padding: '10px 16px', background: 'var(--bg3)', borderBottom: '1px solid var(--b2)' }}>
-              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--t2)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Desbloqueios</span>
+              <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--t2)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Desbloqueios</span>
             </div>
             <div style={{ background: 'var(--secondary-background)', display: 'flex', flexDirection: 'column', gap: 1 }}>
               {DESBLOQUEIOS.flatMap(({ nivel: n, items }) =>
@@ -645,10 +645,10 @@ export function ProgressPage() {
                     }}>
                       <i className={`ph ${unlocked ? 'ph-check-circle' : 'ph-lock'}`}
                         style={{ fontSize: 16, color: unlocked ? '#22c55e' : 'var(--t3)', flexShrink: 0 }} />
-                      <span style={{ fontSize: 13, fontWeight: 600, color: unlocked ? 'var(--t1)' : 'var(--t3)', flex: 1 }}>{item}</span>
+                      <span style={{ fontSize: 13, fontWeight: 400, color: unlocked ? 'var(--t1)' : 'var(--t3)', flex: 1 }}>{item}</span>
                       {!unlocked && (
                         <span style={{
-                          fontSize: 10, fontWeight: 700, padding: '1px 6px',
+                          fontSize: 10, fontWeight: 500, padding: '1px 6px',
                           border: '1.5px solid var(--b2)', borderRadius: 'var(--radius-sm)',
                           color: 'var(--t3)',
                         }}>Nível {n}</span>
@@ -664,7 +664,7 @@ export function ProgressPage() {
           <div style={{ border: '2px solid var(--border)', borderRadius: 'var(--radius-base)', overflow: 'hidden', boxShadow: '4px 4px 0 var(--border)' }}>
             <div style={{ padding: '10px 16px', background: 'var(--bg3)', borderBottom: '1px solid var(--b2)', display: 'flex', alignItems: 'center', gap: 6 }}>
               <i className="ph ph-medal" style={{ color: '#f59e0b', fontSize: 14 }} />
-              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--t2)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Conquistas</span>
+              <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--t2)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Conquistas</span>
             </div>
             <div style={{ background: 'var(--secondary-background)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, padding: 12 }}>
               {CONQUISTAS.map(c => {
@@ -688,9 +688,9 @@ export function ProgressPage() {
                     <span style={{ fontSize: 24, flexShrink: 0 }}>{c.icon}</span>
                     <div style={{ minWidth: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
-                        <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--t1)' }}>{c.titulo}</span>
+                        <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--t1)' }}>{c.titulo}</span>
                         {c.raro && (
-                          <span style={{ fontSize: 8, fontWeight: 900, padding: '1px 5px', background: '#f59e0b', color: '#fff', borderRadius: 'var(--radius-sm)' }}>RARO</span>
+                          <span style={{ fontSize: 8, fontWeight: 700, padding: '1px 5px', background: '#f59e0b', color: '#fff', borderRadius: 'var(--radius-sm)' }}>RARO</span>
                         )}
                       </div>
                       <span style={{ fontSize: 10, color: 'var(--t3)', lineHeight: 1.4 }}>{c.desc}</span>
@@ -708,7 +708,7 @@ export function ProgressPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
           {(['semanal', 'mensal'] as const).map(type => (
             <div key={type}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--t2)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>
+              <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--t2)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>
                 Desafios {type === 'semanal' ? 'da semana' : 'do mês'}
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -726,12 +726,12 @@ export function ProgressPage() {
                           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
                             <span style={{ fontSize: 28, flexShrink: 0 }}>{c.icon}</span>
                             <div>
-                              <div style={{ fontSize: 14, fontWeight: 700, color: c.done ? '#22c55e' : 'var(--t1)', marginBottom: 2 }}>{c.title}</div>
+                              <div style={{ fontSize: 14, fontWeight: 500, color: c.done ? '#22c55e' : 'var(--t1)', marginBottom: 2 }}>{c.title}</div>
                               <div style={{ fontSize: 12, color: 'var(--t3)' }}>{c.desc}</div>
                             </div>
                           </div>
                           <span style={{
-                            fontSize: 11, fontWeight: 700, padding: '3px 10px', flexShrink: 0,
+                            fontSize: 11, fontWeight: 500, padding: '3px 10px', flexShrink: 0,
                             background: c.done ? '#22c55e' : '#f59e0b18',
                             color: c.done ? '#fff' : '#92400e',
                             border: `1.5px solid ${c.done ? '#22c55e' : '#f59e0b'}`,
@@ -750,7 +750,7 @@ export function ProgressPage() {
                           </>
                         )}
                         {c.done && (
-                          <div style={{ fontSize: 12, color: '#22c55e', fontWeight: 600, marginTop: 6 }}>
+                          <div style={{ fontSize: 12, color: '#22c55e', fontWeight: 400, marginTop: 6 }}>
                             Desafio concluído! +{c.reward} IO recebidos 🎉
                           </div>
                         )}
@@ -775,7 +775,7 @@ export function ProgressPage() {
             }}>
               <i className="ph ph-chart-line-up" style={{ fontSize: 48, color: 'var(--t3)' }} />
               <div>
-                <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--t1)', marginBottom: 6 }}>Nenhuma ação ainda</div>
+                <div style={{ fontSize: 16, fontWeight: 500, color: 'var(--t1)', marginBottom: 6 }}>Nenhuma ação ainda</div>
                 <div style={{ fontSize: 13, color: 'var(--t3)' }}>Complete hábitos para ver seu histórico de IO</div>
               </div>
             </div>
@@ -789,9 +789,9 @@ export function ProgressPage() {
             return (
               <div key={day.date}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--t1)' }}>{label}</span>
+                  <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--t1)' }}>{label}</span>
                   <span style={{
-                    fontSize: 11, fontWeight: 700, padding: '2px 10px',
+                    fontSize: 11, fontWeight: 500, padding: '2px 10px',
                     background: '#f59e0b', color: '#000',
                     border: '2px solid var(--border)', borderRadius: 'var(--radius-sm)',
                     boxShadow: '2px 2px 0 var(--border)', fontFamily: 'var(--font-mono)',
@@ -806,7 +806,7 @@ export function ProgressPage() {
                     <div style={{ flex: 1 }}>
                       <ProgressBar value={pctDay} color={color} />
                     </div>
-                    <span style={{ fontSize: 13, fontWeight: 700, fontFamily: 'var(--font-mono)', color, flexShrink: 0 }}>
+                    <span style={{ fontSize: 13, fontWeight: 500, fontFamily: 'var(--font-mono)', color, flexShrink: 0 }}>
                       {day.done}/{day.total}
                     </span>
                   </div>

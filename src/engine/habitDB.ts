@@ -36,6 +36,7 @@ export interface Habit {
   goal_period: 'mensal' | 'semanal' | 'anual' | null
   reminder_enabled?: boolean
   reminder_time?: string
+  session_logs?: SessionLog[]   // logs de sessão (opcional — preenchido em memória)
   created_at: string
   updated_at: string
 }

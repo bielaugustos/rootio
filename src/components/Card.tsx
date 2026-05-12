@@ -17,7 +17,7 @@ export function Card({ title, content, id, children }: CardProps) {
         background: 'var(--secondary-background)',
         color: 'var(--foreground)',
         border: 'var(--border-width) solid var(--border)',
-        boxShadow: 'var(--shadow-x) var(--shadow-y) 0 var(--border)',
+        boxShadow: 'var(--shadow-x) var(--shadow-y) 0 var(--shadow-color)',
         borderRadius: 'var(--radius-base)',
         padding: 'var(--spacing)',
         display: 'flex',
@@ -26,7 +26,7 @@ export function Card({ title, content, id, children }: CardProps) {
       }}
     >
       {title && (
-        <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--t1)' }}>
+        <h3 style={{ fontSize: 18, fontWeight: 600, color: 'var(--t1)' }}>
           {title}
         </h3>
       )}

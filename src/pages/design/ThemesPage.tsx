@@ -13,10 +13,16 @@ import { PageWrapper } from '../../components/PageWrapper'
 import { Checkbox } from '../../components/Checkbox'
 import { Radio } from '../../components/Radio'
 import { Toggle } from '../../components/Toggle'
-import { Slider } from '../../components/Slider'
-import { TimeRangeSlider } from '../../components/TimeRangeSlider'
+
 import { DatePicker } from '../../components/DatePicker'
+import { DateRangePicker, DEFAULT_SHORTCUTS } from '../../components/DateRangePicker'
 import { TimePicker } from '../../components/TimePicker'
+import type { TimeValue } from '../../components/TimePicker'
+import { NumberField } from '../../components/NumberField'
+import { ToggleButtonGroup, ToggleButton } from '../../../public/newcomp/ToggleButton.tsx'
+
+import { Slider as NewcompSlider } from '../../components/Slider'
+import { Timeline, TimelineItem, TimelineSeparator, TimelineConnector, TimelineDot, TimelineContent, TimelineOppositeContent } from '../../../public/newcomp/TimeLine.tsx'
 
 
 const icons = [
@@ -46,7 +52,7 @@ const presets = [
 
 function SectionTitle({ children }: { children: string }) {
   return (
-    <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--t1)' }}>
+    <h2 style={{ fontSize: 20, fontWeight: 500, color: 'var(--t1)' }}>
       {children}
     </h2>
   )
@@ -65,14 +71,6 @@ function Section({ children }: { children: React.ReactNode }) {
   )
 }
 
-function minutesToTime(minutes: number): string {
-  const hours = Math.floor(minutes / 60)
-  const mins = minutes % 60
-  const ampm = hours >= 12 ? 'PM' : 'AM'
-  const h12 = hours % 12 || 12
-  return `${h12}:${mins.toString().padStart(2, '0')} ${ampm}`
-}
-
 export function ThemesPage() {
   const { setGlobalToken, mode } = useTheme()
   const [active, setActive] = useState('Amber')
@@ -82,9 +80,9 @@ export function ThemesPage() {
   const [copied, setCopied] = useState('')
   const [code, setCode] = useState(`<Button label="Clique aqui" />`)
   const [bioFocused, setBioFocused] = useState(false)
-  const [sliderValue, setSliderValue] = useState(50)
-  const [dateValue, setDateValue] = useState('')
-  const [timeValue, setTimeValue] = useState('08:00')
+
+  const [dateValue, setDateValue] = useState<Date | null>(null)
+  const [timeValue, setTimeValue] = useState<TimeValue | null>({ hours: 8, minutes: 0 })
   const [checkboxChecked, setCheckboxChecked] = useState(true)
   const [radioChecked, setRadioChecked] = useState(false)
   const [toggleChecked, setToggleChecked] = useState(false)
@@ -107,7 +105,7 @@ export function ThemesPage() {
 
   return (
     <PageWrapper>
-      <h1 style={{ fontSize: 28, fontWeight: 900, color: 'var(--t1)', marginBottom: 8 }}>Temas</h1>
+      <h1 style={{ fontSize: 28, fontWeight: 700, color: 'var(--t1)', marginBottom: 8 }}>Temas</h1>
       <p style={{ color: 'var(--t2)', fontSize: 15, marginBottom: 32 }}>
         Presets de tema prontos. Clique para aplicar ao vivo.
       </p>
@@ -147,7 +145,7 @@ export function ThemesPage() {
               boxShadow: `3px 3px 0 ${preset.border}`,
               marginBottom: 10,
             }} />
-            <div style={{ fontSize: 14, fontWeight: 700, color: preset.border, fontFamily: 'var(--font-sans)' }}>
+            <div style={{ fontSize: 14, fontWeight: 500, color: preset.border, fontFamily: 'var(--font-sans)' }}>
               {preset.name}
             </div>
             <div style={{ fontSize: 11, color: preset.border, opacity: 0.6, fontFamily: 'var(--font-mono)', marginTop: 2 }}>
@@ -158,7 +156,7 @@ export function ThemesPage() {
       </div>
 
       <section style={{ padding: 24, border: '2px solid var(--border)', borderRadius: 'var(--radius-base)', boxShadow: '4px 4px 0 var(--border)', background: 'var(--secondary-background)', marginBottom: '30px' }}>
-        <h2 style={{ fontSize: 16, fontWeight: 700, color: 'var(--t1)', marginBottom: 8 }}>Exportar tema atual</h2>
+        <h2 style={{ fontSize: 16, fontWeight: 500, color: 'var(--t1)', marginBottom: 8 }}>Exportar tema atual</h2>
         <p style={{ fontSize: 14, color: 'var(--t2)', marginBottom: 16 }}>
           Salve as customizações feitas no editor como um arquivo JSON para compartilhar ou fazer backup.
         </p>
@@ -315,7 +313,7 @@ export function ThemesPage() {
             <label style={{
               display: 'block',
               fontSize: 14,
-              fontWeight: 600,
+              fontWeight: 400,
               color: 'var(--t1)',
               marginBottom: 6,
             }}>
@@ -396,7 +394,7 @@ export function ThemesPage() {
             boxShadow: '4px 4px 0 var(--border)',
             background: 'var(--secondary-background)',
           }}>
-            <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--t1)', marginBottom: 12 }}>Checkbox</h4>
+            <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Checkbox</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <Checkbox checked={checkboxChecked} onChange={setCheckboxChecked} id="checkbox-demo" />
@@ -415,7 +413,7 @@ export function ThemesPage() {
             boxShadow: '4px 4px 0 var(--border)',
             background: 'var(--secondary-background)',
           }}>
-            <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--t1)', marginBottom: 12 }}>Radio</h4>
+            <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Radio</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <Radio checked={radioChecked} onChange={(checked) => setRadioChecked(checked)} name="demo" id="radio-1" />
@@ -434,7 +432,7 @@ export function ThemesPage() {
             boxShadow: '4px 4px 0 var(--border)',
             background: 'var(--secondary-background)',
           }}>
-            <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--t1)', marginBottom: 12 }}>Toggle</h4>
+            <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Toggle</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <Toggle checked={toggleChecked} onChange={setToggleChecked} id="toggle-demo" />
@@ -449,47 +447,539 @@ export function ThemesPage() {
         </div>
       </Section>
 
-      {/* Sliders */}
-      <Section>
-        <SectionTitle>Sliders</SectionTitle>
+       {/* Newcomp Slider */}
+       <Section>
+         <SectionTitle>Sliders</SectionTitle>
+         <div style={{
+           display: 'grid',
+           gap: 'var(--grid-gap, 16px)',
+           gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+         }}>
+           <div style={{
+             padding: '16px 20px',
+             border: '2px solid var(--border)',
+             borderRadius: 'var(--radius-base)',
+             boxShadow: '4px 4px 0 var(--border)',
+             background: 'var(--secondary-background)',
+           }}>
+             <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Padrão</h4>
+             <div style={{ marginTop: 20 }}>
+               <NewcompSlider label="Continuous slider" defaultValue={30} valueLabelDisplay="auto" />
+             </div>
+           </div>
+           <div style={{
+             padding: '16px 20px',
+             border: '2px solid var(--border)',
+             borderRadius: 'var(--radius-base)',
+             boxShadow: '4px 4px 0 var(--border)',
+             background: 'var(--secondary-background)',
+           }}>
+             <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Desabilitado</h4>
+             <div style={{ marginTop: 20 }}>
+               <NewcompSlider label="Disabled" defaultValue={60} disabled />
+             </div>
+           </div>
+           <div style={{
+             padding: '16px 20px',
+             border: '2px solid var(--border)',
+             borderRadius: 'var(--radius-base)',
+             boxShadow: '4px 4px 0 var(--border)',
+             background: 'var(--secondary-background)',
+           }}>
+             <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Com marks</h4>
+             <div style={{ marginTop: 20 }}>
+               <NewcompSlider label="Auto marks" defaultValue={20} step={10} marks valueLabelDisplay="auto" />
+             </div>
+           </div>
+           <div style={{
+             padding: '16px 20px',
+             border: '2px solid var(--border)',
+             borderRadius: 'var(--radius-base)',
+             boxShadow: '4px 4px 0 var(--border)',
+             background: 'var(--secondary-background)',
+           }}>
+             <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Cores</h4>
+             <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
+               <NewcompSlider label="Primary" defaultValue={40} color="primary" valueLabelDisplay="auto" />
+               <NewcompSlider label="Secondary" defaultValue={40} color="secondary" valueLabelDisplay="auto" />
+               <NewcompSlider label="Success" defaultValue={40} color="success" valueLabelDisplay="auto" />
+             </div>
+           </div>
+           <div style={{
+             padding: '16px 20px',
+             border: '2px solid var(--border)',
+             borderRadius: 'var(--radius-base)',
+             boxShadow: '4px 4px 0 var(--border)',
+             background: 'var(--secondary-background)',
+           }}>
+             <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Tamanhos</h4>
+             <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
+               <NewcompSlider label="Small" size="small" defaultValue={40} valueLabelDisplay="auto" color="secondary" />
+               <NewcompSlider label="Medium" defaultValue={60} valueLabelDisplay="auto" color="primary" />
+             </div>
+           </div>
+           <div style={{
+             padding: '16px 20px',
+             border: '2px solid var(--border)',
+             borderRadius: 'var(--radius-base)',
+             boxShadow: '4px 4px 0 var(--border)',
+             background: 'var(--secondary-background)',
+           }}>
+             <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Label sempre visível</h4>
+             <div style={{ marginTop: 20 }}>
+               <NewcompSlider label="Volume" defaultValue={50} valueLabelDisplay="on" color="primary" />
+             </div>
+           </div>
+           <div style={{
+             padding: '16px 20px',
+             border: '2px solid var(--border)',
+             borderRadius: 'var(--radius-base)',
+             boxShadow: '4px 4px 0 var(--border)',
+             background: 'var(--secondary-background)',
+           }}>
+             <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Track invertido</h4>
+             <div style={{ marginTop: 20 }}>
+               <NewcompSlider label="Inverted" defaultValue={40} track="inverted" valueLabelDisplay="auto" color="warning" />
+             </div>
+           </div>
+           <div style={{
+             padding: '16px 20px',
+             border: '2px solid var(--border)',
+             borderRadius: 'var(--radius-base)',
+             boxShadow: '4px 4px 0 var(--border)',
+             background: 'var(--secondary-background)',
+           }}>
+             <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Vertical</h4>
+             <div style={{ marginTop: 20, display: 'flex', gap: 32, alignItems: 'flex-end', justifyContent: 'center', height: 160 }}>
+               <NewcompSlider orientation="vertical" height={140} defaultValue={30} valueLabelDisplay="auto" color="primary" />
+               <NewcompSlider orientation="vertical" height={140} defaultValue={[20, 70]} valueLabelDisplay="auto" color="success" />
+               <NewcompSlider orientation="vertical" height={140} defaultValue={50} step={10} marks valueLabelDisplay="auto" color="secondary" />
+             </div>
+       </div>
+      </div>
+    </Section>
+
+    {/* Timeline */}
+    <Section>
+      <SectionTitle>Timeline</SectionTitle>
+      <div style={{
+        display: 'grid',
+        gap: 'var(--grid-gap, 16px)',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+      }}>
         <div style={{
-          display: 'grid',
-          gap: 'var(--grid-gap, 16px)',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+          padding: '16px 20px',
+          border: '2px solid var(--border)',
+          borderRadius: 'var(--radius-base)',
+          boxShadow: '4px 4px 0 var(--border)',
+          background: 'var(--secondary-background)',
         }}>
-          <div style={{
-            padding: '16px 20px',
-            border: '2px solid var(--border)',
-            borderRadius: 'var(--radius-base)',
-            boxShadow: '4px 4px 0 var(--border)',
-            background: 'var(--secondary-background)',
-          }}>
-            <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--t1)', marginBottom: 12 }}>Linear Slider</h4>
-              <div style={{marginTop:'20px'}}>
-                <Slider value={sliderValue} onChange={setSliderValue} min={0} max={100} id="slider-volume" />
-              </div>
-          </div>
-          <div style={{
-            padding: '16px 20px',
-            border: '2px solid var(--border)',
-            borderRadius: 'var(--radius-base)',
-            boxShadow: '4px 4px 0 var(--border)',
-            background: 'var(--secondary-background)',
-          }}>
-            <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--t1)', marginBottom: 12 }}>Time Range Slider</h4>
-              <div style={{marginTop:'20px'}}>
-                <TimeRangeSlider
-                  startMinutes={480}
-                  endMinutes={960}
-                  step={15}
-                  onChange={(start, end) => {
-                    console.log(minutesToTime(start), '→', minutesToTime(end))
-                  }}
-                />
-              </div>
+          <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Basic (right)</h4>
+          <div style={{ marginTop: 20 }}>
+            <Timeline>
+              <TimelineItem>
+                <TimelineSeparator>
+                  <TimelineDot />
+                  <TimelineConnector />
+                </TimelineSeparator>
+                <TimelineContent>
+                  <p className="tl-title">Eat</p>
+                  <p className="tl-body">Because you need strength</p>
+                </TimelineContent>
+              </TimelineItem>
+              <TimelineItem>
+                <TimelineSeparator>
+                  <TimelineDot color="primary" />
+                  <TimelineConnector />
+                </TimelineSeparator>
+                <TimelineContent>
+                  <p className="tl-title">Code</p>
+                  <p className="tl-body">Because it&apos;s awesome!</p>
+                </TimelineContent>
+              </TimelineItem>
+              <TimelineItem>
+                <TimelineSeparator>
+                  <TimelineDot color="secondary" />
+                </TimelineSeparator>
+                <TimelineContent>
+                  <p className="tl-title">Sleep</p>
+                  <p className="tl-body">Because you need rest</p>
+                </TimelineContent>
+              </TimelineItem>
+            </Timeline>
           </div>
         </div>
-      </Section>
+        <div style={{
+          padding: '16px 20px',
+          border: '2px solid var(--border)',
+          borderRadius: 'var(--radius-base)',
+          boxShadow: '4px 4px 0 var(--border)',
+          background: 'var(--secondary-background)',
+        }}>
+          <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Alternate</h4>
+          <div style={{ marginTop: 20 }}>
+            <Timeline position="alternate">
+              <TimelineItem>
+                <TimelineSeparator>
+                  <TimelineDot color="primary" />
+                  <TimelineConnector />
+                </TimelineSeparator>
+                <TimelineContent>
+                  <p className="tl-title">Eat</p>
+                  <p className="tl-body">Because you need strength</p>
+                </TimelineContent>
+              </TimelineItem>
+              <TimelineItem>
+                <TimelineSeparator>
+                  <TimelineDot color="secondary" />
+                  <TimelineConnector />
+                </TimelineSeparator>
+                <TimelineContent>
+                  <p className="tl-title">Code</p>
+                  <p className="tl-body">Because it&apos;s fun</p>
+                </TimelineContent>
+              </TimelineItem>
+              <TimelineItem>
+                <TimelineSeparator>
+                  <TimelineDot color="success" />
+                </TimelineSeparator>
+                <TimelineContent>
+                  <p className="tl-title">Sleep</p>
+                  <p className="tl-body">Because you need rest</p>
+                </TimelineContent>
+              </TimelineItem>
+            </Timeline>
+          </div>
+        </div>
+        <div style={{
+          padding: '16px 20px',
+          border: '2px solid var(--border)',
+          borderRadius: 'var(--radius-base)',
+          boxShadow: '4px 4px 0 var(--border)',
+          background: 'var(--secondary-background)',
+        }}>
+          <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Left position</h4>
+          <div style={{ marginTop: 20 }}>
+            <Timeline position="left">
+              <TimelineItem>
+                <TimelineSeparator>
+                  <TimelineDot color="primary" />
+                  <TimelineConnector />
+                </TimelineSeparator>
+                <TimelineContent>
+                  <p className="tl-title">Design</p>
+                  <p className="tl-body">Create wireframes and mockups</p>
+                </TimelineContent>
+              </TimelineItem>
+              <TimelineItem>
+                <TimelineSeparator>
+                  <TimelineDot color="secondary" />
+                  <TimelineConnector />
+                </TimelineSeparator>
+                <TimelineContent>
+                  <p className="tl-title">Develop</p>
+                  <p className="tl-body">Implement the features</p>
+                </TimelineContent>
+              </TimelineItem>
+              <TimelineItem>
+                <TimelineSeparator>
+                  <TimelineDot color="success" />
+                </TimelineSeparator>
+                <TimelineContent>
+                  <p className="tl-title">Deploy</p>
+                  <p className="tl-body">Ship to production</p>
+                </TimelineContent>
+              </TimelineItem>
+            </Timeline>
+          </div>
+        </div>
+        <div style={{
+          padding: '16px 20px',
+          border: '2px solid var(--border)',
+          borderRadius: 'var(--radius-base)',
+          boxShadow: '4px 4px 0 var(--border)',
+          background: 'var(--secondary-background)',
+        }}>
+          <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Opposite content</h4>
+          <div style={{ marginTop: 20 }}>
+            <Timeline position="alternate">
+              <TimelineItem>
+                <TimelineOppositeContent>
+                  <span className="tl-time">09:30 am</span>
+                </TimelineOppositeContent>
+                <TimelineSeparator>
+                  <TimelineDot color="primary" />
+                  <TimelineConnector />
+                </TimelineSeparator>
+                <TimelineContent>
+                  <p className="tl-title">Breakfast</p>
+                  <p className="tl-body">Pancakes and coffee</p>
+                </TimelineContent>
+              </TimelineItem>
+              <TimelineItem>
+                <TimelineOppositeContent>
+                  <span className="tl-time">10:00 am</span>
+                </TimelineOppositeContent>
+                <TimelineSeparator>
+                  <TimelineDot color="secondary" />
+                  <TimelineConnector />
+                </TimelineSeparator>
+                <TimelineContent>
+                  <p className="tl-title">Start coding</p>
+                  <p className="tl-body">TypeScript + React</p>
+                </TimelineContent>
+              </TimelineItem>
+              <TimelineItem>
+                <TimelineOppositeContent>
+                  <span className="tl-time">06:00 pm</span>
+                </TimelineOppositeContent>
+                <TimelineSeparator>
+                  <TimelineDot color="success" />
+                </TimelineSeparator>
+                <TimelineContent>
+                  <p className="tl-title">Deploy</p>
+                  <p className="tl-body">Push to production</p>
+                </TimelineContent>
+              </TimelineItem>
+            </Timeline>
+          </div>
+        </div>
+        <div style={{
+          padding: '16px 20px',
+          border: '2px solid var(--border)',
+          borderRadius: 'var(--radius-base)',
+          boxShadow: '4px 4px 0 var(--border)',
+          background: 'var(--secondary-background)',
+        }}>
+          <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Outlined dots</h4>
+          <div style={{ marginTop: 20 }}>
+            <Timeline>
+              <TimelineItem>
+                <TimelineSeparator>
+                  <TimelineDot color="primary" variant="outlined" />
+                  <TimelineConnector />
+                </TimelineSeparator>
+                <TimelineContent>
+                  <p className="tl-title">Planning</p>
+                </TimelineContent>
+              </TimelineItem>
+              <TimelineItem>
+                <TimelineSeparator>
+                  <TimelineDot color="secondary" variant="outlined" />
+                  <TimelineConnector />
+                </TimelineSeparator>
+                <TimelineContent>
+                  <p className="tl-title">Execution</p>
+                </TimelineContent>
+              </TimelineItem>
+              <TimelineItem>
+                <TimelineSeparator>
+                  <TimelineDot color="success" variant="outlined" />
+                </TimelineSeparator>
+                <TimelineContent>
+                  <p className="tl-title">Review</p>
+                </TimelineContent>
+              </TimelineItem>
+            </Timeline>
+          </div>
+        </div>
+        <div style={{
+          padding: '16px 20px',
+          border: '2px solid var(--border)',
+          borderRadius: 'var(--radius-base)',
+          boxShadow: '4px 4px 0 var(--border)',
+          background: 'var(--secondary-background)',
+        }}>
+          <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Card content</h4>
+          <div style={{ marginTop: 20 }}>
+            <Timeline position="alternate">
+              <TimelineItem>
+                <TimelineOppositeContent>
+                  <span className="tl-time">2020</span>
+                </TimelineOppositeContent>
+                <TimelineSeparator>
+                  <TimelineDot color="primary" />
+                  <TimelineConnector />
+                </TimelineSeparator>
+                <TimelineContent>
+                  <div className="tl-card">
+                    <p className="tl-title" style={{ margin: 0 }}>Launch</p>
+                    <p className="tl-body" style={{ marginTop: 4 }}>Initial product release</p>
+                  </div>
+                </TimelineContent>
+              </TimelineItem>
+              <TimelineItem>
+                <TimelineOppositeContent>
+                  <span className="tl-time">2022</span>
+                </TimelineOppositeContent>
+                <TimelineSeparator>
+                  <TimelineDot color="secondary" />
+                  <TimelineConnector />
+                </TimelineSeparator>
+                <TimelineContent>
+                  <div className="tl-card">
+                    <p className="tl-title" style={{ margin: 0 }}>Growth</p>
+                    <p className="tl-body" style={{ marginTop: 4 }}>Reached 10k users</p>
+                  </div>
+                </TimelineContent>
+              </TimelineItem>
+              <TimelineItem>
+                <TimelineOppositeContent>
+                  <span className="tl-time">2024</span>
+                </TimelineOppositeContent>
+                <TimelineSeparator>
+                  <TimelineDot color="success" />
+                </TimelineSeparator>
+                <TimelineContent>
+                  <div className="tl-card">
+                    <p className="tl-title" style={{ margin: 0 }}>IPO</p>
+                    <p className="tl-body" style={{ marginTop: 4 }}>Public company</p>
+                  </div>
+                </TimelineContent>
+              </TimelineItem>
+            </Timeline>
+          </div>
+        </div>
+      </div>
+    </Section>
+
+    {/* ToggleButton */}
+   <Section>
+     <SectionTitle>ToggleButton</SectionTitle>
+     <div style={{
+       display: 'grid',
+       gap: 'var(--grid-gap, 16px)',
+       gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+     }}>
+       <div style={{
+         padding: '16px 20px',
+         border: '2px solid var(--border)',
+         borderRadius: 'var(--radius-base)',
+         boxShadow: '4px 4px 0 var(--border)',
+         background: 'var(--secondary-background)',
+       }}>
+         <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Exclusive selection</h4>
+         <div style={{ marginTop: 20 }}>
+           <ToggleButtonGroup value="left" exclusive onChange={(_, v) => console.log(v)} aria-label="Text alignment">
+             <ToggleButton value="left"><i className="ph ph-align-left" /></ToggleButton>
+             <ToggleButton value="center"><i className="ph ph-align-center" /></ToggleButton>
+             <ToggleButton value="right"><i className="ph ph-align-right" /></ToggleButton>
+             <ToggleButton value="justify" disabled><i className="ph ph-align-justify" /></ToggleButton>
+           </ToggleButtonGroup>
+         </div>
+       </div>
+       <div style={{
+         padding: '16px 20px',
+         border: '2px solid var(--border)',
+         borderRadius: 'var(--radius-base)',
+         boxShadow: '4px 4px 0 var(--border)',
+         background: 'var(--secondary-background)',
+       }}>
+         <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Multiple selection</h4>
+         <div style={{ marginTop: 20 }}>
+           <ToggleButtonGroup value={['bold', 'italic']} onChange={(_, v) => console.log(v)} aria-label="Text formatting">
+             <ToggleButton value="bold"><i className="ph ph-bold" /></ToggleButton>
+             <ToggleButton value="italic"><i className="ph ph-italic" /></ToggleButton>
+             <ToggleButton value="underline"><i className="ph ph-underline" /></ToggleButton>
+             <ToggleButton value="strikethrough"><i className="ph ph-strikethrough" /></ToggleButton>
+           </ToggleButtonGroup>
+         </div>
+       </div>
+       <div style={{
+         padding: '16px 20px',
+         border: '2px solid var(--border)',
+         borderRadius: 'var(--radius-base)',
+         boxShadow: '4px 4px 0 var(--border)',
+         background: 'var(--secondary-background)',
+       }}>
+         <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Sizes</h4>
+         <div style={{ marginTop: 20 }}>
+           <ToggleButtonGroup size="small" value="small" exclusive onChange={(_, v) => console.log(v)} aria-label="Small size">
+             <ToggleButton value="small">Small</ToggleButton>
+             <ToggleButton value="medium">Medium</ToggleButton>
+             <ToggleButton value="large">Large</ToggleButton>
+           </ToggleButtonGroup>
+         </div>
+         <div style={{ marginTop: 16 }}>
+           <ToggleButtonGroup size="medium" value="medium" exclusive onChange={(_, v) => console.log(v)} aria-label="Medium size">
+             <ToggleButton value="small">Small</ToggleButton>
+             <ToggleButton value="medium">Medium</ToggleButton>
+             <ToggleButton value="large">Large</ToggleButton>
+           </ToggleButtonGroup>
+         </div>
+         <div style={{ marginTop: 16 }}>
+           <ToggleButtonGroup size="large" value="large" exclusive onChange={(_, v) => console.log(v)} aria-label="Large size">
+             <ToggleButton value="small">Small</ToggleButton>
+             <ToggleButton value="medium">Medium</ToggleButton>
+             <ToggleButton value="large">Large</ToggleButton>
+           </ToggleButtonGroup>
+         </div>
+       </div>
+        <div style={{
+          padding: '16px 20px',
+          border: '2px solid var(--border)',
+          borderRadius: 'var(--radius-base)',
+          boxShadow: '4px 4px 0 var(--border)',
+          background: 'var(--secondary-background)',
+        }}>
+          <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Colors</h4>
+          <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <ToggleButtonGroup color="primary" value="primary" exclusive onChange={(_, v) => console.log(v)} aria-label="Primary color">
+              <ToggleButton value="primary">Primary</ToggleButton>
+              <ToggleButton value="secondary">Secondary</ToggleButton>
+              <ToggleButton value="success">Success</ToggleButton>
+            </ToggleButtonGroup>
+            <ToggleButtonGroup color="secondary" value="secondary" exclusive onChange={(_, v) => console.log(v)} aria-label="Secondary color">
+              <ToggleButton value="primary">Primary</ToggleButton>
+              <ToggleButton value="secondary">Secondary</ToggleButton>
+              <ToggleButton value="success">Success</ToggleButton>
+            </ToggleButtonGroup>
+            <ToggleButtonGroup color="success" value="success" exclusive onChange={(_, v) => console.log(v)} aria-label="Success color">
+              <ToggleButton value="primary">Primary</ToggleButton>
+              <ToggleButton value="secondary">Secondary</ToggleButton>
+              <ToggleButton value="success">Success</ToggleButton>
+            </ToggleButtonGroup>
+            <ToggleButtonGroup color="error" value="error" exclusive onChange={(_, v) => console.log(v)} aria-label="Error color">
+              <ToggleButton value="error">Error</ToggleButton>
+              <ToggleButton value="warning">Warning</ToggleButton>
+              <ToggleButton value="info">Info</ToggleButton>
+            </ToggleButtonGroup>
+          </div>
+        </div>
+        <div style={{
+          padding: '16px 20px',
+          border: '2px solid var(--border)',
+          borderRadius: 'var(--radius-base)',
+          boxShadow: '4px 4px 0 var(--border)',
+          background: 'var(--secondary-background)',
+        }}>
+          <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Disabled state</h4>
+          <div style={{ marginTop: 20 }}>
+            <ToggleButtonGroup disabled value={['bold']} onChange={(_, v) => console.log(v)} aria-label="Disabled formatting">
+              <ToggleButton value="bold"><i className="ph ph-bold" /></ToggleButton>
+              <ToggleButton value="italic"><i className="ph ph-italic" /></ToggleButton>
+              <ToggleButton value="underline"><i className="ph ph-underline" /></ToggleButton>
+            </ToggleButtonGroup>
+          </div>
+        </div>
+        <div style={{
+          padding: '16px 20px',
+          border: '2px solid var(--border)',
+          borderRadius: 'var(--radius-base)',
+          boxShadow: '4px 4px 0 var(--border)',
+          background: 'var(--secondary-background)',
+        }}>
+          <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Vertical orientation</h4>
+          <div style={{ marginTop: 20, display: 'flex', gap: 24, alignItems: 'flex-end', justifyContent: 'center', height: 120 }}>
+            <ToggleButtonGroup orientation="vertical" value="top" exclusive onChange={(_, v) => console.log(v)} aria-label="Vertical alignment">
+              <ToggleButton value="top"><i className="ph ph-arrow-up" /></ToggleButton>
+              <ToggleButton value="middle"><i className="ph ph-arrow-up-down" /></ToggleButton>
+              <ToggleButton value="bottom"><i className="ph ph-arrow-down" /></ToggleButton>
+            </ToggleButtonGroup>
+          </div>
+        </div>
+     </div>
+   </Section>
 
       {/* Progress Bars */}
       <Section>
@@ -506,7 +996,7 @@ export function ThemesPage() {
             boxShadow: '4px 4px 0 var(--border)',
             background: 'var(--secondary-background)',
           }}>
-            <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--t1)', marginBottom: 12 }}>Progresso</h4>
+            <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Progresso</h4>
             <p style={{ fontSize: 12, color: 'var(--t3)', marginBottom: 12, fontFamily: 'var(--font-sans)' }}>
               Barra de progresso com animação neobrutalism — usada na página de hábitos.
             </p>
@@ -523,7 +1013,7 @@ export function ThemesPage() {
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
               <span style={{ fontSize: 11, color: 'var(--t3)', fontFamily: 'var(--font-sans)' }}>0%</span>
-              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--main)', fontFamily: 'var(--font-sans)' }}>67%</span>
+              <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--main)', fontFamily: 'var(--font-sans)' }}>67%</span>
               <span style={{ fontSize: 11, color: 'var(--t3)', fontFamily: 'var(--font-sans)' }}>100%</span>
             </div>
           </div>
@@ -533,41 +1023,64 @@ export function ThemesPage() {
       {/* Date Pickers */}
       <Section>
         <SectionTitle>Date Pickers</SectionTitle>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 20 }}>
-          <div>
-            <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--t1)', marginBottom: 12 }}>Padrão</h4>
-            <DatePicker
-              value={dateValue}
-              onChange={setDateValue}
-              id="datepicker-demo"
-            />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
+            <div style={{ flex: '1 1 200px', minWidth: 200 }}>
+              <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Padrão</h4>
+              <DatePicker
+                value={dateValue}
+                onChange={setDateValue}
+              />
+            </div>
+            <div style={{ flex: '1 1 200px', minWidth: 200 }}>
+              <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Com label</h4>
+              <DatePicker
+                label="Data de vencimento"
+                value={dateValue}
+                onChange={setDateValue}
+              />
+            </div>
+            <div style={{ flex: '1 1 200px', minWidth: 200 }}>
+              <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Desabilitado</h4>
+              <DatePicker
+                defaultValue={new Date()}
+                disabled
+              />
+            </div>
           </div>
           <div>
-            <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--t1)', marginBottom: 12 }}>Com label</h4>
+            <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Static</h4>
             <DatePicker
-              label="Data de vencimento"
+              label="Sempre aberto"
               value={dateValue}
               onChange={setDateValue}
-              id="datepicker-labeled"
+              static
             />
           </div>
-          <div>
-            <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--t1)', marginBottom: 12 }}>Desabilitado</h4>
-            <DatePicker
-              value="2026-05-06"
-              disabled
-              id="datepicker-disabled"
-            />
+        </div>
+      </Section>
+
+      {/* Date Range Picker */}
+      <Section>
+        <SectionTitle>Date Range Picker</SectionTitle>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
+            <div style={{ flex: '1 1 200px', minWidth: 200 }}>
+              <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Popup</h4>
+              <DateRangePicker label="Selecione um período" />
+            </div>
+            <div style={{ flex: '1 1 200px', minWidth: 200 }}>
+              <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>2 calendários</h4>
+              <DateRangePicker label="Dois meses" calendars={2} />
+            </div>
+            <div style={{ flex: '1 1 200px', minWidth: 200 }}>
+              <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Desktop + atalhos</h4>
+              <DateRangePicker label="Com atalhos" calendars={2} shortcuts={DEFAULT_SHORTCUTS} />
+            </div>
           </div>
           <div>
-            <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--t1)', marginBottom: 12 }}>Com mínimo (hoje)</h4>
-            <DatePicker
-              label="Prazo (só datas futuras)"
-              value={dateValue}
-              onChange={setDateValue}
-              minDate={new Date().toISOString().split('T')[0]}
-              id="datepicker-future"
-            />
+            <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Static</h4>
+            <DateRangePicker label="Sempre aberto" static />
           </div>
         </div>
       </Section>
@@ -575,30 +1088,100 @@ export function ThemesPage() {
       {/* Time Pickers */}
       <Section>
         <SectionTitle>Time Pickers</SectionTitle>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
+            <div style={{ flex: '1 1 200px', minWidth: 200 }}>
+              <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Padrão</h4>
+              <TimePicker
+                value={timeValue}
+                onChange={setTimeValue}
+              />
+            </div>
+            <div style={{ flex: '1 1 200px', minWidth: 200 }}>
+              <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Com label</h4>
+              <TimePicker
+                label="Horário de lembrete"
+                value={timeValue}
+                onChange={setTimeValue}
+              />
+            </div>
+            <div style={{ flex: '1 1 200px', minWidth: 200 }}>
+              <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Desabilitado</h4>
+              <TimePicker
+                defaultValue={{ hours: 9, minutes: 30 }}
+                disabled
+              />
+            </div>
+          </div>
+          <div>
+            <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Static</h4>
+            <TimePicker
+              label="Sempre aberto"
+              value={timeValue}
+              onChange={setTimeValue}
+              static
+            />
+          </div>
+        </div>
+      </Section>
+
+      {/* Number */}
+      <Section>
+        <SectionTitle>Number Field</SectionTitle>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 20 }}>
           <div>
-            <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--t1)', marginBottom: 12 }}>Padrão</h4>
-            <TimePicker
-              value={timeValue}
-              onChange={setTimeValue}
-              id="timepicker-demo"
+            <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Padrão</h4>
+            <NumberField
+              label="Idade"
+              defaultValue={25}
+              min={0} max={150}
+              helperText="Entre 0 e 150"
             />
           </div>
           <div>
-            <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--t1)', marginBottom: 12 }}>Com label</h4>
-            <TimePicker
-              label="Horário de lembrete"
-              value={timeValue}
-              onChange={setTimeValue}
-              id="timepicker-labeled"
+            <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Com prefixo/sufixo</h4>
+            <NumberField
+              placeholder="0.00"
+              prefix="R$"
+              suffix="BRL"
+              step={0.01}
+              min={0}
             />
           </div>
           <div>
-            <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--t1)', marginBottom: 12 }}>Desabilitado</h4>
-            <TimePicker
-              value="09:30"
+            <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Sem spinner</h4>
+            <NumberField
+              label="Sem setas"
+              spinner={false}
+              defaultValue={42}
+              min={0} max={100}
+            />
+          </div>
+          <div>
+            <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Com erro</h4>
+            <NumberField
+              label="Valor inválido"
+              defaultValue={200}
+              min={0} max={100}
+              error="Deve ser entre 0 e 100"
+            />
+          </div>
+          <div>
+            <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Desabilitado</h4>
+            <NumberField
+              label="Bloqueado"
+              defaultValue={25}
+              min={0} max={100}
               disabled
-              id="timepicker-disabled"
+            />
+          </div>
+          <div>
+            <h4 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Pequeno</h4>
+            <NumberField
+              label="Small"
+              size="sm"
+              defaultValue={10}
+              min={0} max={50}
             />
           </div>
         </div>
@@ -676,7 +1259,7 @@ export function ThemesPage() {
           { group: 'Espaçamento', tokens: ['--spacing', '--section-gap', '--grid-gap'] },
         ].map(({ group, tokens }) => (
           <section key={group} style={{ marginBottom: 40 }}>
-            <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>
+            <h3 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>
               {group}
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0, border: '2px solid var(--border)', borderRadius: 'var(--radius-base)', overflow: 'hidden' }}>
@@ -806,7 +1389,7 @@ export function ThemesPage() {
         }}>
           {/* Editor */}
           <div>
-            <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--t1)', marginBottom: 12 }}>Código JSX</h3>
+            <h3 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Código JSX</h3>
             <textarea
               value={code}
               onChange={e => setCode(e.target.value)}
@@ -829,7 +1412,7 @@ export function ThemesPage() {
 
           {/* Preview */}
           <div>
-            <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--t1)', marginBottom: 12 }}>Preview</h3>
+            <h3 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Preview</h3>
             <div style={{
               minHeight: 200,
               padding: '16px 20px',
@@ -845,7 +1428,7 @@ export function ThemesPage() {
 
         {/* Quick examples */}
         <div style={{ marginTop: 32 }}>
-          <h3 style={{ fontSize: 14, fontWeight: 700, color: 'var(--t1)', marginBottom: 12 }}>Exemplos rápidos</h3>
+          <h3 style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)', marginBottom: 12 }}>Exemplos rápidos</h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
             <button
               onClick={() => setCode('<Button label="Clique aqui" />')}
@@ -867,7 +1450,7 @@ export function ThemesPage() {
                 e.currentTarget.style.boxShadow = '4px 4px 0 var(--border)'
               }}
             >
-              <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--t1)', marginBottom: 4 }}>Botão simples</div>
+              <div style={{ fontSize: 14, fontWeight: 400, color: 'var(--t1)', marginBottom: 4 }}>Botão simples</div>
               <div style={{ fontSize: 12, color: 'var(--t3)', fontFamily: 'var(--font-mono)' }}>
                 &lt;Button label="Clique aqui" /&gt;
               </div>
@@ -892,7 +1475,7 @@ export function ThemesPage() {
                 e.currentTarget.style.boxShadow = '4px 4px 0 var(--border)'
               }}
             >
-              <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--t1)', marginBottom: 4 }}>Card básico</div>
+              <div style={{ fontSize: 14, fontWeight: 400, color: 'var(--t1)', marginBottom: 4 }}>Card básico</div>
               <div style={{ fontSize: 12, color: 'var(--t3)', fontFamily: 'var(--font-mono)' }}>
                 &lt;Card title="Título" content="..." /&gt;
               </div>
@@ -917,7 +1500,7 @@ export function ThemesPage() {
                 e.currentTarget.style.boxShadow = '4px 4px 0 var(--border)'
               }}
             >
-              <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--t1)', marginBottom: 4 }}>Badge</div>
+              <div style={{ fontSize: 14, fontWeight: 400, color: 'var(--t1)', marginBottom: 4 }}>Badge</div>
               <div style={{ fontSize: 12, color: 'var(--t3)', fontFamily: 'var(--font-mono)' }}>
                 &lt;Badge label="Novo" /&gt;
               </div>

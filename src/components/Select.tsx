@@ -45,7 +45,7 @@ export function Select({
       {label && (
         <label style={{
           fontSize: 13,
-          fontWeight: 600,
+          fontWeight: 400,
           color: 'var(--t1)',
           fontFamily: 'var(--font-sans)',
         }}>
@@ -70,7 +70,7 @@ export function Select({
             borderRadius: 'var(--radius-base)',
             boxShadow: focused
               ? `var(--shadow-x, 4px) var(--shadow-y, 4px) 0 ${error ? 'var(--destructive)' : 'var(--main)'}`
-              : `var(--shadow-x, 4px) var(--shadow-y, 4px) 0 var(--border)`,
+               : `var(--shadow-x, 4px) var(--shadow-y, 4px) 0 var(--shadow-color)`,
             outline: 'none',
             transition: 'border-color 0.15s, box-shadow 0.15s',
             opacity: disabled ? 0.5 : 1,

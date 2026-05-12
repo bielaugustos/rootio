@@ -2,6 +2,39 @@
 @import 'react-grid-layout/css/styles.css';
 @import 'react-resizable/css/styles.css';
 
+/* ── Local Fonts ── */
+@font-face {
+  font-family: 'Geist';
+  src: url('/fonts/Geist/Geist-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  src: url('/fonts/DM_Sans/DMSans-VariableFont_opsz,wght.ttf') format('truetype');
+  font-weight: 100 1000;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  src: url('/fonts/DM_Sans/DMSans-Italic-VariableFont_opsz,wght.ttf') format('truetype');
+  font-weight: 100 1000;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Indie Flower';
+  src: url('/fonts/Indie_Flower/IndieFlower-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* ── Reset / base ── */
 *, *::before, *::after { box-sizing: border-box; }
 
@@ -35,12 +68,13 @@ html, body {
   --radius-base: 5px;
   --radius-sm: 4px;
   --radius-lg: 8px;
-  --font-sans: "DM Sans", system-ui, sans-serif;
+  --font-sans: "Geist", system-ui, sans-serif;
   --font-mono: monospace;
   --font-title: "Indie Flower", cursive;
-  --font-body: "Roboto", sans-serif;
+  --font-body: "Geist", sans-serif;
   --boxShadowX: 4px;
   --boxShadowY: 4px;
+  --shadow-color: #000000;
   --c-habit: #F5EFDF;
   --c-habit-b: #D4C9A9;
   --c-habit-t: #0C0C0C;
@@ -59,12 +93,13 @@ html, body {
   --c-event-bg: #9B7BFF;
   --destructive: #ef593b;
   --destructive-foreground: #000000;
-  --spacing: 16px;
-  --theme-invert-filter: invert(0%);
-}
+   --spacing: 16px;
+   --theme-invert-filter: invert(0%);
+   --shadow-color: #000000;
+ }
 
 .dark {
-  --background: #1D1C21;
+  --background: #000000;
   --secondary-background: #0C0C0C;
   --bg2: #1a1a1a;
   --bg3: #222222;
@@ -82,9 +117,10 @@ html, body {
   --c-goal-b: #D97706;
   --c-goal-bg: #F59E0B;
   --c-goal-t: #ffffff;
-  --c-task-b: #3B82F6;
-  --theme-invert-filter: invert(15%);
-}
+   --c-task-b: #3B82F6;
+   --theme-invert-filter: invert(15%);
+   --shadow-color: #ffffff;
+ }
 
 /* ── Typography ── */
 body {

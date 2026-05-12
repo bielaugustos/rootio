@@ -12,8 +12,8 @@ export interface ButtonProps {
 }
 
 const variantStyles: Record<string, { background: string; color: string; boxShadow: string }> = {
-  default:     { background: 'var(--main)',                  color: 'var(--main-foreground)',       boxShadow: 'var(--shadow-x, 4px) var(--shadow-y, 4px) 0 var(--border)' },
-  neutral:     { background: 'var(--secondary-background)',  color: 'var(--foreground)',             boxShadow: 'var(--shadow-x, 4px) var(--shadow-y, 4px) 0 var(--border)' },
+  default:     { background: 'var(--main)',                  color: 'var(--main-foreground)',       boxShadow: 'var(--shadow-x, 4px) var(--shadow-y, 4px) 0 var(--shadow-color)' },
+  neutral:     { background: 'var(--secondary-background)',  color: 'var(--foreground)',             boxShadow: 'var(--shadow-x, 4px) var(--shadow-y, 4px) 0 var(--shadow-color)' },
   ghost:       { background: 'var(--secondary-background)',  color: 'var(--foreground)',             boxShadow: 'var(--shadow-x, 4px) var(--shadow-y, 4px) 0 var(--b2)' },
   destructive: { background: 'var(--destructive)',           color: 'var(--destructive-foreground)', boxShadow: 'var(--shadow-x, 4px) var(--shadow-y, 4px) 0 #ff6b6b' },
   reverse:     { background: 'var(--main)',                  color: 'var(--main-foreground)',        boxShadow: 'none' },
@@ -45,11 +45,11 @@ export function Button({
       onClick={onClick}
       onMouseEnter={e => {
         if (disabled) return
-        const el = e.currentTarget
-        if (isReverse) {
-          el.style.transform = 'translate(-4px, -4px)'
-          el.style.boxShadow = 'var(--shadow-x, 4px) var(--shadow-y, 4px) 0 var(--border)'
-        } else {
+         const el = e.currentTarget
+         if (isReverse) {
+           el.style.transform = 'translate(-4px, -4px)'
+           el.style.boxShadow = 'var(--shadow-x, 4px) var(--shadow-y, 4px) 0 var(--shadow-color)'
+         } else {
           el.style.transform = 'translate(4px, 4px)'
           el.style.boxShadow = 'none'
         }

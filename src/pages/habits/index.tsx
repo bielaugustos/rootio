@@ -18,6 +18,7 @@ import { LIST_LABELS } from './habitConstants'
 import { EntryForm } from './EntryForm'
 import { ViewRenderer } from '../../components/ViewSwitcher'
 import { HabitBoard } from './HabitBoard'
+import { HistoricoPanel } from './HistoricoPanel'
 
 
 
@@ -32,6 +33,8 @@ export function HabitsPage() {
   const [formOpen, setFormOpen] = useState(false)
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null)
   const [editingHabitId, setEditingHabitId] = useState<string | null>(null)
+  const [historicoOpen, setHistoricoOpen] = useState(false)
+  const [selectedHabitForHistorico, setSelectedHabitForHistorico] = useState<Habit | null>(null)
   const [deletedHabits, setDeletedHabits] = useState<Habit[]>([])
   const [deletedSectionOpen, setDeletedSectionOpen] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -155,6 +158,21 @@ export function HabitsPage() {
     }
   }
 
+  const openHistorico = (habit: Habit) => {
+    setSelectedHabitForHistorico(habit)
+    setHistoricoOpen(true)
+    if (isMobile) {
+      setTimeout(() => {
+        // Scroll to top or something
+      }, 80)
+    }
+  }
+
+  const closeHistorico = () => {
+    setHistoricoOpen(false)
+    setSelectedHabitForHistorico(null)
+  }
+
   const handleToggle = async (id: string) => {
     const habitBefore = habits.find(h => h.id === id)
     const updated     = await toggleHabitDone(id)
@@ -236,7 +254,7 @@ export function HabitsPage() {
           }}>
             <div>
               <h1 style={{ fontSize: 28, color: 'var(--t1)', marginBottom: 4, fontFamily: 'var(--font-title)' }}>Hábitos</h1>
-              <p style={{ color: 'var(--t2)', fontSize: 15 }}>
+              <p style={{ color: 'var(--t2)', fontSize: 13, fontWeight: 500, fontFamily: 'var(--font-sans)' }}>
                 {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
               </p>
             </div>
@@ -271,7 +289,7 @@ export function HabitsPage() {
               }}>
                 <span style={{ fontSize: 20 }}>{pct < 30 ? '🚨' : '⏰'}</span>
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 700 }}>
+                  <div style={{ fontSize: 13, fontWeight: 500 }}>
                     {pending} hábito{pending > 1 ? 's' : ''} ainda pendente{pending > 1 ? 's' : ''}
                   </div>
                   <div style={{ fontSize: 12, opacity: 0.8 }}>Você ainda pode completar o dia.</div>
@@ -297,7 +315,7 @@ export function HabitsPage() {
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               }}>
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--main-foreground)' }}>
+                  <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--main-foreground)' }}>
                     Sua meta '{unmatchedGoal.title}' precisa de consistência
                   </div>
                   <div style={{ fontSize: 12, color: 'var(--main-foreground)', opacity: 0.8 }}>
@@ -336,8 +354,8 @@ export function HabitsPage() {
                     borderRadius: 'var(--radius-sm)',
                     background: isActive ? 'var(--main)' : 'var(--bg2)',
                     color: isActive ? 'var(--main-foreground)' : 'var(--t1)',
-                    cursor: 'pointer', fontSize: 13, fontWeight: 700,
-                    fontFamily: '"DM Sans", var(--font-sans)',
+                    cursor: 'pointer', fontSize: 13, fontWeight: 500,
+                    fontFamily: 'var(--font-sans)',
                     boxShadow: isActive ? 'none' : '2px 2px 0 var(--border)',
                     transform: isActive ? 'translate(2px, 2px)' : 'none',
                     transition: 'transform 0.08s, box-shadow 0.08s',
@@ -376,13 +394,16 @@ export function HabitsPage() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                       {filtered.map(habit => (
                         <div key={habit.id} ref={el => { cardRefs.current[habit.id] = el }}>
-                           <HabitCard
-                             habit={habit}
-                             onToggle={handleToggle}
-                             onEdit={handleEdit}
-                             onRefresh={load}
-                            isMobile={isMobile}
-                          />
+                            <HabitCard
+                              habit={habit}
+                              onToggle={handleToggle}
+                              onEdit={handleEdit}
+                              onRefresh={load}
+                              onOpenHistorico={openHistorico}
+                              onCloseHistorico={closeHistorico}
+                              isHistoricoOpen={historicoOpen && selectedHabitForHistorico?.id === habit.id}
+                             isMobile={isMobile}
+                           />
                         </div>
                       ))}
                     </div>
@@ -399,13 +420,13 @@ export function HabitsPage() {
                           background: 'var(--secondary-background)',
                           border: '2px solid var(--border)',
                           borderRadius: 'var(--radius-base)',
-                          boxShadow: 'var(--shadow-x) var(--shadow-y) 0 var(--border)',
-                          cursor: 'pointer', fontSize: 13, fontWeight: 700,
+                          boxShadow: 'var(--shadow-x) var(--shadow-y) 0 var(--shadow-color)',
+                          cursor: 'pointer', fontSize: 13, fontWeight: 500,
                           fontFamily: 'var(--font-sans)', color: 'var(--t2)',
                           transition: 'all 0.1s',
                         }}
                         onMouseEnter={e => { e.currentTarget.style.transform = 'translate(var(--shadow-x), var(--shadow-y))'; e.currentTarget.style.boxShadow = 'none' }}
-                        onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'var(--shadow-x) var(--shadow-y) 0 var(--border)' }}
+                        onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'var(--shadow-x) var(--shadow-y) 0 var(--shadow-color)' }}
                       >
                         <i className={`ph ${deletedSectionOpen ? 'ph-caret-down' : 'ph-caret-right'}`} style={{ fontSize: 14 }} />
                         Entradas excluídas
@@ -427,7 +448,7 @@ export function HabitsPage() {
                             }}>
                               <span style={{ fontSize: 16, flexShrink: 0 }}>{habit.icon}</span>
                               <span style={{
-                                flex: 1, fontSize: 14, fontWeight: 600, color: 'var(--t2)',
+                                flex: 1, fontSize: 14, fontWeight: 400, color: 'var(--t2)',
                                 textDecoration: 'line-through',
                                 whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                               }}>
@@ -470,7 +491,7 @@ export function HabitsPage() {
             background: 'var(--background)',
             border: '2px solid var(--border)',
             borderRadius: 'var(--radius-base)',
-            boxShadow: 'var(--shadow-x) var(--shadow-y) 0 var(--border)',
+            boxShadow: 'var(--shadow-x) var(--shadow-y) 0 var(--shadow-color)',
             maxHeight: isMobile ? 'none' : 'calc(100vh - 48px)',
             order: isMobile ? -1 : 0,
             scrollMarginTop: 60,
@@ -485,6 +506,35 @@ export function HabitsPage() {
               streak={streak}
               onDelete={handleDelete}
             />
+          </div>
+        )}
+
+        {/* ── Painel do histórico ── */}
+        {historicoOpen && selectedHabitForHistorico && (
+          <div style={{
+            width: isMobile ? '100%' : 420,
+            flexShrink: 0,
+            position: isMobile ? 'relative' : 'sticky',
+            top: isMobile ? 'auto' : 24,
+            display: 'flex',
+            flexDirection: 'column',
+            background: 'var(--background)',
+            border: '2px solid var(--border)',
+            borderRadius: 'var(--radius-base)',
+            boxShadow: 'var(--shadow-x) var(--shadow-y) 0 var(--shadow-color)',
+            maxHeight: isMobile ? 'none' : 'calc(100vh - 48px)',
+            order: isMobile ? -1 : 0,
+            scrollMarginTop: 60,
+            overflowY: 'auto',
+            padding: isMobile ? 12 : 20,
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <h3 style={{ fontSize: 18, fontWeight: 500, color: 'var(--t1)' }}>Histórico - {selectedHabitForHistorico.name}</h3>
+              <Button size="tiny" variant="ghost" onClick={closeHistorico}>
+                <i className="ph ph-x" />
+              </Button>
+            </div>
+            <HistoricoPanel habit={selectedHabitForHistorico} isMobile={isMobile} onRefresh={load} />
           </div>
         )}
       </div>

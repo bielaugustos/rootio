@@ -1,28 +1,20 @@
 import { useState, useMemo } from 'react'
-import { PeriodPicker, type PeriodValue } from '../../components/PeriodPicker'
+import { DateRangePicker, DEFAULT_SHORTCUTS, type DateRange } from '../../components/DateRangePicker'
 import { Button } from '../../components/Button'
-import { calcSummary, filterByMonth, filterByQuarter, filterByYear, formatBRL } from '../../engine/walletDB'
+import { calcSummary, filterByDateRange, formatBRL } from '../../engine/walletDB'
 import type { Transaction } from '../../engine/walletDB'
 import { CATEGORY_COLORS, listContainerStyle, cardStyle } from './walletStyles'
 
 type FinSubTab = 'lista' | 'detalhes'
 
 export function TabFin({ txs, onRefresh, onDelete, isMobile }: { txs: Transaction[]; onRefresh: () => void; onDelete: (id: string) => void; isMobile: boolean }) {
-  const [period, setPeriod] = useState<PeriodValue>(() => ({
-    type: 'month', year: new Date().getFullYear(), month: new Date().getMonth() + 1, quarter: Math.floor(new Date().getMonth() / 3) + 1
-  }))
+  const [dateRange, setDateRange] = useState<DateRange>([null, null])
   const [subTab, setSubTab] = useState<FinSubTab>('lista')
 
-  // Memoizar filtragem para performance e pureza
   const { filteredTxs, summary, categories } = useMemo(() => {
-    const filtered = period.type === 'month'
-      ? filterByMonth(txs, `${period.year}-${String(period.month).padStart(2, '0')}`)
-      : period.type === 'quarter' ? filterByQuarter(txs, period.year, period.quarter)
-      : filterByYear(txs, period.year)
-
+    const filtered = filterByDateRange(txs, dateRange[0], dateRange[1])
     const summary = calcSummary(filtered)
 
-    // Agrupamento por categoria
     const byCat: Record<string, { total: number; type: 'income' | 'expense'; count: number }> = {}
     filtered.forEach(tx => {
       if (!byCat[tx.category]) byCat[tx.category] = { total: 0, type: tx.type, count: 0 }
@@ -35,7 +27,7 @@ export function TabFin({ txs, onRefresh, onDelete, isMobile }: { txs: Transactio
       summary,
       categories: Object.entries(byCat).sort((a, b) => b[1].total - a[1].total)
     }
-  }, [txs, period])
+  }, [txs, dateRange])
 
   return (
     <div style={{ padding: isMobile ? 16 : 24 }}>
@@ -45,7 +37,13 @@ export function TabFin({ txs, onRefresh, onDelete, isMobile }: { txs: Transactio
         <SummaryCard label="Saídas" value={summary.expense} color="#f43f5e" />
       </div>
 
-      <PeriodPicker value={period} onChange={setPeriod} id="tabfin-period" />
+      <DateRangePicker
+        label="Período"
+        value={dateRange}
+        onChange={setDateRange}
+        calendars={2}
+        shortcuts={DEFAULT_SHORTCUTS}
+      />
 
       {/* Navegação Interna */}
       <div style={{ display: 'flex', gap: 8, margin: '16px 0' }}>
@@ -66,23 +64,23 @@ export function TabFin({ txs, onRefresh, onDelete, isMobile }: { txs: Transactio
 const SummaryCard = ({ label, value, color }: { label: string; value: number; color: string }) => (
   <div style={{ ...cardStyle, flex: 1, padding: '14px 16px', display: 'flex', flexDirection: 'column' }}>
     <span style={labelStyle}>{label}</span>
-    <span style={{ fontSize: 20, fontWeight: 900, color, fontFamily: 'var(--font-mono)' }}>{formatBRL(value)}</span>
+    <span style={{ fontSize: 20, fontWeight: 700, color, fontFamily: 'var(--font-mono)' }}>{formatBRL(value)}</span>
   </div>
 )
 
-const labelStyle: React.CSSProperties = { fontSize: 11, color: 'var(--t3)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }
+const labelStyle: React.CSSProperties = { fontSize: 11, color: 'var(--t3)', fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.06em' }
 
 const SubTabBtn = ({ active, onClick, icon, label }: { active: boolean; onClick: () => void; icon: string; label: string }) => (
   <button
     onClick={onClick}
     style={{
       flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-      padding: '5px 14px', fontSize: 12, fontWeight: 700, cursor: 'pointer',
+      padding: '5px 14px', fontSize: 12, fontWeight: 500, cursor: 'pointer',
       borderRadius: 'var(--radius-sm)', fontFamily: 'var(--font-sans)',
       border: `var(--border-width) solid ${active ? 'var(--border)' : 'var(--b2)'}`,
       background: active ? 'var(--main)' : 'var(--secondary-background)',
       color: active ? 'var(--main-foreground)' : 'var(--t2)',
-      boxShadow: active ? 'none' : 'var(--shadow-x) var(--shadow-y) 0 var(--border)',
+      boxShadow: active ? 'none' : 'var(--shadow-x) var(--shadow-y) 0 var(--shadow-color)',
       transform: active ? 'translate(var(--shadow-x), var(--shadow-y))' : 'none',
       transition: 'all 0.1s',
     }}
@@ -95,14 +93,14 @@ const SubTabBtn = ({ active, onClick, icon, label }: { active: boolean; onClick:
 const TransactionList = ({ txs, onDelete }: { txs: Transaction[]; onDelete: (id: string) => void }) => (
   <div style={{ ...listContainerStyle }}>
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 16px', borderBottom: '1px solid var(--b2)', background: 'var(--bg3)' }}>
-      <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--t2)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+      <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--t2)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
         Movimentações · {txs.length}
       </span>
     </div>
     {txs.length === 0 ? (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '48px 24px', textAlign: 'center', background: 'var(--secondary-background)' }}>
         <img src='/illustrations/walletmirrormoves.png' alt='' style={{ width: 120, height: 120, margin: 'auto' }} className='invert-element' />
-        <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--t1)', marginBottom: 6 }}>Sem movimentações</div>
+        <div style={{ fontSize: 16, fontWeight: 500, color: 'var(--t1)', marginBottom: 6 }}>Sem movimentações</div>
         <div style={{ fontSize: 13, color: 'var(--t3)' }}>Registre entradas e saídas para acompanhar seu saldo.</div>
       </div>
     ) : (
@@ -116,10 +114,10 @@ const TransactionList = ({ txs, onDelete }: { txs: Transaction[]; onDelete: (id:
                 <i className={`ph ph-arrow-${isIncome ? 'up' : 'down'}`} />
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--t1)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tx.description}</div>
+                <div style={{ fontSize: 14, fontWeight: 400, color: 'var(--t1)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tx.description}</div>
                 <div style={{ fontSize: 11, color: 'var(--t3)', marginTop: 2 }}>{tx.category} · {new Date(tx.date + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}</div>
               </div>
-              <span style={{ fontSize: 13, fontWeight: 700, color, fontFamily: 'var(--font-mono)', flexShrink: 0 }}>{isIncome ? '+' : '-'}{formatBRL(tx.amount)}</span>
+              <span style={{ fontSize: 13, fontWeight: 500, color, fontFamily: 'var(--font-mono)', flexShrink: 0 }}>{isIncome ? '+' : '-'}{formatBRL(tx.amount)}</span>
               <Button variant="destructive" size="tiny" onClick={() => onDelete(tx.id)}>
                 <i className="ph ph-trash" />
               </Button>
@@ -137,7 +135,7 @@ const CategoryDetails = ({ categories, totalIncome }: { categories: [string, { t
   return (
     <div style={{ ...listContainerStyle }}>
       <div style={{ padding: '10px 16px', borderBottom: '1px solid var(--b2)', background: 'var(--bg3)' }}>
-        <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--t2)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Resumo por categoria</span>
+        <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--t2)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Resumo por categoria</span>
       </div>
 
       {categories.length === 0 ? (
@@ -153,7 +151,7 @@ const CategoryDetails = ({ categories, totalIncome }: { categories: [string, { t
               <div key={type}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
                   <div style={{ width: 8, height: 8, borderRadius: '50%', background: dotColor }} />
-                  <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                     {isIncome ? 'Entradas' : 'Saídas'}
                   </span>
                 </div>
@@ -169,12 +167,12 @@ const CategoryDetails = ({ categories, totalIncome }: { categories: [string, { t
                               <i className={`ph ph-arrow-${isIncome ? 'up' : 'down'}`} style={{ fontSize: 12, color: catColor }} />
                             </div>
                             <div>
-                              <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--t1)' }}>{cat}</span>
+                              <span style={{ fontSize: 13, fontWeight: 400, color: 'var(--t1)' }}>{cat}</span>
                               <span style={{ fontSize: 10, color: 'var(--t3)', marginLeft: 6 }}>{info.count}x</span>
                             </div>
                           </div>
                           <div style={{ textAlign: 'right' }}>
-                            <div style={{ fontSize: 13, fontWeight: 700, color: catColor, fontFamily: 'var(--font-mono)' }}>
+                            <div style={{ fontSize: 13, fontWeight: 500, color: catColor, fontFamily: 'var(--font-mono)' }}>
                               {isIncome ? '+' : '-'}{formatBRL(info.total)}
                             </div>
                             {!isIncome && totalIncome > 0 && (
@@ -195,7 +193,7 @@ const CategoryDetails = ({ categories, totalIncome }: { categories: [string, { t
 
           <div style={{ paddingTop: 12, borderTop: '1px solid var(--b2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontSize: 12, color: 'var(--t3)' }}>{categories.reduce((sum, [, v]) => sum + v.count, 0)} transaç{categories.reduce((sum, [, v]) => sum + v.count, 0) === 1 ? 'ão' : 'ões'}</span>
-            <span style={{ fontSize: 12, fontWeight: 700, color: categories.reduce((sum, [, v]) => sum + (v.type === 'income' ? v.total : -v.total), 0) >= 0 ? '#22c55e' : '#ef4444', fontFamily: 'var(--font-mono)' }}>
+            <span style={{ fontSize: 12, fontWeight: 500, color: categories.reduce((sum, [, v]) => sum + (v.type === 'income' ? v.total : -v.total), 0) >= 0 ? '#22c55e' : '#ef4444', fontFamily: 'var(--font-mono)' }}>
               Saldo: {formatBRL(categories.reduce((sum, [, v]) => sum + (v.type === 'income' ? v.total : -v.total), 0))}
             </span>
           </div>

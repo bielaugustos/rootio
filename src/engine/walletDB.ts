@@ -136,6 +136,16 @@ export function filterByYear(txs: Transaction[], year: number): Transaction[] {
   return txs.filter(t => t.date.startsWith(String(year)))
 }
 
+export function filterByDateRange(txs: Transaction[], start: Date | null, end: Date | null): Transaction[] {
+  if (!start && !end) return txs
+  return txs.filter(t => {
+    const txDate = new Date(t.date + 'T00:00:00')
+    if (start && txDate < start) return false
+    if (end && txDate > end) return false
+    return true
+  })
+}
+
 export function calcSummary(txs: Transaction[]) {
   const income  = txs.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0)
   const expense = txs.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0)

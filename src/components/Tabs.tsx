@@ -22,7 +22,7 @@ export function Tabs<T extends string>({ value, onChange, tabs, id }: TabsProps<
         border: '2px solid var(--border)',
         borderRadius: 'var(--radius-sm)',
         padding: 3,
-        boxShadow: 'var(--shadow-x) var(--shadow-y) 0 var(--border)',
+        boxShadow: 'var(--shadow-x) var(--shadow-y) 0 var(--shadow-color)',
       }}
     >
       {tabs.map((tab) => {
@@ -35,7 +35,7 @@ export function Tabs<T extends string>({ value, onChange, tabs, id }: TabsProps<
               flex: 1,
               padding: '8px 18px',
               fontSize: 12,
-              fontWeight: 700,
+              fontWeight: 500,
               cursor: 'pointer',
               borderRadius: 'calc(var(--radius-sm) - 1px)',
               fontFamily: 'var(--font-sans)',

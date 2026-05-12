@@ -33,8 +33,6 @@ import { useState } from 'react'
 import type { Habit } from '../../../engine/habitDB'
 import { Pill } from '../../../components/Pill'
 
-type HabitWithLogs = Habit & { session_logs?: SessionLog[] }
-
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 export interface Participant {
@@ -129,7 +127,7 @@ export function ParticipantesPanel({ habit }: PanelProps) {
             background: 'var(--c-event, #9B7BFF)',
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           }}>
-            <span style={{ fontSize: 13, fontWeight: 700 }}>Participantes</span>
+            <span style={{ fontSize: 13, fontWeight: 500 }}>Participantes</span>
             <span style={{
               display: 'inline-flex', alignItems: 'center', gap: 4,
               padding: '2px 8px', borderRadius: 20,
@@ -144,7 +142,7 @@ export function ParticipantesPanel({ habit }: PanelProps) {
           {/* <div style={{
             padding: '8px 14px',
             background: '#fef9c3', borderBottom: '1.5px solid #f59e0b',
-            fontSize: 11, color: '#78350f', fontWeight: 600,
+            fontSize: 11, color: '#78350f', fontWeight: 400,
           }}>
             🔧 Preview — aguarda @rootio-data (auth + Supabase)
           </div> */}
@@ -166,7 +164,7 @@ export function ParticipantesPanel({ habit }: PanelProps) {
                   {p.avatar}
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600 }}>{p.name}</div>
+                  <div style={{ fontSize: 13, fontWeight: 400 }}>{p.name}</div>
                   <div style={{ fontSize: 11, color: 'var(--t3)' }}>
                     {p.status === 'invited' ? 'Convite pendente' : p.done_at ? 'Concluído' : 'Online'}
                   </div>
@@ -272,7 +270,7 @@ function buildMockLogs(): SessionLog[] {
 
 // ─── TabelaPanel ─────────────────────────────────────────────────────────────
 
-export function TabelaPanel({ habit }: { habit: HabitWithLogs }) {
+export function TabelaPanel({ habit }: { habit: Habit }) {
   const [open, setOpen] = useState(false)
 
   // Real data from habit, fallback to mock for preview
@@ -332,11 +330,11 @@ export function TabelaPanel({ habit }: { habit: HabitWithLogs }) {
             background: 'var(--c-goal, #F59E0B)',
             display: 'flex', alignItems: 'center', gap: 8,
           }}>
-            <span style={{ fontSize: 13, fontWeight: 700, flex: 1 }}>Tabela de sessões</span>
+            <span style={{ fontSize: 13, fontWeight: 500, flex: 1 }}>Tabela de sessões</span>
             <button
               onClick={exportCSV}
               style={{
-                fontSize: 10, fontWeight: 700, padding: '3px 8px',
+                fontSize: 10, fontWeight: 500, padding: '3px 8px',
                 border: '2px solid var(--border)', borderRadius: 'var(--radius-sm)',
                 background: 'var(--bg2)', cursor: 'pointer', color: 'var(--t1)',
                 boxShadow: '2px 2px 0 var(--border)', fontFamily: 'var(--font-sans)',
@@ -351,7 +349,7 @@ export function TabelaPanel({ habit }: { habit: HabitWithLogs }) {
             <div style={{
               padding: '8px 14px',
               background: '#fef9c3', borderBottom: '1.5px solid #f59e0b',
-              fontSize: 11, color: '#78350f', fontWeight: 600,
+              fontSize: 11, color: '#78350f', fontWeight: 400,
               display: 'flex', alignItems: 'center', gap: 6,
             }}>
               🔧 Preview com dados mockados — registre sessões no Histórico para ver dados reais
@@ -371,8 +369,8 @@ export function TabelaPanel({ habit }: { habit: HabitWithLogs }) {
                 flex: 1, padding: '8px 12px', textAlign: 'center',
                 borderRight: i < 2 ? '1px solid var(--b2)' : 'none',
               }}>
-                <div style={{ fontSize: 14, fontWeight: 900, color: 'var(--t1)' }}>{s.value}</div>
-                <div style={{ fontSize: 9, fontWeight: 700, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '.06em' }}>{s.label}</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--t1)' }}>{s.value}</div>
+                <div style={{ fontSize: 9, fontWeight: 500, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '.06em' }}>{s.label}</div>
               </div>
             ))}
           </div>
@@ -385,7 +383,7 @@ export function TabelaPanel({ habit }: { habit: HabitWithLogs }) {
                   {['Data', 'Status', 'Tempo', 'Insight'].map(h => (
                     <th key={h} style={{
                       padding: '7px 12px', textAlign: 'left',
-                      fontSize: 10, fontWeight: 700, color: 'var(--t3)',
+                      fontSize: 10, fontWeight: 500, color: 'var(--t3)',
                       textTransform: 'uppercase', letterSpacing: '.07em',
                       borderBottom: '1.5px solid var(--b2)',
                       whiteSpace: 'nowrap',
@@ -404,12 +402,12 @@ export function TabelaPanel({ habit }: { habit: HabitWithLogs }) {
                     </td>
                     <td style={{ padding: '7px 12px' }}>
                       <span style={{
-                        fontSize: 10, fontWeight: 700, padding: '2px 6px',
+                        fontSize: 10, fontWeight: 500, padding: '2px 6px',
                         border: '1.5px solid #22c55e', borderRadius: 3,
                         background: '#dcfce7', color: '#15803d',
                       }}>✓ Feito</span>
                     </td>
-                    <td style={{ padding: '7px 12px', fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--t1)', whiteSpace: 'nowrap' }}>
+                    <td style={{ padding: '7px 12px', fontFamily: 'var(--font-mono)', fontWeight: 500, color: 'var(--t1)', whiteSpace: 'nowrap' }}>
                       {log.mins ? `${log.mins}min` : '—'}
                     </td>
                     <td style={{ padding: '7px 12px', color: log.insight ? 'var(--t1)' : 'var(--t3)', fontStyle: log.insight ? 'normal' : 'italic', maxWidth: 200 }}>
