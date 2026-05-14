@@ -86,9 +86,9 @@ function AppWithNav() {
   const commandItems: CommandItem[] = [
     { id: 'nav-home',     label: 'Início',       description: 'Dashboard principal',    iconClass: 'ph-house',          group: 'Navegar', onSelect: () => navigate('/') },
     { id: 'nav-habits',   label: 'Hábitos',      description: 'Ver todos os hábitos',   iconClass: 'ph-check-square',   group: 'Navegar', onSelect: () => navigate('/habits') },
-    { id: 'nav-progress', label: 'Progresso',    description: 'Estatísticas e nível',   iconClass: 'ph-chart-line-up',  group: 'Navegar', onSelect: () => navigate('/progress') },
     { id: 'nav-wallet',   label: 'Carteira',     description: 'Carteira e reservas',   iconClass: 'ph-wallet',         group: 'Navegar', onSelect: () => navigate('/wallet') },
     { id: 'nav-feed',     label: 'Diário',       description: 'Diário pessoal',          iconClass: 'ph-book-open',      group: 'Navegar', onSelect: () => navigate('/feed') },
+    { id: 'nav-progress', label: 'Progresso',    description: 'Estatísticas e nível',   iconClass: 'ph-chart-line-up',  group: 'Navegar', onSelect: () => navigate('/progress') },
     { id: 'nav-themes',   label: 'Temas',        description: 'Personalizar aparência', iconClass: 'ph-palette',        group: 'Sistema', onSelect: () => navigate('/themes') },
     { id: 'nav-settings', label: 'Ajustes',      description: 'Configurações gerais',   iconClass: 'ph-gear',           group: 'Sistema', onSelect: () => navigate('/settings') },
     ...habitItems,
@@ -106,10 +106,10 @@ function AppWithNav() {
             {/* ── Core ── */}
             <Route path="/"               element={<HomePage />} />
             <Route path="/habits"         element={<HabitsPage />} />
-            <Route path="/progress"       element={<ProgressPage />} />
             <Route path="/hub"            element={<HubPage />} />
             <Route path="/notifications"  element={<NotificationsPage />} />
             <Route path="/wallet"         element={<WalletPage />} />
+            <Route path="/progress"       element={<ProgressPage />} />
             <Route path="/settings"       element={<SettingsPage />} />
             <Route path="/settings/account" element={<AccountPage />} />
             <Route path="/themes"         element={<ThemesPage />} />

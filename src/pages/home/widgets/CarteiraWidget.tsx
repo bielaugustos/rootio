@@ -43,10 +43,10 @@ export function CarteiraWidget() {
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             boxShadow: '3px 3px 0 var(--border)', flexShrink: 0,
           }}>
-            <i className="ph ph-wallet" style={{ fontSize: 18, color: '#10b981' }} />
+            <i className="ph ph-wallet" style={{ fontSize: 18, color: 'var(--coral)' }} />
           </div>
           <div>
-            <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--t1)' }}>Carteira</div>
+            <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--t1)', fontFamily: 'Indie Flower' }}>Carteira</div>
             <div style={{ fontSize: 10, fontWeight: 500, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>finanças pessoais</div>
           </div>
         </div>
@@ -58,17 +58,17 @@ export function CarteiraWidget() {
       {/* Saldo */}
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
         <span style={{
-          fontSize: 28, fontWeight: 700, fontFamily: 'var(--font-mono)',
-          color: isPositive ? '#15803d' : '#b91c1c', lineHeight: 1,
+          fontSize: 28, fontWeight: 700, fontFamily: 'Indie Flower',
+          color: summary.balance === 0 ? 'var(--coral)' : isPositive ? '#15803d' : '#b91c1c', lineHeight: 1,
         }}>
           {fmt(summary.balance)}
         </span>
         <span style={{
-          fontSize: 10, fontWeight: 500, color: isPositive ? '#16a34a' : '#dc2626',
+          fontSize: 10, fontWeight: 500,           color: '#000000',
           textTransform: 'uppercase', letterSpacing: '0.08em',
           padding: '2px 7px', borderRadius: 99,
-          background: isPositive ? '#dcfce7' : '#fee2e2',
-          border: `1.5px solid ${isPositive ? '#86efac' : '#fca5a5'}`,
+          background: isPositive ? 'var(--grass)' : 'var(--coral)',
+          border: '2px solid var(--border)',
         }}>
           {isPositive ? '▲ positivo' : '▼ negativo'}
         </span>
@@ -93,7 +93,7 @@ export function CarteiraWidget() {
             <i className="ph ph-trend-up" style={{ fontSize: 12, color: '#22c55e' }} />
             <span style={{ fontSize: 10, fontWeight: 500, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Entradas</span>
           </div>
-          <div style={{ fontSize: 15, fontWeight: 700, fontFamily: 'var(--font-mono)', color: '#15803d' }}>{fmt(summary.income)}</div>
+          <div style={{ fontSize: 15, fontWeight: 700, fontFamily: 'Indie Flower', color: '#15803d' }}>{fmt(summary.income)}</div>
         </div>
         <div style={{
           flex: 1, padding: '10px 12px',
@@ -104,7 +104,7 @@ export function CarteiraWidget() {
             <i className="ph ph-trend-down" style={{ fontSize: 12, color: '#f87171' }} />
             <span style={{ fontSize: 10, fontWeight: 500, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Saídas</span>
           </div>
-          <div style={{ fontSize: 15, fontWeight: 700, fontFamily: 'var(--font-mono)', color: '#b91c1c' }}>{fmt(summary.expense)}</div>
+          <div style={{ fontSize: 15, fontWeight: 700, fontFamily: 'Indie Flower', color: '#b91c1c' }}>{fmt(summary.expense)}</div>
         </div>
       </div>
 

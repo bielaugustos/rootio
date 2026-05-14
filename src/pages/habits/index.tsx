@@ -13,9 +13,12 @@ import { HabitCard }   from './HabitCard'
 import { EntryForm }   from './EntryForm'
 import { LIST_LABELS } from './habitConstants'
 import { useHabitsLayout } from './useHabitsLayout'
+import { DesktopSearchBar } from '../../components/DesktopSearchBar'
+import { MobileSearchBar } from '../../components/MobileSearchBar'
+import { defaultFilter, type FilterState } from '../../components/searchConstants'
 import type { PanelType } from './PanelPortal'
 import { CalendarView } from './CalendarView'
-import { Input } from '../../components/Input'
+
 import {
   DndContext,
   DragOverlay,
@@ -162,27 +165,14 @@ function DrawerHandle({ onClose }: { onClose: () => void }) {
   )
 }
 
-// ─── Filter variants ──────────────────────────────────────────────
 
-const FILTER_VARIANTS: Record<string, { bg: string; border: string; text: string }> = {
-  all:   { bg: 'var(--secondary-background)', border: 'var(--border)',      text: 'var(--t1)' },
-  habit: { bg: 'var(--c-habit, #F5EFDF)',     border: 'var(--c-habit-b, #D4C9A9)', text: 'var(--c-habit-t, #0C0C0C)' },
-  task:  { bg: 'var(--c-task-bg, #6FB8FF)',   border: 'var(--c-task-b, #3B82F6)',  text: 'var(--c-task-t, #000000)' },
-  goal:  { bg: 'var(--c-goal-bg, #F59E0B)',   border: 'var(--c-goal-b, #D97706)',  text: 'var(--c-goal-t, #000000)' },
-  event: { bg: 'var(--c-event-bg, #9B7BFF)',  border: 'var(--c-event-b, #7C5CDB)', text: 'var(--c-event-t, #000000)' },
-}
-
-const FILTER_LABELS: Record<string, string> = {
-  all: 'Todos', habit: 'Hábito', task: 'Tarefa', goal: 'Meta', event: 'Evento',
-}
 
 // ─── HabitsPage ───────────────────────────────────────────────────
 
 export function HabitsPage() {
   // ── Data state ──
   const [habits,       setHabits]       = useState<Habit[]>([])
-  const [activeList,   setActiveList]   = useState<HabitList | 'all'>('all')
-  const [search,       setSearch]       = useState('')
+  const [filter,       setFilter]       = useState<FilterState>(defaultFilter)
   const [loading,      setLoading]      = useState(true)
   const { view: currentView } = useView()
   const view = currentView === 'calendario' ? 'calendar' : 'list'
@@ -336,8 +326,13 @@ export function HabitsPage() {
   }, [loadDeletedHabits])
 
   // ── Derived ──
-  const filteredBySearch = habits.filter(h => h.name.toLowerCase().includes(search.toLowerCase()))
-  const filtered    = activeList === 'all' ? filteredBySearch : filteredBySearch.filter(h => h.list === activeList)
+  const filteredByFilter = habits.filter(h => {
+    const matchList = filter.list === 'all' || h.list === filter.list
+    const matchQuery = h.name.toLowerCase().includes(filter.query.toLowerCase())
+    const matchPending = !filter.onlyPending || !h.done
+    return matchList && matchQuery && matchPending
+  })
+  const filtered = filteredByFilter
   const col2Open    = formOpen || activePanel !== null
 
   if (loading) return (
@@ -363,7 +358,7 @@ export function HabitsPage() {
       {/* ── Mobile drawer backdrop ── */}
       <DrawerOverlay visible={layout.drawerOpen} onClick={closeCol2} />
 
-      <PageWrapper maxWidth={layout.pageMaxWidth}>
+      <PageWrapper maxWidth={view === 'calendar' ? 900 : layout.pageMaxWidth}>
         <div style={{
           display:        'flex',
           gap:            layout.isDesktop ? 20 : 0,
@@ -387,101 +382,55 @@ export function HabitsPage() {
                 <h1 style={{ fontSize: 28, color: 'var(--t1)', marginBottom: 4, fontFamily: 'var(--font-title)' }}>
                   Hábitos
                 </h1>
-                <p style={{ color: 'var(--t2)', fontSize: 15, margin: 0 }}>
-                  {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
-                </p>
+                {view !== 'calendar' && (
+                  <p style={{ color: 'var(--t2)', fontSize: 15, margin: 0 }}>
+                    {new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
+                  </p>
+                )}
               </div>
-              <Button
-                onClick={col2Open && formOpen ? closeCol2 : () => openForm(null)}
-                variant={col2Open && formOpen ? 'neutral' : 'default'}
-                id="btn-new-habit"
-                style={{
-                  background:  col2Open && formOpen ? undefined : '#F59E0B',
-                  borderColor: col2Open && formOpen ? undefined : 'var(--border)',
-                  color:       col2Open && formOpen ? undefined : '#000',
-                  flex:        layout.isMobile ? 1 : undefined,
-                  padding:     '12px 24px',
-                }}
-              >
-                <i className={`ph ${col2Open && formOpen ? 'ph-x' : 'ph-plus'}`} style={{ fontSize: 16 }} />
-                {col2Open && formOpen ? 'Cancelar' : 'Nova entrada'}
-              </Button>
+              {!(layout.isMobile === false && view === 'list') && (
+                <Button
+                  onClick={col2Open && formOpen ? closeCol2 : () => openForm(null)}
+                  variant={col2Open && formOpen ? 'neutral' : 'default'}
+                  id="btn-new-habit"
+                  style={{
+                    background:  col2Open && formOpen ? undefined : '#F59E0B',
+                    borderColor: col2Open && formOpen ? undefined : 'var(--border)',
+                    color:       col2Open && formOpen ? undefined : '#000',
+                    flex:        layout.isMobile ? 1 : undefined,
+                    padding:     '12px 24px',
+                  }}
+                >
+                  <i className={`ph ${col2Open && formOpen ? 'ph-x' : 'ph-plus'}`} style={{ fontSize: 16 }} />
+                  {col2Open && formOpen ? 'Cancelar' : 'Nova entrada'}
+                </Button>
+              )}
             </div>
 
-            {/* Search input */}
+            {/* Search & filters */}
             {!showTrash && view === 'list' && (
               <div style={{ marginBottom: 20 }}>
-                <Input
-                  placeholder="digite o texto buscar e pressione enter para +"
-                  value={search}
-                  onChange={setSearch}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && search.trim()) {
-                      handleSave({
-                        name: search.trim(),
-                        list: activeList === 'all' ? 'habit' : activeList
-                      })
-                      setSearch('')
-                    }
-                  }}
-                />
+                {layout.isMobile ? (
+                  <MobileSearchBar
+                    habits={habits}
+                    filter={filter}
+                    onFilterChange={setFilter}
+                    onSelectHabit={handleEdit}
+                    onNewEntry={() => openForm(null)}
+                  />
+                ) : (
+                  <DesktopSearchBar
+                    habits={habits}
+                    filter={filter}
+                    onFilterChange={setFilter}
+                    onSelectHabit={handleEdit}
+                    onNewEntry={() => openForm(null)}
+                  />
+                )}
               </div>
             )}
 
-            {/* Filter pills */}
-            <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
-              {!showTrash && view === 'list' && (['all', 'habit', 'task', 'goal', 'event'] as const).map(list => {
-                const isActive = activeList === list
-                const v = FILTER_VARIANTS[list]
-                const count = list === 'all' ? habits.length : habits.filter(h => h.list === list).length
-                return (
-                  <button
-                    key={list}
-                    onClick={() => setActiveList(list)}
-                    style={{
-                      display: 'inline-flex', alignItems: 'center', gap: 6,
-                      padding: '5px 14px', fontSize: 12, fontWeight: 700,
-                      fontFamily: 'var(--font-sans)', cursor: 'pointer',
-                      borderRadius: 'var(--radius-sm)',
-                      border: `2px solid ${isActive ? 'var(--border)' : 'var(--b2)'}`,
-                      background: isActive ? v.bg : 'var(--secondary-background)',
-                      color: isActive ? v.text : 'var(--t2)',
-                      boxShadow: isActive ? 'none' : 'var(--shadow-x) var(--shadow-y) 0 var(--border)',
-                      transform: isActive ? 'translate(var(--shadow-x), var(--shadow-y))' : 'none',
-                      transition: 'all 0.1s',
-                    }}
-                  >
-                    {FILTER_LABELS[list]}
-                    <span style={{ opacity: 0.6 }}>{count}</span>
-                  </button>
-                )
-              })}
-              {view === 'list' && (
-              <button
-                onClick={() => {
-                  const next = !showTrash
-                  setShowTrash(next)
-                  if (next) { closeCol2(); setSearch(''); loadDeletedHabits() }
-                }}
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 6,
-                  padding: '5px 14px', fontSize: 12, fontWeight: 700,
-                  fontFamily: 'var(--font-sans)', cursor: 'pointer',
-                  borderRadius: 'var(--radius-sm)',
-                  border: `2px solid ${showTrash ? 'var(--border)' : 'var(--b2)'}`,
-                  background: showTrash ? '#FF6B6B' : 'var(--secondary-background)',
-                  color: showTrash ? '#fff' : 'var(--t2)',
-                  boxShadow: showTrash ? 'none' : 'var(--shadow-x) var(--shadow-y) 0 var(--border)',
-                  transform: showTrash ? 'translate(var(--shadow-x), var(--shadow-y))' : 'none',
-                  transition: 'all 0.1s',
-                }}
-              >
-                <i className="ph ph-trash" style={{ fontSize: 14 }} />
-                Lixeira
-                <span style={{ opacity: 0.6 }}>{deletedHabits.length}</span>
-              </button>
-              )}
-            </div>
+
 
             {/* Habit list */}
             {showTrash ? (
@@ -567,7 +516,7 @@ export function HabitsPage() {
                 <p style={{ color: 'var(--t2)', fontSize: 15, marginBottom: 16 }}>
                   {habits.length === 0
                     ? 'Nenhum hábito ainda.'
-                    : `Nenhum ${LIST_LABELS[activeList as HabitList] ?? 'item'} nesta categoria.`}
+                    : `Nenhum ${LIST_LABELS[filter.list as HabitList] ?? 'item'} nesta categoria.`}
                 </p>
                 <Button label="Criar primeiro hábito" onClick={() => openForm(null)} />
               </div>

@@ -30,13 +30,13 @@ export function StreakWidget() {
           <i className="ph ph-fire" style={{ fontSize: 20, color: '#f97316' }} />
         </div>
         <div>
-          <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--t1)' }}>Streak</div>
+          <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--t1)', fontFamily: 'Indie Flower' }}>Streak</div>
           <div style={{ fontSize: 10, fontWeight: 500, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>dias seguidos</div>
         </div>
       </div>
 
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-        <span style={{ fontSize: 36, fontWeight: 700, fontFamily: 'var(--font-mono)', color: 'var(--t1)', lineHeight: 1 }}>{streak}</span>
+        <span style={{ fontSize: 36, fontWeight: 700, fontFamily: 'Indie Flower', color: 'var(--t1)', lineHeight: 1 }}>{streak}</span>
         <span style={{ fontSize: 12, color: 'var(--t3)', fontWeight: 400 }}>dias</span>
       </div>
 

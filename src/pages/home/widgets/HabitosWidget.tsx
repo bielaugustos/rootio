@@ -31,7 +31,7 @@ export function HabitosWidget() {
             <i className="ph ph-check-square" style={{ fontSize: 18, color: '#f59e0b' }} />
           </div>
           <div>
-            <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--t1)' }}>Hábitos</div>
+            <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--t1)', fontFamily: 'Indie Flower' }}>Hábitos</div>
             <div style={{ fontSize: 10, fontWeight: 500, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
               {doneCount}/{habits.length} concluídos hoje
             </div>

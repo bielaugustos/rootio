@@ -19,9 +19,8 @@ export function IOHojeWidget() {
   const pct = today.total > 0 ? Math.round((today.done / today.total) * 100) : 0
   const isComplete = pct === 100
   const statusLabel = isComplete ? 'completo!' : today.total === 0 ? 'sem hábitos' : 'em andamento'
-  const statusBg = isComplete ? '#dcfce7' : today.done > 0 ? '#dbeafe' : 'var(--bg3)'
-  const statusBorder = isComplete ? '#22c55e' : today.done > 0 ? '#3b82f6' : 'var(--b2)'
-  const statusColor = isComplete ? '#166534' : today.done > 0 ? '#1e40af' : 'var(--t3)'
+  const statusBg = isComplete ? 'var(--grass)' : today.done > 0 ? '#dbeafe' : 'var(--background)'
+  const statusColor = isComplete ? '#000000' : today.done > 0 ? '#1e40af' : 'var(--t3)'
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', padding: 20, gap: 14 }}>
@@ -35,7 +34,7 @@ export function IOHojeWidget() {
           <i className="ph ph-chart-bar" style={{ fontSize: 20, color: '#3b82f6' }} />
         </div>
         <div>
-          <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--t1)' }}>Hoje</div>
+          <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--t1)', fontFamily: 'Indie Flower' }}>Hoje</div>
           <div style={{ fontSize: 10, fontWeight: 500, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>progresso diário</div>
         </div>
       </div>
@@ -56,21 +55,21 @@ export function IOHojeWidget() {
           <div style={{
             position: 'absolute', inset: 0, display: 'flex',
             alignItems: 'center', justifyContent: 'center',
-            fontSize: 12, fontWeight: 700, fontFamily: 'var(--font-mono)', color: 'var(--t1)',
+            fontSize: 12, fontWeight: 700, fontFamily: 'Indie Flower', color: 'var(--t1)',
           }}>
             {pct}%
           </div>
         </div>
 
         <div>
-          <div style={{ fontSize: 22, fontWeight: 700, fontFamily: 'var(--font-mono)', color: 'var(--t1)' }}>
+          <div style={{ fontSize: 22, fontWeight: 700, fontFamily: 'Indie Flower', color: 'var(--t1)' }}>
             {today.done}<span style={{ fontSize: 14, color: 'var(--t3)' }}>/{today.total}</span>
           </div>
           <div style={{ fontSize: 10, fontWeight: 500, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: 2 }}>hábitos feitos</div>
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 4, marginTop: 8,
             padding: '3px 10px', borderRadius: 99,
-            background: statusBg, border: `1.5px solid ${statusBorder}`,
+            background: statusBg,           border: `2px solid var(--border)`,
             fontSize: 11, fontWeight: 500, color: statusColor,
           }}>
             <i className={`ph ${isComplete ? 'ph-check-circle' : 'ph-clock'}`} style={{ fontSize: 11 }} />

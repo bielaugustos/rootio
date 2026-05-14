@@ -1,6 +1,6 @@
 export const DEFAULT_DARK: Record<string, string> = {
-  '--background': '#1D1C21',
-  '--secondary-background': '#26252B',
+  '--background': '#2A2A2A',
+  '--secondary-background': '#2A2A2A',
   '--bg2': '#2E2D33',
   '--bg3': '#35343B',
   '--bg4': '#3C3B42',
