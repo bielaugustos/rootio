@@ -463,7 +463,7 @@ export function CalendarView({
   const [selectedDate,  setSelectedDate]  = useState<string | null>(todayStr())
   const [historyCache,  setHistoryCache]  = useState<Map<string, Set<string>>>(new Map())
   const [contextMenu,   setContextMenu]   = useState<{ x: number; y: number; dateStr: string } | null>(null)
-  const [searchQuery,   setSearchQuery]   = useState('')
+
   const touchStartX = useRef<number | null>(null)
 
   // Load history for visible month
@@ -492,19 +492,16 @@ export function CalendarView({
     const ds   = dateToStr(d)
     const dow  = d.getDay()
     const thisMonthHabits = habitsForDay(habits, dow)
-    const filtered = searchQuery
-      ? thisMonthHabits.filter(h => h.name.toLowerCase().includes(searchQuery.toLowerCase()))
-      : thisMonthHabits
 
     return {
       date:        d,
       dateStr:     ds,
       isToday:     ds === todayStr(),
       isOtherMonth: d.getMonth() !== month,
-      habits:      filtered,
+      habits:      thisMonthHabits,
       doneFromHistory: historyCache.get(ds) ?? new Set(),
     }
-  }, [habits, month, historyCache, searchQuery])
+  }, [habits, month, historyCache])
 
   const selectedDayData = selectedDate
     ? buildDayData(new Date(selectedDate + 'T12:00:00'))
@@ -593,36 +590,7 @@ export function CalendarView({
           )}
         </div>
 
-        {/* Search */}
-        <div style={{ position: 'relative', flex: isMobile ? 1 : 'none' }}>
-          <i className="ph ph-magnifying-glass" style={{
-            position: 'absolute', left: 9, top: '50%', transform: 'translateY(-50%)',
-            color: 'var(--t3)', fontSize: 13, pointerEvents: 'none',
-          }} />
-          <input
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            placeholder="Buscar hábitos..."
-            style={{
-              paddingLeft:   28,
-              paddingRight:  10,
-              paddingTop:    7,
-              paddingBottom: 7,
-              fontSize:      12,
-              fontFamily:    'var(--font-sans)',
-              fontWeight:    600,
-              border:        '2px solid var(--b2, #ccc)',
-              borderRadius:  'var(--radius-sm)',
-              background:    'var(--secondary-background)',
-              color:         'var(--t1)',
-              outline:       'none',
-              width:         isMobile ? '100%' : 180,
-              transition:    'border-color .15s, box-shadow .15s',
-            }}
-            onFocus={e  => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = '2px 2px 0 var(--border)' }}
-            onBlur={e   => { e.currentTarget.style.borderColor = 'var(--b2, #ccc)'; e.currentTarget.style.boxShadow = 'none' }}
-          />
-        </div>
+
 
         {/* Stats chip */}
         {!isMobile && (
