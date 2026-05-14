@@ -91,7 +91,9 @@ const PRESETS = [
 export function AgendarPanel({ habit, onRefresh }: PanelProps) {
   const [open,   setOpen]   = useState(false)
   const [saving, setSaving] = useState(false)
-  const [date,   setDate]   = useState<string>(habit.deadline ?? '')
+  const [date,   setDate]   = useState<Date | null>(
+    habit.deadline ? new Date(habit.deadline) : null
+  )
 
   const today = todayISO()
 
@@ -108,17 +110,17 @@ export function AgendarPanel({ habit, onRefresh }: PanelProps) {
   }, [habit.id, onRefresh])
 
   const handleDateChange = async (iso: string) => {
-    setDate(iso)
+    setDate(new Date(iso))
     await save(iso)
   }
 
   const handlePreset = async (iso: string) => {
-    setDate(iso)
+    setDate(new Date(iso))
     await save(iso)
   }
 
   const handleClear = async () => {
-    setDate('')
+    setDate(null)
     await save('')
   }
 
@@ -205,13 +207,13 @@ export function AgendarPanel({ habit, onRefresh }: PanelProps) {
                   onClick={() => handlePreset(today)}
                   style={{
                     padding: '5px 12px', fontSize: 11, fontWeight: 500,
-                    border: `2px solid ${date === today ? 'var(--border)' : 'var(--b2)'}`,
+                    border: `2px solid ${date && date.toISOString().slice(0,10) === today ? 'var(--border)' : 'var(--b2)'}`,
                     borderRadius: 'var(--radius-sm)',
-                    background: date === today ? 'var(--main, #ffbf00)' : 'var(--bg3)',
+                    background: date && date.toISOString().slice(0,10) === today ? 'var(--main, #ffbf00)' : 'var(--bg3)',
                     color: 'var(--t1)', cursor: 'pointer',
                     fontFamily: 'var(--font-sans)',
-                    boxShadow: date === today ? '2px 2px 0 var(--border)' : 'none',
-                    transform: date === today ? 'translate(2px,2px)' : 'none',
+                    boxShadow: date && date.toISOString().slice(0,10) === today ? '2px 2px 0 var(--border)' : 'none',
+                    transform: date && date.toISOString().slice(0,10) === today ? 'translate(2px,2px)' : 'none',
                   }}
                 >
                   Hoje
@@ -219,7 +221,7 @@ export function AgendarPanel({ habit, onRefresh }: PanelProps) {
 
                 {PRESETS.map(p => {
                   const iso = p.fn()
-                  const active = date === iso
+                  const active = date ? date.toISOString().slice(0,10) === iso : false
                   return (
                     <button
                       key={p.label}
@@ -249,9 +251,8 @@ export function AgendarPanel({ habit, onRefresh }: PanelProps) {
               </div>
               <DatePicker
                 value={date}
-                onChange={handleDateChange}
+                onChange={(d) => { setDate(d); if (d) handleDateChange(d.toISOString()) }}
                 placeholder="Escolher data..."
-                minDate={today}
               />
             </div>
 

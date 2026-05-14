@@ -2,237 +2,149 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PageWrapper } from '../../components/PageWrapper'
 import { FeedOnboarding } from './FeedOnboarding'
-import { POSTS, CATEGORIES } from './data'
+import { loadEntries, type DiaryEntry, getMoodLabel } from './data'
 
-// ─── Shared styles ────────────────────────────────────────────────────────────
-const iconBtn: React.CSSProperties = {
-  width: 36, height: 36,
-  display: 'flex', alignItems: 'center', justifyContent: 'center',
-  background: 'var(--secondary-background)',
-  border: '2px solid var(--border)',
-  borderRadius: 'var(--radius-sm)',
-  boxShadow: '2px 2px 0 var(--border)',
-  cursor: 'pointer', color: 'var(--t2)',
-  transition: 'transform 0.1s, box-shadow 0.1s',
-}
-
-const ghostBtn: React.CSSProperties = {
-  display: 'flex', alignItems: 'center', gap: 5,
-  background: 'none', border: 'none',
-  padding: '5px 10px', borderRadius: 'var(--radius-sm)',
-  fontSize: 13, color: 'var(--t3)', cursor: 'pointer',
-  fontFamily: 'var(--font-sans)',
-}
-
-const actionBtn: React.CSSProperties = {
-  display: 'flex', alignItems: 'center', gap: 5,
-  background: 'none', border: 'none',
-  padding: '5px 8px', borderRadius: 'var(--radius-sm)',
-  fontSize: 13, fontWeight: 400, color: 'var(--t3)',
-  cursor: 'pointer', fontFamily: 'var(--font-sans)',
-  transition: 'background 0.12s',
-}
-
-// ─── Feed page ────────────────────────────────────────────────────────────────
-export function FeedPage() {
-  // Show onboarding only on first visit (persisted in localStorage)
-  const [showOnboarding, setShowOnboarding] = useState(
-    () => localStorage.getItem('feed-onboarding-done') !== '1'
-  )
-
-  const [activeCategory, setActiveCategory] = useState('Tudo')
-  const [likes,  setLikes]  = useState<Record<string, number>>({})
-  const [liked,  setLiked]  = useState<Record<string, boolean>>({})
+function EntryCard({ entry }: { entry: DiaryEntry }) {
   const navigate = useNavigate()
-
-  const filtered = POSTS.filter(p => activeCategory === 'Tudo' || p.category === activeCategory)
-
-  const toggleLike = (id: string, base: number, e: React.MouseEvent) => {
-    e.stopPropagation()
-    const isLiked = liked[id]
-    setLiked(prev  => ({ ...prev, [id]: !isLiked }))
-    setLikes(prev  => ({ ...prev, [id]: (prev[id] ?? base) + (isLiked ? -1 : 1) }))
-  }
-
-  // Render onboarding overlay (fullscreen, above everything)
-  if (showOnboarding) {
-    return <FeedOnboarding onDone={() => setShowOnboarding(false)} />
-  }
+  const mood = getMoodLabel(entry.mood)
+  const date = new Date(entry.date + 'T12:00:00')
+  const day = date.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })
 
   return (
-    <PageWrapper maxWidth={680}>
-
-      {/* ── Header ── */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-        <h1 style={{ fontFamily: 'var(--font-title)', fontSize: 28, color: 'var(--t1)' }}>Feed</h1>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button
-            onClick={() => navigate('/feed/settings')}
-            style={iconBtn}
-            onMouseEnter={e => { e.currentTarget.style.transform = 'translate(2px,2px)'; e.currentTarget.style.boxShadow = 'none' }}
-            onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '2px 2px 0 var(--border)' }}
-            title="Configurações do Feed"
-          >
-            <i className="ph ph-gear" style={{ fontSize: 18 }} />
-          </button>
-          <button
-            style={iconBtn}
-            onMouseEnter={e => { e.currentTarget.style.transform = 'translate(2px,2px)'; e.currentTarget.style.boxShadow = 'none' }}
-            onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '2px 2px 0 var(--border)' }}
-          >
-            <i className="ph ph-bell" style={{ fontSize: 18 }} />
-          </button>
-        </div>
-      </div>
-
-      {/* ── Composer ── */}
-      <div style={{
+    <article
+      onClick={() => navigate(`/feed/${entry.id}`)}
+      style={{
         background: 'var(--secondary-background)',
         border: '2px solid var(--border)',
         borderRadius: 'var(--radius-base)',
         boxShadow: '3px 3px 0 var(--border)',
-        padding: '12px 16px',
-        marginBottom: 16,
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
-          <div style={{ width: 36, height: 36, borderRadius: 'var(--radius-sm)', background: 'var(--main)', border: '2px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 500, fontSize: 12, flexShrink: 0 }}>
-            EU
+        padding: 16, cursor: 'pointer',
+        transition: 'transform 0.1s, box-shadow 0.1s',
+      }}
+      onMouseEnter={e => { e.currentTarget.style.transform = 'translate(2px,2px)'; e.currentTarget.style.boxShadow = 'none' }}
+      onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '3px 3px 0 var(--border)' }}
+    >
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 10 }}>
+        <div style={{ fontSize: 28, lineHeight: 1, flexShrink: 0 }}>{mood.emoji}</div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 15, fontWeight: 500, color: 'var(--t1)', marginBottom: 2 }}>{entry.title || 'Sem título'}</div>
+          <div style={{ fontSize: 12, color: 'var(--t3)' }}>{day}</div>
+        </div>
+        <div style={{ fontSize: 11, fontWeight: 500, padding: '2px 8px', borderRadius: 'var(--radius-sm)', border: '1.5px solid var(--border)', background: 'var(--bg2)', color: 'var(--t3)', whiteSpace: 'nowrap' }}>
+          {mood.label}
+        </div>
+      </div>
+      <p style={{ fontSize: 14, color: 'var(--t2)', lineHeight: 1.6, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        {entry.content}
+      </p>
+      {entry.tags.length > 0 && (
+        <div style={{ display: 'flex', gap: 4, marginTop: 10, flexWrap: 'wrap' }}>
+          {entry.tags.map(tag => (
+            <span key={tag} style={{ fontSize: 10, fontWeight: 500, padding: '2px 6px', borderRadius: 'var(--radius-sm)', border: '1.5px solid var(--border)', background: 'var(--main)', color: 'var(--main-foreground)' }}>
+              {tag}
+            </span>
+          ))}
+        </div>
+      )}
+    </article>
+  )
+}
+
+export function FeedPage() {
+  const [showOnboarding, setShowOnboarding] = useState(
+    () => localStorage.getItem('feed-onboarding-done') !== '1'
+  )
+  const [entries, setEntries] = useState<DiaryEntry[]>(loadEntries)
+  const navigate = useNavigate()
+
+  if (showOnboarding) {
+    return <FeedOnboarding onDone={() => setShowOnboarding(false)} />
+  }
+
+  const today = new Date().toISOString().split('T')[0]
+  const todayEntry = entries.find(e => e.date === today)
+
+  return (
+    <PageWrapper maxWidth={680}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+        <div>
+          <h1 style={{ fontFamily: 'var(--font-title)', fontSize: 28, color: 'var(--t1)', margin: 0 }}>Diário</h1>
+          <p style={{ fontSize: 14, color: 'var(--t3)', margin: '4px 0 0 0' }}>Registre seus pensamentos e reflexões</p>
+        </div>
+        <button
+          onClick={() => navigate('/feed/settings')}
+          style={{
+            width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'var(--secondary-background)', border: '2px solid var(--border)',
+            borderRadius: 'var(--radius-sm)', boxShadow: '2px 2px 0 var(--border)',
+            cursor: 'pointer', color: 'var(--t2)',
+          }}
+          title="Configurações do Diário"
+        >
+          <i className="ph ph-gear" style={{ fontSize: 18 }} />
+        </button>
+      </div>
+
+      {/* Hoje - check-in rápido */}
+      {todayEntry ? (
+        <div style={{
+          background: 'var(--secondary-background)', border: '2px solid var(--border)',
+          borderRadius: 'var(--radius-base)', boxShadow: '3px 3px 0 var(--border)',
+          padding: '12px 16px', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 12,
+        }}>
+          <div style={{ fontSize: 24 }}>{getMoodLabel(todayEntry.mood).emoji}</div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--t1)' }}>Check-in de hoje feito</div>
+            <div style={{ fontSize: 12, color: 'var(--t3)' }}>{todayEntry.title || 'Toque para ver detalhes'}</div>
           </div>
-          <button
-            onClick={() => navigate('/feed/new')}
-            style={{ flex: 1, background: 'var(--bg2)', border: '2px solid var(--border)', borderRadius: 'var(--radius-base)', padding: '9px 14px', textAlign: 'left', fontSize: 14, color: 'var(--t3)', cursor: 'pointer', fontFamily: 'var(--font-sans)' }}
-          >
-            O que você está pensando?
-          </button>
+          <button onClick={() => navigate(`/feed/${todayEntry.id}`)} style={{
+            background: 'none', border: 'none', color: 'var(--main)', cursor: 'pointer', fontSize: 13, fontWeight: 500, fontFamily: 'var(--font-sans)',
+          }}>Ver →</button>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <button style={ghostBtn}><i className="ph ph-image" style={{ fontSize: 16 }} /> Imagem</button>
-          <button style={ghostBtn}><i className="ph ph-link"  style={{ fontSize: 16 }} /> Link</button>
-          <div style={{ flex: 1 }} />
-          <button
-            onClick={() => navigate('/feed/new')}
-            style={{
-              background: 'var(--main)', color: 'var(--main-foreground)',
-              border: '2px solid var(--border)',
-              borderRadius: 'var(--radius-sm)',
-              boxShadow: '2px 2px 0 var(--border)',
-              padding: '7px 18px', fontWeight: 500, fontSize: 13,
-              cursor: 'pointer', letterSpacing: '0.05em',
-              transition: 'transform 0.1s, box-shadow 0.1s',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.transform = 'translate(2px,2px)'; e.currentTarget.style.boxShadow = 'none' }}
-            onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '2px 2px 0 var(--border)' }}
-          >
-            POSTAR
-          </button>
+      ) : (
+        <div style={{
+          background: 'var(--secondary-background)', border: '2px solid var(--main)',
+          borderRadius: 'var(--radius-base)', boxShadow: '3px 3px 0 var(--border)',
+          padding: '16px 18px', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 12,
+          cursor: 'pointer',
+        }}
+          onClick={() => navigate('/feed/new')}
+        >
+          <div style={{ width: 40, height: 40, borderRadius: 'var(--radius-sm)', background: 'var(--main)', border: '2px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <i className="ph ph-pencil" style={{ fontSize: 18, color: 'var(--main-foreground)' }} />
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--t1)' }}>Como foi seu dia?</div>
+            <div style={{ fontSize: 12, color: 'var(--t3)' }}>Registre seu humor e reflexões</div>
+          </div>
+          <i className="ph ph-arrow-right" style={{ fontSize: 18, color: 'var(--t3)' }} />
         </div>
-      </div>
+      )}
 
-      {/* ── Category pills ── */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 16, overflowX: 'auto', paddingBottom: 4 }}>
-        {CATEGORIES.map(cat => (
-          <button
-            key={cat}
-            onClick={() => setActiveCategory(cat)}
-            style={{
-              flexShrink: 0, padding: '6px 16px',
-              borderRadius: 'var(--radius-base)',
-              border: '2px solid var(--border)',
-              fontFamily: 'var(--font-sans)', fontSize: 13, fontWeight: 400, cursor: 'pointer',
-              background: activeCategory === cat ? 'var(--main)'               : 'var(--secondary-background)',
-              color:      activeCategory === cat ? 'var(--main-foreground)'    : 'var(--t2)',
-              boxShadow:  activeCategory === cat ? '2px 2px 0 var(--border)'  : 'none',
-              transition: 'all 0.12s',
-            }}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
-
-      {/* ── Posts ── */}
+      {/* Timeline */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {filtered.map(post => {
-          const likeCount = likes[post.id] ?? post.likes
-          const isLiked   = liked[post.id] ?? false
-          return (
-            <article
-              key={post.id}
-              onClick={() => navigate(`/feed/${post.id}`)}
-              style={{
-                background: 'var(--secondary-background)',
-                border: '2px solid var(--border)',
-                borderRadius: 'var(--radius-base)',
-                boxShadow: '3px 3px 0 var(--border)',
-                padding: 16, cursor: 'pointer',
-                transition: 'transform 0.1s, box-shadow 0.1s',
-              }}
-              onMouseEnter={e => { e.currentTarget.style.transform = 'translate(2px,2px)'; e.currentTarget.style.boxShadow = 'none' }}
-              onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '3px 3px 0 var(--border)' }}
-            >
-              {/* Author */}
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 10 }}>
-                <div style={{ width: 40, height: 40, borderRadius: 'var(--radius-sm)', border: '2px solid var(--border)', background: post.bgColor, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 500, fontSize: 12, color: post.fgColor, flexShrink: 0 }}>
-                  {post.initials}
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                    <span style={{ fontFamily: 'var(--font-sans)', fontWeight: 500, fontSize: 14, color: 'var(--t1)' }}>{post.user}</span>
-                    {post.badge && (
-                      <span style={{ fontSize: 10, fontWeight: 500, letterSpacing: '0.05em', textTransform: 'uppercase', padding: '1px 7px', borderRadius: 'var(--radius-sm)', border: '1.5px solid var(--border)', background: 'var(--main)', color: 'var(--main-foreground)' }}>
-                        {post.badge}
-                      </span>
-                    )}
-                  </div>
-                  <div style={{ fontSize: 12, color: 'var(--t3)' }}>{post.time} atrás · {post.category}</div>
-                </div>
-                <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--t3)', padding: 4 }} onClick={e => e.stopPropagation()}>
-                  <i className="ph ph-dots-three" style={{ fontSize: 18 }} />
-                </button>
-              </div>
-
-              {/* Text */}
-              <p style={{ fontSize: 14, color: 'var(--t1)', lineHeight: 1.65, marginBottom: post.hasImage ? 12 : 10 }}>
-                {post.text}
-              </p>
-
-              {/* Image */}
-              {post.hasImage && (
-                <div style={{ width: '100%', aspectRatio: '16/9', borderRadius: 'var(--radius-sm)', border: '2px solid var(--border)', background: `linear-gradient(135deg, ${post.bgColor}, var(--bg2))`, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10, overflow: 'hidden' }}>
-                  {post.imageSrc
-                    ? <img src={post.imageSrc} alt="post" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    : <i className="ph ph-image" style={{ fontSize: 40, color: 'var(--t3)', opacity: 0.4 }} />
-                  }
-                </div>
-              )}
-
-              {/* Actions */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4, paddingTop: 8, borderTop: '1px solid var(--b2)' }}>
-                <button
-                  onClick={e => toggleLike(post.id, post.likes, e)}
-                  style={{ ...actionBtn, color: isLiked ? '#ef4444' : 'var(--t3)' }}
-                >
-                  <i className={`ph ${isLiked ? 'ph-heart-fill' : 'ph-heart'}`} style={{ fontSize: 18 }} />
-                  <span>{likeCount >= 1000 ? `${(likeCount / 1000).toFixed(1)}k` : likeCount}</span>
-                </button>
-                <button style={actionBtn} onClick={e => { e.stopPropagation(); navigate(`/feed/${post.id}`) }}>
-                  <i className="ph ph-chat-circle" style={{ fontSize: 18 }} />
-                  <span>{post.comments}</span>
-                </button>
-                <div style={{ flex: 1 }} />
-                <button style={actionBtn} onClick={e => e.stopPropagation()}>
-                  <i className="ph ph-share-network" style={{ fontSize: 18 }} />
-                </button>
-                <button style={actionBtn} onClick={e => e.stopPropagation()}>
-                  <i className="ph ph-bookmark-simple" style={{ fontSize: 18 }} />
-                </button>
-              </div>
-            </article>
-          )
-        })}
+        {entries.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '60px 24px', color: 'var(--t3)' }}>
+            <i className="ph ph-book-open" style={{ fontSize: 48, display: 'block', marginBottom: 12 }} />
+            <div style={{ fontFamily: 'var(--font-title)', fontSize: 18, marginBottom: 8, color: 'var(--t1)' }}>Nenhuma entrada ainda</div>
+            <div style={{ fontSize: 14, marginBottom: 20 }}>Comece a registrar seus dias e acompanhe sua evolução.</div>
+            <button onClick={() => navigate('/feed/new')} style={{
+              background: 'var(--main)', color: 'var(--main-foreground)',
+              border: '2px solid var(--border)', borderRadius: 'var(--radius-sm)',
+              boxShadow: '3px 3px 0 var(--border)', padding: '10px 24px',
+              fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'var(--font-sans)',
+            }}>
+              <i className="ph ph-plus" style={{ fontSize: 16, marginRight: 6 }} />Primeira entrada
+            </button>
+          </div>
+        ) : (
+          entries.map(entry => (
+            <EntryCard key={entry.id} entry={entry} />
+          ))
+        )}
       </div>
 
-      {/* ── FAB ── */}
+      {/* FAB */}
       <button
         onClick={() => navigate('/feed/new')}
         style={{
@@ -242,7 +154,6 @@ export function FeedPage() {
           boxShadow: '3px 3px 0 var(--border)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           cursor: 'pointer', zIndex: 50,
-          transition: 'transform 0.1s, box-shadow 0.1s',
         }}
         onMouseEnter={e => { e.currentTarget.style.transform = 'translate(3px,3px)'; e.currentTarget.style.boxShadow = 'none' }}
         onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '3px 3px 0 var(--border)' }}

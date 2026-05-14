@@ -10,6 +10,7 @@ export interface InputProps {
   id?: string
   style?: React.CSSProperties
   onChange?: (value: string) => void
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void
 }
 
 export function Input({
@@ -22,6 +23,7 @@ export function Input({
   id,
   style,
   onChange,
+  onKeyDown,
 }: InputProps) {
   const [focused, setFocused] = useState(false)
   const [internal, setInternal] = useState(value)
@@ -61,6 +63,7 @@ export function Input({
         onChange={handleChange}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
+        onKeyDown={onKeyDown}
         style={{
           height: 40,
           padding: '0 12px',

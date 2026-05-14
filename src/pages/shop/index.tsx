@@ -7,7 +7,7 @@ import { spendIO } from '../../engine/economyDB'
 import { getProfile, updateProfile } from '../../engine/profileDB'
 
 // ─── Catalogue ────────────────────────────────────────────────────────────────
-type ShopCategory = 'avatares' | 'temas' | 'powerups'
+type ShopCategory = 'avatares' | 'temas' | 'powerups' | 'planos'
 
 interface ShopItem {
   id: string
@@ -17,12 +17,11 @@ interface ShopItem {
   category: ShopCategory
   emoji?: string
   color?: string
-  preview?: string   // CSS background or color value
+  preview?: string
   rarity: 'comum' | 'raro' | 'lendario'
 }
 
 const ITEMS: ShopItem[] = [
-  // Avatares
   { id: 'av-fire',   name: '🔥 Chama',       desc: 'Para os incansáveis', price: 50,  category: 'avatares', emoji: '🔥', rarity: 'comum'   },
   { id: 'av-brain',  name: '🧠 Mente',        desc: 'Para os pensadores',  price: 50,  category: 'avatares', emoji: '🧠', rarity: 'comum'   },
   { id: 'av-rocket', name: '🚀 Foguete',      desc: 'Para os ambiciosos',  price: 100, category: 'avatares', emoji: '🚀', rarity: 'raro'    },
@@ -31,13 +30,11 @@ const ITEMS: ShopItem[] = [
   { id: 'av-gem',    name: '💎 Diamante',     desc: 'Raridade suprema',    price: 500, category: 'avatares', emoji: '💎', rarity: 'lendario' },
   { id: 'av-herb',   name: '🌿 Erva',         desc: 'Natural e sereno',    price: 30,  category: 'avatares', emoji: '🌿', rarity: 'comum'   },
   { id: 'av-bolt',   name: '⚡ Relâmpago',    desc: 'Velocidade máxima',   price: 80,  category: 'avatares', emoji: '⚡', rarity: 'raro'    },
-  // Temas de cor de fundo
   { id: 'bg-ocean',  name: 'Oceano',          desc: 'Azul profundo',       price: 60,  category: 'temas', color: '#1e3a5f', rarity: 'comum'   },
   { id: 'bg-forest', name: 'Floresta',        desc: 'Verde intenso',       price: 60,  category: 'temas', color: '#14532d', rarity: 'comum'   },
   { id: 'bg-dusk',   name: 'Entardecer',      desc: 'Roxo mágico',         price: 80,  category: 'temas', color: '#4c1d95', rarity: 'raro'    },
   { id: 'bg-neo',    name: 'Neon',            desc: 'Rosa vibrante',       price: 120, category: 'temas', color: '#831843', rarity: 'raro'    },
   { id: 'bg-gold',   name: 'Ouro',            desc: 'Dourado premium',     price: 250, category: 'temas', color: '#78350f', rarity: 'lendario' },
-  // Power-ups
   { id: 'pu-x2',     name: 'Multiplicador ×2', desc: '+100% IO por 7 dias',  price: 150, category: 'powerups', emoji: '✖️', rarity: 'raro'    },
   { id: 'pu-shield', name: 'Escudo de Streak', desc: 'Protege 1 dia de streak', price: 80, category: 'powerups', emoji: '🛡️', rarity: 'comum' },
   { id: 'pu-turbo',  name: 'Turbo de Hábitos', desc: '+50% IO em hábitos por 3 dias', price: 100, category: 'powerups', emoji: '💨', rarity: 'raro' },
@@ -70,19 +67,16 @@ function ItemCard({ item, owned, canAfford, onBuy }: {
       cursor: owned ? 'default' : canAfford ? 'pointer' : 'not-allowed',
       opacity: !owned && !canAfford ? 0.7 : 1,
     }}
-      onMouseEnter={e => { if (!owned && canAfford) { e.currentTarget.style.transform = 'translate(2px,2px)'; e.currentTarget.style.boxShadow = owned ? '0 0 0 var(--main)' : '0 0 0 var(--border)' } }}
+      onMouseEnter={e => { if (!owned && canAfford) { e.currentTarget.style.transform = 'translate(2px,2px)'; e.currentTarget.style.boxShadow = '0 0 0 var(--border)' } }}
       onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = owned ? '4px 4px 0 var(--main)' : '4px 4px 0 var(--border)' }}
       onClick={() => { if (!owned && canAfford) onBuy(item) }}
     >
-      {/* Preview */}
       <div style={{
         height: 80, display: 'flex', alignItems: 'center', justifyContent: 'center',
         background: item.color ?? 'var(--bg2)',
-        fontSize: item.emoji ? 36 : 14,
-        position: 'relative',
+        fontSize: item.emoji ? 36 : 14, position: 'relative',
       }}>
         {item.emoji ?? ''}
-        {/* Rarity badge */}
         <div style={{ position: 'absolute', top: 6, right: 6, fontSize: 9, fontWeight: 500, padding: '2px 6px', borderRadius: 'var(--radius-sm)', border: '1.5px solid var(--border)', background: RARITY_BG[item.rarity], color: RARITY_COLOR[item.rarity], textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           {item.rarity}
         </div>
@@ -92,8 +86,6 @@ function ItemCard({ item, owned, canAfford, onBuy }: {
           </div>
         )}
       </div>
-
-      {/* Info */}
       <div style={{ padding: '10px 12px', flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
         <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--t1)' }}>{item.name}</div>
         <div style={{ fontSize: 11, color: 'var(--t3)', flex: 1 }}>{item.desc}</div>
@@ -136,18 +128,121 @@ function ConfirmModal({ item, onConfirm, onClose }: { item: ShopItem; onConfirm:
   )
 }
 
+// ─── Plans section ────────────────────────────────────────────────────────────
+const PLAN_FEATURES = [
+  { label: 'Hábitos e tarefas', free: true, pro: true },
+  { label: 'Diário pessoal', free: true, pro: true },
+  { label: 'Carteira e reservas', free: true, pro: true },
+  { label: 'IO Economy', free: true, pro: true },
+  { label: 'Metas de carreira', free: false, pro: true },
+  { label: 'Quadro kanban', free: false, pro: true },
+  { label: 'Sprint/Pomodoro', free: false, pro: true },
+  { label: 'Power-ups na loja', free: false, pro: true },
+  { label: 'Mentor', free: false, pro: true },
+  { label: 'Sync na nuvem', free: false, pro: true },
+  { label: 'Suporte prioritário', free: false, pro: true },
+]
+
+function PlansSection({ currentPlan }: { currentPlan: 'free' | 'pro' }) {
+  const navigate = useNavigate()
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
+        {/* Free plan */}
+        <div style={{
+          background: 'var(--secondary-background)', border: '2px solid var(--border)',
+          borderRadius: 'var(--radius-lg)', boxShadow: '4px 4px 0 var(--border)',
+          overflow: 'hidden', display: 'flex', flexDirection: 'column',
+          opacity: currentPlan === 'free' ? 1 : 0.6,
+        }}>
+          <div style={{ padding: '20px 20px 16px', textAlign: 'center', borderBottom: '2px solid var(--border)' }}>
+            <div style={{ fontFamily: 'var(--font-title)', fontSize: 18, color: 'var(--t1)', marginBottom: 4 }}>Free</div>
+            <div style={{ fontSize: 12, color: 'var(--t3)', marginBottom: 12 }}>Para começar</div>
+            <div style={{ fontSize: 32, fontWeight: 900, color: 'var(--t1)' }}>
+              R$ 0
+            </div>
+            {currentPlan === 'free' && (
+              <div style={{ marginTop: 10, fontSize: 11, fontWeight: 500, padding: '3px 10px', background: 'var(--main)', color: 'var(--main-foreground)', border: '1.5px solid var(--border)', borderRadius: 'var(--radius-sm)', display: 'inline-block' }}>
+                PLANO ATUAL
+              </div>
+            )}
+          </div>
+          <div style={{ padding: '16px 20px', flex: 1 }}>
+            {PLAN_FEATURES.map(f => (
+              <div key={f.label} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0', fontSize: 13, color: f.free ? 'var(--t1)' : 'var(--t3)' }}>
+                <i className={`ph ${f.free ? 'ph-check-circle-fill' : 'ph-minus-circle'}`} style={{ fontSize: 16, color: f.free ? 'var(--main)' : 'var(--b2)', flexShrink: 0 }} />
+                {f.label}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Pro plan */}
+        <div style={{
+          background: 'var(--foreground)', border: '2px solid var(--border)',
+          borderRadius: 'var(--radius-lg)', boxShadow: '6px 6px 0 var(--main)',
+          overflow: 'hidden', display: 'flex', flexDirection: 'column', position: 'relative',
+          transform: 'translate(-2px, -2px)',
+        }}>
+          <div style={{ position: 'absolute', top: 10, right: 10, fontSize: 9, fontWeight: 500, padding: '2px 8px', background: 'var(--main)', color: '#000', border: '1.5px solid #000', borderRadius: 'var(--radius-sm)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            RECOMENDADO
+          </div>
+          <div style={{ padding: '20px 20px 16px', textAlign: 'center', borderBottom: '2px solid var(--border)' }}>
+            <div style={{ fontFamily: 'var(--font-title)', fontSize: 18, color: 'var(--background)', marginBottom: 4 }}>Pro</div>
+            <div style={{ fontSize: 12, color: 'var(--bg3)', marginBottom: 12 }}>Experiência completa</div>
+            <div style={{ fontSize: 32, fontWeight: 900, color: 'var(--background)' }}>
+              R$ 19<span style={{ fontSize: 14, fontWeight: 400, color: 'var(--bg3)' }}>/mês</span>
+            </div>
+            {currentPlan === 'pro' ? (
+              <div style={{ marginTop: 10, fontSize: 11, fontWeight: 500, padding: '3px 10px', background: 'var(--main)', color: '#000', border: '1.5px solid #000', borderRadius: 'var(--radius-sm)', display: 'inline-block' }}>
+                PLANO ATUAL
+              </div>
+            ) : (
+              <Button variant="default" size="sm" style={{ marginTop: 10, width: '100%' }} onClick={() => {
+                updateProfile({ plan: 'pro' })
+                window.dispatchEvent(new Event('habits-changed'))
+                navigate('/shop')
+              }}>
+                <i className="ph ph-crown-simple" style={{ fontSize: 14 }} /> Fazer Upgrade
+              </Button>
+            )}
+          </div>
+          <div style={{ padding: '16px 20px', flex: 1 }}>
+            {PLAN_FEATURES.map(f => (
+              <div key={f.label} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0', fontSize: 13, color: f.pro ? 'var(--background)' : 'var(--bg3)' }}>
+                <i className={`ph ${f.pro ? 'ph-check-circle-fill' : 'ph-minus-circle'}`} style={{ fontSize: 16, color: f.pro ? 'var(--main)' : 'var(--bg3)', flexShrink: 0 }} />
+                {f.label}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div style={{ background: 'var(--secondary-background)', border: '2px solid var(--border)', borderRadius: 'var(--radius-base)', boxShadow: '3px 3px 0 var(--border)', padding: '14px 18px', textAlign: 'center' }}>
+        <p style={{ fontSize: 13, color: 'var(--t3)', margin: 0 }}>
+          Todos os planos incluem armazenamento local. Upgrade é vitalício enquanto ativo.
+        </p>
+      </div>
+    </div>
+  )
+}
+
 // ─── Main page ────────────────────────────────────────────────────────────────
 export function ShopPage() {
   const navigate  = useNavigate()
   const [io, setIO]               = useState(0)
   const [owned, setOwned]         = useState<string[]>([])
+  const [plan, setPlan]           = useState<'free' | 'pro'>('free')
   const [filter, setFilter]       = useState<ShopCategory | 'todos'>('todos')
   const [confirm, setConfirm]     = useState<ShopItem | null>(null)
   const [toast, setToast]         = useState<string | null>(null)
 
   useEffect(() => {
-    getEconomy().then(e => setIO(e.io_saldo))
-    getProfile().then(p => setOwned(p.shop_owned ?? []))
+    Promise.all([
+      getEconomy().then(e => setIO(e.io_saldo)),
+      getProfile().then(p => { setOwned(p.shop_owned ?? []); setPlan(p.plan) }),
+    ])
   }, [])
 
   const showToast = (msg: string) => {
@@ -160,7 +255,6 @@ export function ShopPage() {
     const updated = [...owned, item.id]
     await updateProfile({ shop_owned: updated })
 
-    // Apply avatar or bg instantly
     if (item.category === 'avatares' && item.emoji) {
       await updateProfile({ avatar: item.emoji, shop_owned: updated })
     } else if (item.category === 'temas' && item.color) {
@@ -174,30 +268,26 @@ export function ShopPage() {
     window.dispatchEvent(new Event('habits-changed'))
   }
 
-  const filtered = ITEMS.filter(i => filter === 'todos' || i.category === filter)
+  const filtered = ITEMS.filter(i => filter === 'todos' || filter === 'planos' || i.category === filter)
 
   return (
     <PageWrapper maxWidth={860}>
-      {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
         <h1 style={{ fontFamily: 'var(--font-title)', fontSize: 28, color: 'var(--t1)' }}>Loja</h1>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          {/* IO balance chip */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: 'var(--main)', border: '2px solid var(--border)', borderRadius: 'var(--radius-sm)', boxShadow: '2px 2px 0 var(--border)', fontWeight: 500, fontSize: 14, color: 'var(--main-foreground)' }}>
             <i className="ph ph-coin" style={{ fontSize: 16 }} /> IO {io}
           </div>
-          <button onClick={() => navigate('/shop/settings')} style={iconBtn}
-            onMouseEnter={e => { e.currentTarget.style.transform = 'translate(2px,2px)'; e.currentTarget.style.boxShadow = 'none' }}
-            onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '2px 2px 0 var(--border)' }}>
+          <button onClick={() => navigate('/shop/settings')} style={iconBtn}>
             <i className="ph ph-gear" style={{ fontSize: 17 }} />
           </button>
         </div>
       </div>
-      <p style={{ fontSize: 14, color: 'var(--t3)', marginBottom: 20 }}>Gaste seu IO em avatares, temas e power-ups.</p>
+      <p style={{ fontSize: 14, color: 'var(--t3)', marginBottom: 20 }}>Gaste seu IO em avatares, temas e power-ups. Ou faça upgrade para o plano Pro.</p>
 
       {/* Category filters */}
       <div style={{ display: 'flex', gap: 6, marginBottom: 20, overflowX: 'auto', paddingBottom: 2 }}>
-        {([['todos','Todos','squares-four'],['avatares','Avatares','smiley'],['temas','Temas','palette'],['powerups','Power-ups','lightning']] as const).map(([k, label, icon]) => (
+        {([['todos','Todos','squares-four'],['planos','Planos','crown-simple'],['avatares','Avatares','smiley'],['temas','Temas','palette'],['powerups','Power-ups','lightning']] as const).map(([k, label, icon]) => (
           <button key={k} onClick={() => setFilter(k)} style={{
             flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6,
             padding: '7px 14px', borderRadius: 'var(--radius-sm)',
@@ -211,25 +301,27 @@ export function ShopPage() {
         ))}
       </div>
 
-      {/* Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 14 }}>
-        {filtered.map(item => (
-          <ItemCard
-            key={item.id}
-            item={item}
-            owned={owned.includes(item.id)}
-            canAfford={io >= item.price}
-            onBuy={setConfirm}
-          />
-        ))}
-      </div>
+      {/* Content */}
+      {filter === 'planos' ? (
+        <PlansSection currentPlan={plan} />
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 14 }}>
+          {filtered.map(item => (
+            <ItemCard
+              key={item.id}
+              item={item}
+              owned={owned.includes(item.id)}
+              canAfford={io >= item.price}
+              onBuy={setConfirm}
+            />
+          ))}
+        </div>
+      )}
 
-      {/* Confirm modal */}
       {confirm && (
         <ConfirmModal item={confirm} onConfirm={() => handleBuy(confirm)} onClose={() => setConfirm(null)} />
       )}
 
-      {/* Toast */}
       {toast && (
         <div style={{ position: 'fixed', bottom: 32, left: '50%', transform: 'translateX(-50%)', background: 'var(--foreground)', color: 'var(--main)', border: '2px solid var(--border)', borderRadius: 'var(--radius-sm)', boxShadow: '3px 3px 0 var(--border)', padding: '10px 20px', fontSize: 14, fontWeight: 400, zIndex: 400, whiteSpace: 'nowrap' }}>
           {toast}

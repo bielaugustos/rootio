@@ -4,6 +4,8 @@ import {
 } from 'react'
 import { useLocation } from 'react-router-dom'
 
+const WIDGETS_LS_KEY = 'dashboard-widgets-hidden'
+
 export type ViewId =
   | 'lista'
   | 'tabela'
@@ -323,6 +325,35 @@ function SegmentedPick<T extends string>({
   )
 }
 
+function WidgetsToggleItem() {
+  const [tick, setTick] = useState(0)
+  const hidden = localStorage.getItem(WIDGETS_LS_KEY) === '1'
+
+  const toggle = () => {
+    const next = !hidden
+    localStorage.setItem(WIDGETS_LS_KEY, next ? '1' : '0')
+    window.dispatchEvent(new Event('widgets-visibility-change'))
+    setTick(t => t + 1)
+  }
+
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+      padding: '10px 0',
+      borderBottom: '1px solid var(--bg3)',
+    }}>
+      <div>
+        <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--t1)' }}>Mostrar widgets</div>
+        <div style={{ fontSize: 10, color: 'var(--t3)', marginTop: 1 }}>Painéis do dashboard</div>
+      </div>
+      <ToggleSwitch
+        value={!hidden}
+        onChange={() => toggle()}
+      />
+    </div>
+  )
+}
+
 interface ViewSwitcherProps {
   leftOffset?: string
 }
@@ -496,6 +527,7 @@ export function ViewSwitcher({ leftOffset }: ViewSwitcherProps) {
 
           {tab === 'display' && (
             <div style={{ padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 0 }}>
+              <WidgetsToggleItem />
               {([
                 { key: 'linhasVerticais',  label: 'Linhas verticais',    desc: 'Mostra grade na tabela' },
                 { key: 'exibirIcone',      label: 'Ícone da página',     desc: 'Emojis dos itens' },

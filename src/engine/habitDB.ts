@@ -12,6 +12,19 @@ export interface Subtask {
   done: boolean
 }
 
+export interface ReminderConfig {
+  enabled:          boolean
+  hora:             string            // "HH:MM"
+  nudge_enabled:    boolean
+  nudge_hora:       string            // hora-limite para o nudge (ex: "20:00")
+  freq_mode:        'dias' | 'intervalo'
+  freq_days:        number[]          // dias da semana (0=dom..6=sab)
+  freq_intervalo:   number            // a cada N dias
+  modo_foco:        boolean
+  snooze_active:    boolean
+  snooze_until:     string | null     // ISO timestamp
+}
+
 export interface Habit {
   id: string
   user_id: string
@@ -29,6 +42,7 @@ export interface Habit {
   deadline: string | null
   tags: string[]
   hidden: boolean
+  order: number
   streak_goal: number | null
   goal_target: number | null
   goal_current: number | null
@@ -36,7 +50,8 @@ export interface Habit {
   goal_period: 'mensal' | 'semanal' | 'anual' | null
   reminder_enabled?: boolean
   reminder_time?: string
-  session_logs?: SessionLog[]   // logs de sessão (opcional — preenchido em memória)
+  reminder_config?: ReminderConfig
+  session_logs?: any[]   // logs de sessão (opcional — preenchido em memória)
   created_at: string
   updated_at: string
 }
@@ -139,7 +154,7 @@ function newId(): string {
 export async function getHabits(list?: HabitList): Promise<Habit[]> {
   const db = await getHabitDB()
   const all = await db.getAllFromIndex('habits', 'by-user', LOCAL_USER)
-  const visible = all.filter(h => !h.hidden)
+  const visible = all.filter(h => !h.hidden).sort((a, b) => a.order - b.order)
   if (list) return visible.filter(h => h.list === list)
   return visible
 }
@@ -169,11 +184,15 @@ export async function createHabit(data: Partial<Omit<Habit, 'id' | 'user_id' | '
     deadline: data.deadline ?? null,
     tags: data.tags ?? [],
     hidden: false,
+    order: data.order ?? 0,
     streak_goal: data.streak_goal ?? null,
     goal_target: data.goal_target ?? null,
     goal_current: data.goal_current ?? null,
     goal_unit: data.goal_unit ?? null,
     goal_period: data.goal_period ?? null,
+    reminder_enabled: data.reminder_enabled,
+    reminder_time: data.reminder_time,
+    reminder_config: data.reminder_config,
     created_at: now,
     updated_at: now,
   }

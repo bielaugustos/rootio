@@ -117,7 +117,9 @@ export function WalletForm({ mode, initialType = 'expense', editGoal, initialEme
   const [goalName, setGoalName]         = useState(editGoal?.name ?? '')
   const [goalTarget, setGoalTarget]     = useState(editGoal?.target ?? 0)
   const [goalSaved, setGoalSaved]       = useState(editGoal?.saved ?? 0)
-  const [goalDeadline, setGoalDeadline] = useState(editGoal?.deadline ?? '')
+  const [goalDeadline, setGoalDeadline] = useState<Date | null>(
+    editGoal?.deadline ? new Date(editGoal.deadline) : null
+  )
   const [emergencyTarget, setEmergencyTarget]   = useState(initialEmergency?.target ?? 0)
   const [emergencyCurrent, setEmergencyCurrent] = useState(initialEmergency?.current ?? 0)
   const [saveError, setSaveError] = useState('')
@@ -134,7 +136,7 @@ export function WalletForm({ mode, initialType = 'expense', editGoal, initialEme
       amount: String(amount), description: desc, category: 'Outros',
       date: new Date().toISOString().split('T')[0],
       goalName, goalTarget: String(goalTarget), goalSaved: String(goalSaved),
-      goalUnit: 'R$', goalDeadline,
+      goalUnit: 'R$', goalDeadline: goalDeadline ? goalDeadline.toISOString().split('T')[0] : '',
       emergencyTarget: String(emergencyTarget), emergencyCurrent: String(emergencyCurrent),
     })
   }

@@ -16,19 +16,19 @@ export function ProgressoWidget() {
   const weekPct = weekTotal > 0 ? Math.round((weekDone / weekTotal) * 100) : 0
 
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', padding: 20, gap: 14 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', padding: 14, gap: 10 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <div style={{
-          width: 44, height: 44, borderRadius: '50%',
+          width: 36, height: 36, borderRadius: '50%',
           background: 'var(--bg3)', border: '2px solid var(--border)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           boxShadow: '3px 3px 0 var(--border)', flexShrink: 0,
         }}>
-          <i className="ph ph-chart-line" style={{ fontSize: 20, color: '#7c3aed' }} />
+          <i className="ph ph-chart-line" style={{ fontSize: 16, color: '#7c3aed' }} />
         </div>
         <div>
-          <div style={{ fontSize: 20, fontWeight: 700, fontFamily: 'var(--font-mono)', color: 'var(--t1)', lineHeight: 1 }}>{weekPct}%</div>
-          <div style={{ fontSize: 10, fontWeight: 500, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 2 }}>semana completa</div>
+          <div style={{ fontSize: 18, fontWeight: 700, fontFamily: 'var(--font-mono)', color: 'var(--t1)', lineHeight: 1 }}>{weekPct}%</div>
+          <div style={{ fontSize: 9, fontWeight: 500, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 2 }}>semana completa</div>
         </div>
       </div>
 
@@ -43,7 +43,7 @@ export function ProgressoWidget() {
           return (
             <div key={day.date} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
               <div style={{
-                width: '100%', height: 52,
+                width: '100%', height: 36,
                 background: 'var(--bg3)',
                 border: `2px solid ${isToday ? '#7c3aed' : 'var(--b2)'}`,
                 borderRadius: 6, position: 'relative', overflow: 'hidden',
@@ -67,9 +67,10 @@ export function ProgressoWidget() {
       </div>
 
       <div style={{
-        textAlign: 'center', padding: '7px 12px',
+        textAlign: 'center', padding: '5px 10px',
         background: 'var(--bg3)', border: '2px solid var(--b2)',
         borderRadius: 'var(--radius-sm)', fontSize: 11, color: 'var(--t2)', fontWeight: 400,
+        marginBottom: 8,
       }}>
         {weekDone} de {weekTotal} completados
       </div>

@@ -74,17 +74,15 @@ Cada agente tem um escopo bem definido e deve ser acionado conforme o contexto.
 
 | # | Prioridade | Tarefa | Status |
 |---|-----------|--------|--------|
-| 1 | 🔴 Crítico | Definir escopo do MVP: ocultar seções incompletas (Career, Finance, Mentor, Projects, Sprint, Shop) | Concluído |
-| 2 | 🔴 Crítico | Criar fluxo de Onboarding (3 telas: boas-vindas → perfil → primeiro hábito) | Pendente |
-| 3 | 🔴 Crítico | Substituir ícones/splash genéricos do Capacitor pelo branding Rootio | Pendente |
+| 1 | 🔴 Crítico | Onboarding: 4 informações de exemplo inciais do step 2 ao 5 (Perfil, Hábitos, Finanças, Carreira) | Pendente | o concluido=step6 - dados reutilizados
+| 2 | 🔴 Crítico | Página Habits ( 9 forms de action pills: Streaks, Histórico, Lembrete, Timer, Anexos, Tabela, Progresso, Agendar, Participantes ) | Pendente | - refinar
+| 3 | 🔴 Crítico | Página Wallet: 3 tabs funcionais com responsividade e integração com dashboard | Pendente |
 | 4 | 🟡 Importante | Empty states com ilustrações em todas as seções ativas | Pendente |
 | 5 | 🟡 Importante | Tela de Login/Cadastro (UI apenas — integração é com @rootio-data) | Pendente |
-| 6 | 🟡 Importante | Push notifications UI: configuração de lembretes de hábitos | Concluído |
-| 6.1 | 🟡 Importante | Slider: adicionar exemplos na /themes (newcomp Sllider.tsx) | Concluído |
+| 6 | 🟡 Importante | Push notifications UI: configuração na página Notifications | Pendente | - Log de todas as entradas com lembrete de prazo
 | 7 | 🟡 Importante | Revisar Feed: mudar de rede social para diário pessoal | Pendente |
 | 8 | 🟢 Estratégico | ShopPage: definir e implementar modelo freemium (UI de planos) | Pendente |
-| 9 | 🟢 Estratégico | CommandK: melhorar grupos e adicionar ações rápidas | Pendente |
-| 10 | 🟢 Estratégico | PaletteEditor: esconder em produção por padrão | Pendente |
+| 9 | 🟢 Estratégico | Progress: melhorar expêriencia da jornada e redesign da página| Pendente |
 
 ---
 

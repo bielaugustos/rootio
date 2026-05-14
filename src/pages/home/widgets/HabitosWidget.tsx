@@ -18,7 +18,7 @@ export function HabitosWidget() {
   const doneCount = habits.filter(h => h.done).length
 
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', padding: 20, gap: 12 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', padding: 20, gap: 12 }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -47,7 +47,7 @@ export function HabitosWidget() {
       </div>
 
       {/* Habit list */}
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: 8 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: 8 }}>
         {habits.length === 0 ? (
           <div style={{ gridColumn: '1/-1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--t4)', fontSize: 12 }}>
             Nenhum hábito cadastrado
@@ -57,7 +57,7 @@ export function HabitosWidget() {
             key={habit.id}
             onClick={() => navigate('/habits')}
             style={{
-              padding: '8px 10px',
+              padding: '0 12px', height: 32,
               background: habit.done ? 'var(--bg3)' : 'var(--secondary-background)',
               border: `2px solid ${habit.done ? '#22c55e' : 'var(--border)'}`,
               borderRadius: 'var(--radius-sm)',
@@ -77,7 +77,7 @@ export function HabitosWidget() {
               background: habit.done ? '#22c55e' : '#f59e0b',
             }} />
             <div style={{
-              fontSize: 11, fontWeight: 400,
+              fontSize: 13, fontWeight: 400,
               color: habit.done ? 'var(--t3)' : 'var(--t1)',
               textDecoration: habit.done ? 'line-through' : 'none',
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',

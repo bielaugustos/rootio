@@ -9,7 +9,7 @@ const NAV_MAIN = [
   { to: '/habits',        label: 'Hábitos',      icon: 'ph-check-square',   end: false },
   { to: '/progress',      label: 'Progresso',    icon: 'ph-chart-line-up',  end: false },
   { to: '/wallet',         label: 'Carteira',      icon: 'ph-wallet',         end: false },
-  { to: '/feed',          label: 'Feed',         icon: 'ph-newspaper',      end: false },
+  { to: '/feed',          label: 'Diário',       icon: 'ph-book-open',      end: false },
 ]
 
 const NAV_BOTTOM = [
@@ -96,26 +96,22 @@ function NavItem({
   )
 }
 
+
+
 // ─── Main Sidebar ─────────────────────────────────────────────────────────────
 export function Sidebar() {
-  const [state, setState] = useState<SidebarState>('collapsed')
+  const [state, setState] = useState<SidebarState>(() => {
+    const mobile = window.innerWidth < MOBILE_BP
+    if (mobile) return 'hidden'
+    const saved = localStorage.getItem('sidebar-state') as SidebarState | null
+    return (saved && saved in WIDTHS) ? saved : 'collapsed'
+  })
   const [profile, setProfile] = useState<Profile | null>(null)
   const [pts, setPts] = useState(0)
 
   const width = WIDTHS[state]
   const isExpanded  = state === 'expanded'
   const isHidden    = state === 'hidden'
-
-  // Persist state across refreshes, force hidden on mobile
-  useEffect(() => {
-    const mobile = window.innerWidth < MOBILE_BP
-    if (mobile) {
-      setState('hidden')
-    } else {
-      const saved = localStorage.getItem('sidebar-state') as SidebarState | null
-      if (saved && saved in WIDTHS) setState(saved)
-    }
-  }, [])
 
   useEffect(() => {
     const check = () => {
@@ -157,14 +153,14 @@ export function Sidebar() {
           zIndex: 200,
           width: 28, height: 28,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          background: 'var(--secondary-background)',
+          background: 'transparent',
           border: '2px solid var(--border)',
           borderRadius: 'var(--radius-sm)',
           boxShadow: '2px 2px 0 var(--border)',
           cursor: 'pointer',
           color: 'var(--t2)',
           fontSize: 14,
-          transition: 'left 0.22s ease',
+          transition: 'left 0.22s ease, transform 0.08s, box-shadow 0.08s',
         }}
         onMouseEnter={e => {
           e.currentTarget.style.transform = 'translate(2px,2px)'
@@ -185,7 +181,7 @@ export function Sidebar() {
           top: 0, left: 0,
           width,
           height: '100dvh',
-          background: 'var(--secondary-background)',
+          background: 'var(--bg)',
           borderRight: isHidden ? 'none' : '2px solid var(--border)',
           display: 'flex',
           flexDirection: 'column',
@@ -228,13 +224,18 @@ export function Sidebar() {
         <nav style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: '6px 0' }}>
           {isExpanded && (
             <div style={{ padding: '8px 16px 2px', fontSize: 10, fontWeight: 500, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--t3)', whiteSpace: 'nowrap' }}>
-              App
+
             </div>
           )}
 
           {NAV_MAIN.map(item => (
             <NavItem key={item.to} {...item} state={state} />
           ))}
+
+          {/* ── Habits view toggle ── */}
+          {/* {isExpanded && location.pathname.startsWith('/habits') && (
+            <HabitsViewToggle />
+          )} */}
 
           {/* Divider */}
           <div style={{ height: 1, background: 'var(--b2)', margin: isExpanded ? '8px 16px' : '8px 10px' }} />

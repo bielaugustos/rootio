@@ -32,7 +32,7 @@ import { useState, useEffect, useCallback } from 'react'
 import type { Habit } from '../../engine/habitDB'
 import { getHabitStreak, getHabitLast7Days, updateHabit } from '../../engine/habitDB'
 // import { Pill } from '../../components/Pill'
-// import { Button } from '../../components/Button'
+import { Button } from '../../components/Button'
 // import { Badge } from '../../components/Badge'
 
 // ─── Types ─────────────────────────────────────────────────────────────────
@@ -170,7 +170,7 @@ function SessionLogItem({
       padding: '10px 12px',
       border: `1.5px solid ${isToday ? 'var(--main)' : 'var(--b2, #ccc)'}`,
       borderRadius: 'var(--radius-sm)',
-      background: isToday ? 'color-mix(in srgb, var(--main) 8%, var(--bg))' : 'var(--bg2)',
+      background: isToday ? 'color-mix(in srgb, var(--main) 8%, var(--background))' : 'var(--background)',
       display: 'flex',
       flexDirection: 'column',
       gap: 8,
@@ -211,7 +211,7 @@ function SessionLogItem({
             style={{
               width: 60, fontSize: 11, fontWeight: 500, fontFamily: 'var(--font-mono)',
               border: '2px solid var(--border)', borderRadius: 4, padding: '2px 6px',
-              background: 'var(--bg2)', color: 'var(--t1)', textAlign: 'right',
+              color: 'var(--t1)', textAlign: 'right',
             }}
           />
         ) : (
@@ -219,11 +219,15 @@ function SessionLogItem({
             onClick={() => setEditingMins(true)}
             title="Editar tempo"
             style={{
-              fontSize: 11, fontWeight: 500, fontFamily: 'var(--font-mono)',
+              fontSize: 11, fontWeight: 500, fontFamily: 'var(--font-title)',
               padding: '2px 8px', border: '1.5px solid var(--b2)',
               borderRadius: 4, background: 'var(--bg3)', color: 'var(--t2)',
               cursor: 'pointer',
+              boxShadow: '2px 2px 0 var(--border)',
+              transition: 'all 0.1s',
             }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'translate(2px,2px)'; e.currentTarget.style.boxShadow = 'none' }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '2px 2px 0 var(--border)' }}
           >
             {formatMins(mins)}
           </button>
@@ -241,8 +245,8 @@ function SessionLogItem({
           rows={2}
           style={{
             fontSize: 12, color: 'var(--t1)', fontFamily: 'var(--font-sans)',
-            border: '2px solid var(--border)', borderRadius: 4, padding: '6px 8px',
-            background: 'var(--bg2)', resize: 'none', width: '100%',
+            border: '2px solid #000000', borderRadius: 4, padding: '6px 8px',
+            resize: 'none', width: '100%',
             outline: 'none',
           }}
         />
@@ -319,7 +323,7 @@ function RetroEntry({
                 borderRadius: 'var(--radius-sm)',
                 background: selected === d ? 'var(--main)' : 'var(--bg3)',
                 color: 'var(--t1)', cursor: 'pointer',
-                boxShadow: selected === d ? '2px 2px 0 var(--border)' : 'none',
+                boxShadow: 'none',
                 transform: selected === d ? 'translate(2px,2px)' : 'none',
               }}
             >
@@ -341,10 +345,11 @@ function RetroEntry({
               onClick={() => setMins(m)}
               style={{
                 padding: '4px 10px', fontSize: 11, fontWeight: 400,
-                border: mins === m ? '1.5px solid var(--border)' : '1.5px solid var(--b2)',
+                border: mins === m ? '2px solid var(--border)' : '2px solid var(--b2)',
                 borderRadius: 'var(--radius-sm)',
                 background: mins === m ? 'var(--main)' : 'var(--bg3)',
-                cursor: 'pointer', color: 'var(--t1)',
+                color: 'var(--t1)', cursor: 'pointer',
+                transform: mins === m ? 'translate(2px,2px)' : 'none',
               }}
             >
               {m === 0 ? '—' : `${m}min`}
@@ -365,31 +370,15 @@ function RetroEntry({
           rows={2}
           style={{
             fontSize: 12, width: '100%', resize: 'none', fontFamily: 'var(--font-sans)',
-            border: '2px solid var(--b2)', borderRadius: 'var(--radius-sm)',
-            padding: '8px', background: 'var(--bg2)', color: 'var(--t1)', outline: 'none',
+            border: '2px solid #000000', borderRadius: 'var(--radius-sm)',
+            padding: '8px', color: 'var(--t1)', outline: 'none',
           }}
         />
       </div>
 
-      <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', paddingTop: 4 }}>
-        <button onClick={onClose} style={{
-          padding: '7px 16px', fontSize: 12, fontWeight: 500,
-          border: '2px solid var(--border)', borderRadius: 'var(--radius-sm)',
-          background: 'var(--bg2)', cursor: 'pointer', color: 'var(--t1)',
-        }}>
-          Cancelar
-        </button>
-        <button
-          onClick={handleAdd}
-          style={{
-            padding: '7px 16px', fontSize: 12, fontWeight: 500,
-            border: '2px solid var(--border)', borderRadius: 'var(--radius-sm)',
-            background: 'var(--main)', cursor: 'pointer', color: 'var(--t1)',
-            boxShadow: '2px 2px 0 var(--border)',
-          }}
-        >
-          Registrar
-        </button>
+      <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', paddingTop: 4, paddingBottom: 16 }}>
+        <Button label="Cancelar" variant="ghost" size="sm" onClick={onClose} />
+        <Button label="Registrar" variant="default" size="sm" onClick={handleAdd} />
       </div>
     </div>
   )
@@ -464,30 +453,29 @@ export function HistoricoPanel({
     .sort((a, b) => b.date.localeCompare(a.date))
     .slice(0, 7)
 
-  return (
-    <div>
-      <div style={{
-        border: '2px solid var(--border)',
-        borderRadius: 'var(--radius-base)',
-        background: 'var(--bg2)',
-        overflow: 'hidden',
-        boxShadow: '4px 4px 0 var(--border)',
-      }}>
-          {/* ── Header ── */}
-          <div style={{
-            padding: '10px 14px',
-            borderBottom: '2px solid var(--border)',
-            background: 'var(--bg3)',
+   return (
+     <div>
+       <div style={{
+         borderRadius: 'var(--radius-base)',
+         overflow: 'hidden',
+         boxShadow: '4px 4px 0 var(--border)',
+         background: 'var(--background)',
+       }}>
+{/* ── Header ── */}
+           <div style={{
+             padding: '6px 14px',
+             borderBottom: '2px solid var(--border)',
+             background: 'var(--main)',
             display: 'flex', alignItems: 'center', gap: 8,
           }}>
-            <span style={{ fontSize: 13, fontWeight: 500, flex: 1 }}>Histórico</span>
+            <span style={{ fontSize: 13, fontWeight: 900, flex: 1, fontFamily: 'Indie Flower' }}>Histórico</span>
             {saving && <span style={{ fontSize: 10, color: 'var(--t3)' }}>salvando...</span>}
         <button
           onClick={handleEdit}
           style={{
             fontSize: 10, padding: '2px 6px',
             border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)',
-            background: 'var(--bg2)', color: 'var(--t2)',
+            background: 'var(--main)', color: 'var(--main-foreground)',
             cursor: 'pointer',
           }}
         >
@@ -495,8 +483,8 @@ export function HistoricoPanel({
         </button>
           </div>
 
-          {/* ── Dot grid ── */}
-          <div style={{ padding: '14px 14px 10px' }}>
+{/* ── Dot grid ── */}
+           <div style={{ padding: '8px 14px 6px' }}>
             <div style={{ fontSize: 10, fontWeight: 500, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 8 }}>
               Últimas 4 semanas
             </div>
@@ -528,7 +516,6 @@ export function HistoricoPanel({
             <div style={{
               borderTop: '2px solid var(--border)',
               padding: '0 14px',
-              background: 'var(--bg3)',
             }}>
               <RetroEntry
                 habitName={habit.name}

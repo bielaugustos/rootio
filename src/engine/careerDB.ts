@@ -69,7 +69,7 @@ export async function getActiveGoals(): Promise<CareerGoal[]> {
   return all.filter(g => g.active)
 }
 
-export async function saveGoal(goal: Omit<CareerGoal, 'id' | 'created_at' | 'updated_at'>): Promise<void> {
+export async function saveGoal(goal: Omit<CareerGoal, 'id' | 'user_id' | 'created_at' | 'updated_at'>): Promise<void> {
   const db = await getCareerDB()
   const now = new Date().toISOString()
   const fullGoal: CareerGoal = {

@@ -17,11 +17,12 @@ import { ThemesPage }        from './pages/design/ThemesPage'
 import { SettingsPage }      from './pages/settings'
 import { AccountPage }       from './pages/settings/account'
 import { NotificationsPage } from './pages/notifications/NotificationsPage'
-import { WalletPage }        from './pages/wallet'
+import { WalletPage } from './pages/wallet'
 import { HubPage }           from './pages/hub'
 import { ProgressPage }      from './pages/progress'
 import { PrivacidadePage }   from './pages/legal/PrivacidadePage'
 import { SyncPage }          from './pages/legal/SyncPage'
+import { OnboardingPage }    from './pages/onboarding'
 
 // ── Feed (migrated from Next.js) ──────────────────────────────────────────────
 import { FeedPage }          from './pages/feed'
@@ -29,6 +30,9 @@ import { PostDetailPage }    from './pages/feed/PostDetailPage'
 import { NewPostPage }       from './pages/feed/NewPostPage'
 import { PostConfirmPage }   from './pages/feed/PostConfirmPage'
 import { FeedSettingsPage }  from './pages/feed/settings'
+
+// ── Auth ───────────────────────────────────────────────────────────────────────
+import { LoginPage }          from './pages/login'
 
 // ── New section stubs ─────────────────────────────────────────────────────────
 import { CareerPage }        from './pages/career'
@@ -44,7 +48,7 @@ import { ShopPage }          from './pages/shop'
 import { ShopSettingsPage }  from './pages/shop/settings'
 import { SprintPage }        from './pages/sprint'
 import { SprintSettingsPage } from './pages/sprint/settings'
-import { OnboardingPage }    from './pages/onboarding/index'
+
 
 const HABITS_CHANGE_EVENT = 'habits-changed'
 
@@ -77,18 +81,14 @@ function AppWithNav() {
     return () => window.removeEventListener(HABITS_CHANGE_EVENT, loadHabits)
   }, [loadHabits])
 
-  useEffect(() => {
-    if (localStorage.getItem('onboarding-completed') !== 'true') {
-      navigate('/onboarding')
-    }
-  }, [navigate])
+
 
   const commandItems: CommandItem[] = [
     { id: 'nav-home',     label: 'Início',       description: 'Dashboard principal',    iconClass: 'ph-house',          group: 'Navegar', onSelect: () => navigate('/') },
     { id: 'nav-habits',   label: 'Hábitos',      description: 'Ver todos os hábitos',   iconClass: 'ph-check-square',   group: 'Navegar', onSelect: () => navigate('/habits') },
     { id: 'nav-progress', label: 'Progresso',    description: 'Estatísticas e nível',   iconClass: 'ph-chart-line-up',  group: 'Navegar', onSelect: () => navigate('/progress') },
     { id: 'nav-wallet',   label: 'Carteira',     description: 'Carteira e reservas',   iconClass: 'ph-wallet',         group: 'Navegar', onSelect: () => navigate('/wallet') },
-    { id: 'nav-feed',     label: 'Feed',         description: 'Comunidade Rootio',      iconClass: 'ph-newspaper',      group: 'Navegar', onSelect: () => navigate('/feed') },
+    { id: 'nav-feed',     label: 'Diário',       description: 'Diário pessoal',          iconClass: 'ph-book-open',      group: 'Navegar', onSelect: () => navigate('/feed') },
     { id: 'nav-themes',   label: 'Temas',        description: 'Personalizar aparência', iconClass: 'ph-palette',        group: 'Sistema', onSelect: () => navigate('/themes') },
     { id: 'nav-settings', label: 'Ajustes',      description: 'Configurações gerais',   iconClass: 'ph-gear',           group: 'Sistema', onSelect: () => navigate('/settings') },
     ...habitItems,
@@ -102,6 +102,7 @@ function AppWithNav() {
         <div style={{ flex: 1, minWidth: 0, width: 0, display: 'flex', flexDirection: 'column' }}>
           <Routes>
             <Route path="/onboarding"     element={<OnboardingPage />} />
+            <Route path="/login"          element={<LoginPage />} />
             {/* ── Core ── */}
             <Route path="/"               element={<HomePage />} />
             <Route path="/habits"         element={<HabitsPage />} />

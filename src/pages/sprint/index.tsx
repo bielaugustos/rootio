@@ -263,7 +263,7 @@ function SessionHistory({ sessions }: { sessions: SprintSession[] }) {
       </div>
 
       {/* Recent sessions */}
-      {weekSessions.length > 0 && (
+      {weekSessions.length > 0 ? (
         <div style={{ background: 'var(--secondary-background)', border: '2px solid var(--border)', borderRadius: 'var(--radius-base)', boxShadow: '3px 3px 0 var(--border)', overflow: 'hidden' }}>
           <div style={{ padding: '10px 16px', borderBottom: '2px solid var(--border)', fontSize: 12, fontWeight: 500, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--t3)' }}>
             Sessões recentes
@@ -282,6 +282,12 @@ function SessionHistory({ sessions }: { sessions: SprintSession[] }) {
               </div>
             </div>
           ))}
+        </div>
+      ) : (
+        <div style={{ textAlign: 'center', padding: '40px 24px', color: 'var(--t3)', border: '2px dashed var(--b2)', borderRadius: 'var(--radius-base)' }}>
+          <i className="ph ph-timer" style={{ fontSize: 40, display: 'block', marginBottom: 12 }} />
+          <div style={{ fontFamily: 'var(--font-title)', fontSize: 16, marginBottom: 6, color: 'var(--t1)' }}>Nenhuma sessão ainda</div>
+          <div style={{ fontSize: 13 }}>Complete um ciclo de foco para ver seu histórico aqui.</div>
         </div>
       )}
     </div>

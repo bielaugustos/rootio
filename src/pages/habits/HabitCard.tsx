@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react'
 import { toggleSubtask, getHabitStreak, type Habit } from '../../engine'
 import type { TimeValue } from '../../components/TimePicker'
-import { LIST_COLORS, LIST_LABELS } from './habitConstants'
+import { LIST_COLORS, LIST_LABELS, PRIORITY_COLORS } from './habitConstants'
 import { Checkbox } from '../../components/Checkbox'
 import { Button } from '../../components/Button'
 import { Pill } from '../../components/Pill'
 import { Badge } from '../../components/Badge'
+import { useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
-import { LembretePanel } from './LembretePanel'
 import { TimerPanel } from './panels/TimerPanel'
 import { AnexosPanel } from './panels/AnexosPanel'
 import { AgendarPanel } from './panels/AgendarPanel'
@@ -21,10 +22,13 @@ interface HabitCardProps {
   onToggle: (id: string) => void
   onEdit: (habit: Habit) => void
   onRefresh: () => void
-  onOpenHistorico?: (habit: Habit) => void
-  onCloseHistorico?: () => void
-  isHistoricoOpen?: boolean
+  onDelete?: (id: string) => void
+  updateHabit?: (id: string, data: Partial<Habit>) => Promise<Habit>
   isMobile?: boolean
+  done?: boolean
+  // ── NOVO ──────────────────────────────────────────────
+  onPanelOpen?: (habitId: string, type: import('./PanelPortal').PanelType) => void
+  activePanelType?: import('./PanelPortal').PanelType
 }
 
 
@@ -103,7 +107,10 @@ function GoalPanels({ habit }: { habit: Habit }) {
   )
 }
 
-export function HabitCard({ habit, onToggle, onEdit, onRefresh, onOpenHistorico, onCloseHistorico, isHistoricoOpen, isMobile }: HabitCardProps) {
+export function HabitCard({
+  habit, onToggle, onEdit, onRefresh,
+  isMobile, onPanelOpen, activePanelType,
+}: HabitCardProps) {
   const [expanded, setExpanded] = useState(false)
   const [detailsExpanded, setDetailsExpanded] = useState(false)
   const [streak, setStreak] = useState(0)
@@ -113,6 +120,15 @@ export function HabitCard({ habit, onToggle, onEdit, onRefresh, onOpenHistorico,
 
   const hasProgress = habit.list === 'goal' && (habit.goal_target ?? 0) > 0
   const hasDetails = (habit.tags ?? []).length > 0 || !!habit.notes?.trim()
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: habit.id })
 
   const formatTimeWithAmPm = (time: string | TimeValue | null | undefined) => {
     if (!time) return ''
@@ -142,19 +158,39 @@ export function HabitCard({ habit, onToggle, onEdit, onRefresh, onOpenHistorico,
   }, [habit.id])
 
   return (
-    <div style={{
+    <div ref={setNodeRef} style={{
       background: 'var(--background)',
       border: `2px solid ${habit.done ? 'var(--b2)' : 'var(--border)'}`,
       borderRadius: 'var(--radius-base)',
       boxShadow: 'none',
-      opacity: habit.done ? 0.7 : 1,
-      transition: 'all 0.15s',
+      opacity: isDragging ? 0.35 : (habit.done ? 0.7 : 1),
+      transition: isDragging ? 'none' : (transition || 'all 0.15s'),
       overflow: 'hidden',
       width: '100%',
       minWidth: 0,
+      transform: isDragging ? 'none' : CSS.Transform.toString(transform),
     }}>
       {/* Zona 1 — Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px' }}>
+        <button
+          {...attributes}
+          {...listeners}
+          style={{
+            width: 28, height: 28, flexShrink: 0,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            border: '2px solid var(--border)',
+            borderRadius: 'var(--radius-sm)',
+            background: 'var(--secondary-background)',
+            cursor: 'grab',
+            boxShadow: '2px 2px 0 var(--border)',
+            color: 'var(--foreground)', fontSize: 16,
+            transition: 'transform 0.1s, box-shadow 0.1s',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'translate(2px,2px)'; e.currentTarget.style.boxShadow = 'none' }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '2px 2px 0 var(--border)' }}
+        >
+          <i className="ph ph-dots-six-vertical" />
+        </button>
         <Checkbox
           checked={habit.done}
           onChange={() => onToggle(habit.id)}
@@ -258,7 +294,7 @@ export function HabitCard({ habit, onToggle, onEdit, onRefresh, onOpenHistorico,
               padding: '8px 16px',
               borderTop: '1px solid var(--b2)',
             }}>
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'flex-start' }}>
+              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'flex-start' }}>
                 {(habit.list === 'habit' || habit.list === 'task') && (
                   <Pill label={`${streak}d streak`} variant="default" size="sm"
                     icon={<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>}
@@ -267,11 +303,14 @@ export function HabitCard({ habit, onToggle, onEdit, onRefresh, onOpenHistorico,
 
                 {habit.list === 'habit' && (
                   <>
-                    <Pill label="Histórico" variant="habit" size="sm" selected={isHistoricoOpen}
+                    <Pill label="Histórico" variant="default" size="sm" selected={activePanelType === 'historico'}
                       icon={<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/></svg>}
-                      onClick={() => isHistoricoOpen ? onCloseHistorico?.() : onOpenHistorico?.(habit)}
+                      onClick={() => onPanelOpen?.(habit.id, 'historico')}
                     />
-                    <LembretePanel habit={habit} onRefresh={onRefresh} />
+                    <Pill label="Lembrete" variant="default" size="sm" selected={activePanelType === 'lembrete'}
+                      icon={<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>}
+                      onClick={() => onPanelOpen?.(habit.id, 'lembrete')}
+                    />
                   </>
                 )}
 
@@ -404,6 +443,11 @@ export function HabitCard({ habit, onToggle, onEdit, onRefresh, onOpenHistorico,
 
           {/* Badges */}
           <div style={{ padding: '8px 16px', borderTop: '1px solid var(--b2)', display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+            {/* Priority shield */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 8px', border: '2px solid var(--border)', borderRadius: 'var(--radius-sm)', background: PRIORITY_COLORS[habit.priority || 'media'], boxShadow: '2px 2px 0 var(--border)' }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', border: '2px solid var(--foreground)', background: PRIORITY_COLORS[habit.priority || 'media'] }} />
+              <span style={{ fontSize: 10, fontWeight: 500, color: '#000', textTransform: 'capitalize' }}>{habit.priority === 'media' ? 'média' : habit.priority}</span>
+            </div>
             <Badge label={(() => {
               const dayNames = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sab']
               if (habit.days.length === 7) return 'Repetir'
@@ -411,10 +455,6 @@ export function HabitCard({ habit, onToggle, onEdit, onRefresh, onOpenHistorico,
             })()} variant="default" id={`repetition-${habit.id}`} />
             {habit.reminder_enabled && habit.reminder_time && <Badge label={formatTimeWithAmPm(habit.reminder_time)} variant="secondary" id={`reminder-${habit.id}`} />}
             {habit.est_mins != null && habit.est_mins > 0 && <Badge label={`Tempo: ${habit.est_mins}min`} style={{ background: '#9B7BFF', color: 'white' }} id={`time-${habit.id}`} />}
-            <Badge label={habit.priority === 'baixa' ? 'Baixa' : habit.priority === 'media' ? 'Média' : 'Alta'} style={{
-              background: habit.priority === 'alta' ? 'var(--coral)' : habit.priority === 'media' ? 'var(--amber-2)' : 'var(--grass)',
-              color: 'black'
-            }} id={`priority-${habit.id}`} />
             {(habit.tags ?? []).map(tag => <Badge key={tag} label={tag.charAt(0).toUpperCase() + tag.slice(1)} variant="outline" id={`tag-${habit.id}-${tag}`} />)}
           </div>
 

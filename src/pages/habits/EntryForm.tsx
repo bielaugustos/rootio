@@ -1,7 +1,6 @@
-import { useState, useEffect, type ReactNode, type CSSProperties } from 'react'
+import { useState, type ReactNode, type CSSProperties } from 'react'
 import type { Habit, HabitList, Priority } from '../../engine/habitDB'
-import type { CareerGoal } from '../../engine/careerDB'
-import { getActiveGoals } from '../../engine/careerDB'
+
 import { Button } from '../../components/Button'
 import { Toggle } from '../../components/Toggle'
 import { Input } from '../../components/Input'
@@ -168,13 +167,6 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
   const [mode, setMode] = useState<'simples' | 'avancado'>('simples')
   const [openSections, setOpenSections] = useState<Set<string>>(new Set(['nome-icone']))
   const [selectedCategory, setSelectedCategory] = useState('saude')
-  const [careerGoals, setCareerGoals] = useState<CareerGoal[]>([])
-  const [selectedGoal, setSelectedGoal] = useState<string>('')
-
-  useEffect(() => {
-    getActiveGoals().then(setCareerGoals)
-  }, [])
-
   const [iconOpen, setIconOpen] = useState(false)
   const [newSubtask, setNewSubtask] = useState('')
   const [newTag, setNewTag] = useState('')
@@ -207,18 +199,6 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
     }
     return time
   }
-
-  const habitSuggestions: Record<string, string[]> = {
-    habilidade: ['Estudar 30min/dia', 'Praticar projetos pessoais', 'Ler artigos técnicos'],
-    educacao: ['Cursar online 1h/semana', 'Fazer exercícios de matemática', 'Aprender idioma'],
-    cargo: ['Networking 15min/dia', 'Atualizar currículo', 'Preparar para entrevistas'],
-    network: ['Conectar com 2 pessoas/semana', 'Participar de eventos', 'Mentoria reversa'],
-    projeto: ['Trabalhar no projeto 1h/dia', 'Revisar código', 'Planejar features'],
-    financeiro: ['Economizar R$50/dia', 'Investir 10%/salário', 'Criar reserva de emergência'],
-  }
-
-  const selectedGoalObj = careerGoals.find(g => g.id === selectedGoal)
-  const suggestions = selectedGoalObj ? habitSuggestions[selectedGoalObj.category] || [] : []
 
   const toggleDay = (day: number) => {
     const days = form.days ?? []
@@ -286,12 +266,11 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
   const totalPts = form.pts ?? 10
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: '0 4px 16px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: '32px', background: 'var(--background)' }}>
 
       {/* ── Header ── */}
       <div style={{
         display: 'flex', flexDirection: 'column', gap: 12,
-        background: 'var(--background)',
         paddingBottom: 12,
       }}>
         <div style={{
@@ -326,7 +305,7 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
           </h2>
           {habit?.id && onDelete && (
             <button
-              onClick={() => onDelete(habit.id!)}
+              onClick={() => { onDelete(habit.id!); onClose(); }}
               style={{
                 width: 28, height: 28, flexShrink: 0,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -356,18 +335,18 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
               <button
                 key={l}
                 onClick={() => set('list', l)}
-                style={{
-                  padding: '6px 14px',
-                  border: '2px solid var(--border)',
-                  borderRadius: 'var(--radius-sm)',
-                  background: isActive ? 'var(--main)' : 'var(--bg2)',
-                  color: isActive ? 'var(--main-foreground)' : 'var(--t1)',
-                  cursor: 'pointer', fontSize: 13, fontWeight: 500,
-                  fontFamily: 'var(--font-sans)',
-                  boxShadow: isActive ? 'none' : '2px 2px 0 var(--border)',
-                  transform: isActive ? 'translate(2px, 2px)' : 'none',
-                  transition: 'transform 0.08s, box-shadow 0.08s',
-                }}
+                  style={{
+                    padding: '4px 8px',
+                    border: '2px solid var(--border)',
+                    borderRadius: 'var(--radius-sm)',
+                    background: isActive ? 'var(--main)' : 'var(--bg2)',
+                    color: isActive ? 'var(--main-foreground)' : 'var(--t1)',
+                    cursor: 'pointer', fontSize: 13, fontWeight: 500,
+                    fontFamily: 'var(--font-sans)',
+                    boxShadow: isActive ? 'none' : '2px 2px 0 var(--border)',
+                    transform: isActive ? 'translate(2px, 2px)' : 'none',
+                    transition: 'transform 0.08s, box-shadow 0.08s',
+                  }}
                 onMouseEnter={e => {
                   if (!isActive) { e.currentTarget.style.transform = 'translate(2px,2px)'; e.currentTarget.style.boxShadow = 'none' }
                 }}
@@ -413,7 +392,7 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
                   }}
                   style={{
                     display: 'flex', alignItems: 'center', gap: 6,
-                    padding: '6px 14px',
+                    padding: '4px 8px',
                     border: '2px solid var(--border)',
                     borderRadius: 'var(--radius-sm)',
                     background: 'var(--bg2)',
@@ -441,7 +420,7 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
                 <button
                   onClick={() => setIconOpen(o => !o)}
                   style={{
-                    width: 44, height: 44, fontSize: 22,
+                    width: 36, height: 36, fontSize: 18,
                     border: `2px solid ${iconOpen ? 'var(--main)' : 'var(--border)'}`,
                     borderRadius: 'var(--radius-base)',
                     background: 'var(--secondary-background)',
@@ -459,8 +438,8 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
                   <div style={{
                     position: 'absolute', top: '100%', left: 0, marginTop: 6, zIndex: 20,
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(7, 36px)',
-                    gap: 4, padding: 8,
+                    gridTemplateColumns: 'repeat(7, 28px)',
+                    gap: 2, padding: 6,
                     background: 'var(--background)',
                     border: '2px solid var(--border)',
                     borderRadius: 'var(--radius-base)',
@@ -471,7 +450,7 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
                         key={icon}
                         onClick={() => { set('icon', icon); setIconOpen(false) }}
                         style={{
-                          width: 36, height: 36, fontSize: 18,
+                          width: 28, height: 28, fontSize: 14,
                           border: `2px solid ${form.icon === icon ? 'var(--border)' : 'transparent'}`,
                           borderRadius: 'var(--radius-sm)',
                           background: 'var(--bg3)',
@@ -496,64 +475,12 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
             </div>
           </div>
 
-          {/* Link to Career Goal */}
-          {careerGoals.length > 0 && (
-            <div>
-              <label style={labelStyle}>Meta de carreira (opcional)</label>
-              <select
-                value={selectedGoal}
-                onChange={e => setSelectedGoal(e.target.value)}
-                style={{
-                  width: '100%', padding: '9px 12px',
-                  background: 'var(--bg2)', border: '2px solid var(--border)',
-                  borderRadius: 'var(--radius-sm)', fontSize: 14, color: 'var(--t1)',
-                  fontFamily: 'var(--font-sans)', outline: 'none',
-                }}
-              >
-                <option value="">Nenhuma</option>
-                {careerGoals.map(goal => (
-                  <option key={goal.id} value={goal.id}>{goal.title}</option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          {/* Suggestions */}
-          {suggestions.length > 0 && (
-            <div>
-              <label style={labelStyle}>Sugestões baseadas na meta</label>
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                {suggestions.map(suggestion => (
-                  <button
-                    key={suggestion}
-                    onClick={() => set('name', suggestion)}
-                    style={{
-                      padding: '6px 12px',
-                      border: '2px solid var(--border)',
-                      borderRadius: 'var(--radius-sm)',
-                      background: 'var(--bg3)',
-                      color: 'var(--t2)',
-                      cursor: 'pointer', fontSize: 12, fontWeight: 400,
-                      boxShadow: '2px 2px 0 var(--border)',
-                      transition: 'all 0.1s',
-                    }}
-                    onMouseEnter={e => { e.currentTarget.style.transform = 'translate(2px,2px)'; e.currentTarget.style.boxShadow = 'none' }}
-                    onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '2px 2px 0 var(--border)' }}
-                  >
-                    {suggestion}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* 2. Frequência */}
-          <div style={{
-            background: 'var(--background)',
-            border: '2px solid var(--border)',
-            borderRadius: 'var(--radius-base)',
-            padding: '14px 16px',
-          }}>
+           {/* 2. Frequência */}
+           <div style={{
+             border: '2px solid var(--border)',
+             borderRadius: 'var(--radius-base)',
+             padding: '14px 16px',
+           }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
               <span style={labelStyle}>Frequência</span>
               <span style={{ fontSize: 11, color: 'var(--t3)', fontFamily: 'var(--font-sans)' }}>
@@ -597,13 +524,12 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
 
           </div>
 
-          {/* 4. Lembrete */}
-          <div style={{
-            background: 'var(--background)',
-            border: '2px solid var(--border)',
-            borderRadius: 'var(--radius-base)',
-            padding: '14px 16px',
-          }}>
+           {/* 4. Lembrete */}
+           <div style={{
+             border: '2px solid var(--border)',
+             borderRadius: 'var(--radius-base)',
+             padding: '14px 16px',
+           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <i className="ph ph-bell ph-bold" style={{ fontSize: 18, color: 'var(--border)' }} />
@@ -632,9 +558,9 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
             )}
           </div>
 
-          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 16, marginBottom: 16, flexWrap: 'wrap' }}>
-            <Button label="Cancelar" variant="neutral" onClick={onClose} />
-            <Button label={habit?.id ? 'Salvar alterações' : 'Criar hábito'} onClick={() => onSave(form)} />
+          <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 16, marginBottom: 16, flexWrap: 'wrap' }}>
+            <Button size="sm" label="Cancelar" variant="neutral" onClick={onClose} />
+            <Button size="sm" label={habit?.id ? 'Salvar alterações' : 'Criar hábito'} onClick={() => onSave(form)} />
           </div>
 
 
@@ -661,7 +587,7 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
                     onClick={() => setSelectedCategory(cat.key)}
                     style={{
                       display: 'flex', alignItems: 'center', gap: 10,
-                      padding: 14,
+                      padding: '8px 16px',
                       border: '2px solid var(--border)',
                       borderRadius: 'var(--radius-base)',
                       background: isActive ? 'var(--main)' : 'var(--background)',
@@ -704,28 +630,32 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
             <div style={{ display: 'flex', gap: 6 }}>
               {(['baixa', 'media', 'alta'] as Priority[]).map(p => {
                 const isActive = form.priority === p
+                const color = PRIORITY_COLORS[p]
                 return (
                   <button
                     key={p}
                     onClick={() => set('priority', p)}
                     style={{
                       flex: 1,
-                      padding: '8px 12px',
-                      border: 'none',
+                      padding: '8px 16px',
+                      border: `2px solid var(--foreground)`,
                       borderRadius: 'var(--radius-sm)',
-                      background: isActive ? PRIORITY_COLORS[p] + '18' : 'transparent',
-                      color: isActive ? PRIORITY_COLORS[p] : 'var(--t3)',
+                      background: color,
+                      color: '#000',
                       cursor: 'pointer', fontSize: 12, fontWeight: 500,
                       fontFamily: 'var(--font-sans)',
                       textTransform: 'capitalize',
-                      borderBottom: isActive ? `2px solid ${PRIORITY_COLORS[p]}` : `2px solid transparent`,
+                      boxShadow: isActive ? 'none' : `var(--shadow-x) var(--shadow-y) 0 var(--shadow-color)`,
+                      transform: isActive ? 'translate(var(--shadow-x), var(--shadow-y))' : 'none',
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                       transition: 'all 0.1s',
                     }}
+
                   >
                     <span style={{
                       width: 8, height: 8, borderRadius: '50%',
-                      background: PRIORITY_COLORS[p], flexShrink: 0,
+                      border: '2px solid var(--foreground)',
+                      background: color, flexShrink: 0,
                     }} />
                     {p === 'media' ? 'média' : p}
                   </button>
@@ -738,7 +668,7 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
             <FormLabel tooltip="IO é a moeda do app. Ganhe IO completando hábitos e use para desbloquear avatares e cores.">
               IO — {totalPts} pts
             </FormLabel>
-            <Slider value={totalPts} onChange={v => set('pts', v)} min={0} max={50} id="slider-pts" />
+            <Slider value={totalPts} onChange={v => set('pts', v)} min={0} max={50} />
           </AccordionSection>
 
           {form.list !== 'goal' && (
@@ -766,7 +696,7 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
                 onChange={v => set('streak_goal', v === 0 ? null : v)}
                 min={0}
                 max={365}
-                id="slider-streak-goal"
+
               />
             </AccordionSection>
           )}
@@ -782,7 +712,7 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
                     key={u}
                     onClick={() => set('goal_unit', u)}
                     style={{
-                      padding: '4px 12px', fontSize: 12, fontWeight: 500,
+                      padding: '8px 16px', fontSize: 12, fontWeight: 500,
                       borderRadius: 'var(--radius-sm)', cursor: 'pointer',
                       fontFamily: 'var(--font-sans)',
                       background: form.goal_unit === u ? 'var(--main)' : 'var(--bg3)',
@@ -810,7 +740,7 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
                   onChange={v => set('goal_current', v)}
                   min={0}
                   max={form.goal_target ?? 1000}
-                  id="slider-goal-current"
+
                 />
               </div>
 
@@ -836,7 +766,7 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
                       key={p}
                       onClick={() => set('goal_period', form.goal_period === p ? null : p)}
                       style={{
-                        padding: '4px 14px', fontSize: 12, fontWeight: 500,
+                        padding: '8px 16px', fontSize: 12, fontWeight: 500,
                         borderRadius: 'var(--radius-sm)', cursor: 'pointer',
                         fontFamily: 'var(--font-sans)',
                         background: form.goal_period === p ? 'var(--main)' : 'var(--bg3)',
@@ -857,12 +787,12 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
           {form.list !== 'goal' && (
             <AccordionSection id="subtasks" label="Subtarefas" openSections={openSections} setOpenSections={setOpenSections}>
               <FormLabel>Subtarefas</FormLabel>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {(form.subtasks ?? []).map(sub => (
                   <div key={sub.id} style={{
                     display: 'flex', alignItems: 'center', gap: 8,
-                    padding: '8px 12px',
-                    background: 'var(--bg3, #e8e4dc)',
+                    padding: '8px 18px',
+
                     borderRadius: 'var(--radius-sm)',
                     border: '2px solid var(--b2)',
                   }}>
@@ -1016,9 +946,9 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
       )}
 
       {mode === 'avancado' && (
-        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 16, flexWrap: 'wrap' }}>
-          <Button label="Cancelar" variant="neutral" onClick={onClose} />
-          <Button label={habit?.id ? 'Salvar alterações' : 'Criar hábito'} onClick={() => onSave(form)} />
+        <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 16, flexWrap: 'wrap' }}>
+          <Button size="sm" label="Cancelar" variant="neutral" onClick={onClose} />
+          <Button size="sm" label={habit?.id ? 'Salvar alterações' : 'Criar hábito'} onClick={() => onSave(form)} />
         </div>
       )}
 
@@ -1026,7 +956,7 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(3, 1fr)',
-        gap: 10, marginTop: 4, marginBottom: 8,
+        gap: 10, marginTop: 4, marginBottom: 20,
       }}>
         <div style={{
           padding: '12px 14px',
@@ -1082,7 +1012,7 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
           display: 'flex', flexDirection: 'column', gap: 4,
           boxSizing: 'border-box',
         }}>
-          <span style={{ fontSize: 24, fontWeight: 700, color: '#ef4444', lineHeight: 1 }}>{altaCount}</span>
+          <span style={{ fontSize: 24, fontWeight: 700, color: '#FF6B6B', lineHeight: 1 }}>{altaCount}</span>
           <span style={{ fontSize: 11, color: 'var(--t3)', fontWeight: 500 }}>🔴 Crítico</span>
         </div>
         <div style={{
@@ -1094,7 +1024,7 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
           display: 'flex', flexDirection: 'column', gap: 4,
           boxSizing: 'border-box',
         }}>
-          <span style={{ fontSize: 24, fontWeight: 700, color: '#f59e0b', lineHeight: 1 }}>{mediaCount}</span>
+          <span style={{ fontSize: 24, fontWeight: 700, color: 'var(--main)', lineHeight: 1 }}>{mediaCount}</span>
           <span style={{ fontSize: 11, color: 'var(--t3)', fontWeight: 500 }}>🟡 Importante</span>
         </div>
         <div style={{

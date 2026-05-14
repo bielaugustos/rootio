@@ -384,7 +384,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(function Slider(
   }
 
   function thumbStyle(pctVal: number): React.CSSProperties {
-    const half = THUMB_SIZE / 2;
+
     if (orientation === "horizontal") {
       return { left: `${pctVal}%`, top: "50%", transform: `translate(-50%, -50%)`, width: THUMB_SIZE, height: THUMB_SIZE };
     } else {

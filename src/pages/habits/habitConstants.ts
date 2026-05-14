@@ -10,8 +10,8 @@ export const LIST_COLORS: Record<HabitList, { bg: string; border: string; text: 
 
 export const PRIORITY_COLORS: Record<Priority, string> = {
   baixa: '#22c55e',
-  media: '#f59e0b',
-  alta:  '#ef4444',
+  media: 'var(--main)',
+  alta:  '#FF6B6B',
 }
 
 export const LIST_LABELS: Record<HabitList, string> = {

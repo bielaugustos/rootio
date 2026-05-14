@@ -1,9 +1,8 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useMemo, useEffect, useState } from 'react'
 import { useContainerWidth } from 'react-grid-layout'
 import ReactGridLayout from 'react-grid-layout'
 import { GridBackground } from 'react-grid-layout/extras'
 import { useDashboardLayout } from './useDashboardLayout'
-import { Button } from '../../components/Button'
 import { StreakWidget } from './widgets/StreakWidget'
 import { IOHojeWidget } from './widgets/IOHojeWidget'
 import { ProgressoWidget } from './widgets/ProgressoWidget'
@@ -14,7 +13,7 @@ const MOBILE_HEIGHTS: Record<string, number> = {
   streak: 170,
   'io-hoje': 210,
   progresso: 230,
-  habitos: 300,
+  habitos: 220,
   carteira: 310,
 }
 
@@ -24,16 +23,16 @@ const LAYOUTS = {
   lg: [
     { i: 'streak',    x: 0, y: 0, w: 4, h: 2, minW: 3, minH: 2 },
     { i: 'io-hoje',   x: 4, y: 0, w: 4, h: 2, minW: 3, minH: 2 },
-    { i: 'progresso', x: 8, y: 0, w: 4, h: 2, minW: 4, minH: 2 },
-    { i: 'habitos',   x: 0, y: 2, w: 8, h: 4, minW: 6, minH: 3 },
+    { i: 'progresso', x: 8, y: 0, w: 4, h: 3, minW: 4, minH: 3 },
+    { i: 'habitos',   x: 0, y: 2, w: 8, h: 3, minW: 6, minH: 2 },
     { i: 'carteira',  x: 8, y: 2, w: 4, h: 4, minW: 4, minH: 3 },
   ],
   md: [
     { i: 'streak',    x: 0, y: 0, w: 5,  h: 2, minW: 3, minH: 2 },
     { i: 'io-hoje',   x: 5, y: 0, w: 5,  h: 2, minW: 3, minH: 2 },
-    { i: 'progresso', x: 0, y: 2, w: 5,  h: 3, minW: 5, minH: 2 },
+    { i: 'progresso', x: 0, y: 2, w: 5,  h: 4, minW: 5, minH: 3 },
     { i: 'carteira',  x: 5, y: 2, w: 5,  h: 3, minW: 5, minH: 3 },
-    { i: 'habitos',   x: 0, y: 5, w: 10, h: 4, minW: 8, minH: 3 },
+    { i: 'habitos',   x: 0, y: 5, w: 10, h: 3, minW: 8, minH: 2 },
   ],
 }
 
@@ -82,8 +81,10 @@ const WIDGETS: Record<string, React.ReactNode> = {
   carteira:  <CarteiraWidget />,
 }
 
-export function DashboardGrid() {
-  const [editMode, setEditMode] = useState(false)
+export function DashboardGrid({ editMode, onToggleEdit }: {
+  editMode: boolean
+  onToggleEdit: () => void
+}) {
   const { layout, saveLayout, resetLayout, loaded } = useDashboardLayout()
   const { width, containerRef, mounted } = useContainerWidth()
   const windowWidth = useWindowWidth()
@@ -114,25 +115,27 @@ export function DashboardGrid() {
 
   return (
     <div>
-      {/* Toolbar — só no desktop/tablet */}
-      {!isMobile && (
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 10, marginBottom: 20 }}>
-          <Button
-            variant={editMode ? 'reverse' : 'default'}
-            onClick={() => setEditMode(e => !e)}
+      {/* Botão Redefinir — só aparece no modo edição */}
+      {editMode && !isMobile && (
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+          <button
+            onClick={() => { resetLayout(); onToggleEdit() }}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 6,
+              padding: '6px 14px',
+              fontSize: 12, fontWeight: 700, fontFamily: 'var(--font-sans)',
+              border: '2px solid var(--border)', borderRadius: 'var(--radius-sm)',
+              background: 'var(--secondary-background)',
+              boxShadow: '2px 2px 0 var(--border)',
+              cursor: 'pointer', color: 'var(--t3)',
+              transition: 'all .1s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'translate(2px,2px)'; e.currentTarget.style.boxShadow = 'none' }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '2px 2px 0 var(--border)' }}
           >
-            <i className={`ph ${editMode ? 'ph-check' : 'ph-squares-four'}`} style={{ fontSize: 16 }} />
-            {editMode ? 'Salvar layout' : 'Editar dashboard'}
-          </Button>
-          {editMode && (
-            <Button
-              variant="neutral"
-              onClick={() => { resetLayout(); setEditMode(false) }}
-            >
-              <i className="ph ph-arrow-counter-clockwise" style={{ fontSize: 15 }} />
-              Redefinir
-            </Button>
-          )}
+            <i className="ph ph-arrow-counter-clockwise" style={{ fontSize: 14 }} />
+            Redefinir
+          </button>
         </div>
       )}
 

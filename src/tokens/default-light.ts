@@ -1,6 +1,6 @@
 export const DEFAULT_LIGHT: Record<string, string> = {
   // ── Superfícies ──────────────────────────────
-  '--background':               '#f7f4ec',
+  '--background':               '#FFEDD6',
   '--secondary-background':     '#ffffff',
   '--bg2':                      '#f2f2f2',
   '--bg3':                      '#e8e4dc',

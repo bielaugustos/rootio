@@ -86,7 +86,7 @@ export function CarteiraWidget() {
       <div style={{ display: 'flex', gap: 10, marginTop: 'auto' }}>
         <div style={{
           flex: 1, padding: '10px 12px',
-          background: 'var(--bg3)', border: '2px solid var(--b2)',
+          background: 'var(--background)', border: '2px solid var(--border)',
           borderRadius: 'var(--radius-sm)', borderLeft: '4px solid #22c55e',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 3 }}>
@@ -97,7 +97,7 @@ export function CarteiraWidget() {
         </div>
         <div style={{
           flex: 1, padding: '10px 12px',
-          background: 'var(--bg3)', border: '2px solid var(--b2)',
+          background: 'var(--background)', border: '2px solid var(--border)',
           borderRadius: 'var(--radius-sm)', borderLeft: '4px solid #f87171',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 3 }}>
@@ -119,8 +119,8 @@ export function CarteiraWidget() {
               return (
                 <div key={goal.id} style={{
                   padding: '8px 10px',
-                  background: urgent ? '#fef2f2' : 'var(--bg3)',
-                  border: `2px solid ${urgent ? '#fca5a5' : 'var(--b2)'}`,
+                  background: urgent ? '#fef2f2' : 'var(--background)',
+                  border: '2px solid var(--border)',
                   borderRadius: 'var(--radius-sm)',
                   borderLeft: `4px solid ${urgent ? '#dc2626' : '#fbbf24'}`,
                 }}>

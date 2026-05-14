@@ -35,6 +35,7 @@ export function TimeRangeSlider({
   const dragging = useRef<'start' | 'end' | 'range' | null>(null)
   const dragStartX = useRef(0)
   const dragStartValues = useRef({ start: 0, end: 0 })
+  const [grabbing, setGrabbing] = useState(false)
 
   const getMinutes = useCallback((clientX: number): number => {
     if (!trackRef.current) return 0
@@ -49,6 +50,7 @@ export function TimeRangeSlider({
       e.preventDefault()
     }
     dragging.current = type
+    if (type === 'range') setGrabbing(true)
     dragStartX.current = 'touches' in e ? e.touches[0].clientX : e.clientX
     dragStartValues.current = { start, end }
 
@@ -82,6 +84,7 @@ export function TimeRangeSlider({
 
     const onUp = () => {
       dragging.current = null
+      setGrabbing(false)
       window.removeEventListener('mousemove', onMove)
       window.removeEventListener('mouseup', onUp)
       window.removeEventListener('touchmove', onMove)
@@ -123,8 +126,8 @@ export function TimeRangeSlider({
 
   const startPct = (start / TOTAL) * 100
   const endPct = (end / TOTAL) * 100
-  const thumbSize = 28
-  const TOOLTIP_HALF = 40 // ~half width of the widest tooltip ("12:00 AM" + padding)
+  const thumbSize = 20
+  const TOOLTIP_HALF = 40
 
   const tooltipStyle = (pct: number): React.CSSProperties => ({
     position: 'absolute',
@@ -133,10 +136,10 @@ export function TimeRangeSlider({
     background: 'var(--secondary-background)',
     border: '2px solid var(--border)',
     borderRadius: 'var(--radius-sm)',
-    boxShadow: '2px 2px 0 var(--border)',
-    padding: '4px 10px',
-    fontSize: 13,
-    fontWeight: 700,
+
+    padding: '3px 8px',
+    fontSize: 11,
+    fontWeight: 600,
     fontFamily: 'var(--font-mono)',
     color: 'var(--t1)',
     whiteSpace: 'nowrap' as const,
@@ -145,10 +148,10 @@ export function TimeRangeSlider({
   })
 
   return (
-    <div data-comp-id={id} style={{ width: '100%', userSelect: 'none', padding: '32px 0 48px' }}>
+    <div data-comp-id={id} style={{ width: '100%', userSelect: 'none', padding: '12px 0 24px' }}>
 
       {/* Tooltips */}
-      <div style={{ position: 'relative', height: 40, marginBottom: 8 }}>
+      <div style={{ position: 'relative', height: 32, marginBottom: 4 }}>
         <div style={tooltipStyle(startPct)}>{minutesToTime(start)}</div>
         <div style={tooltipStyle(endPct)}>{minutesToTime(end)}</div>
       </div>
@@ -159,7 +162,7 @@ export function TimeRangeSlider({
         onClick={handleTrackClick}
         style={{
           position: 'relative',
-          height: 20,
+          height: 16,
           cursor: 'pointer',
         }}
       >
@@ -168,7 +171,7 @@ export function TimeRangeSlider({
           position: 'absolute',
           left: 0, right: 0,
           top: '50%', transform: 'translateY(-50%)',
-          height: 8,
+          height: 6,
           background: 'var(--bg3, #e8e4dc)',
           border: '2px solid var(--border)',
           borderRadius: 4,
@@ -183,12 +186,14 @@ export function TimeRangeSlider({
             left: `${startPct}%`,
             width: `${endPct - startPct}%`,
             top: '50%', transform: 'translateY(-50%)',
-            height: 8,
+            height: 6,
             background: 'var(--main)',
             border: '2px solid var(--border)',
-            cursor: 'grab',
+            cursor: grabbing ? 'grabbing' : 'grab',
             touchAction: 'none',
             zIndex: 1,
+            transition: 'transform 0.1s',
+            transform: grabbing ? 'translateY(calc(-50% + 1px))' : 'translateY(-50%)',
           }}
         />
 
@@ -203,27 +208,14 @@ export function TimeRangeSlider({
             transform: 'translate(-50%, -50%)',
             width: thumbSize,
             height: thumbSize,
-            background: 'var(--secondary-background)',
+            background: 'var(--main)',
             border: '2px solid var(--border)',
             borderRadius: 'var(--radius-sm)',
-            boxShadow: '3px 3px 0 var(--border)',
             cursor: 'grab',
             touchAction: 'none',
             zIndex: 3,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 2,
           }}
-        >
-          {[0, 1].map(i => (
-            <div key={i} style={{
-              width: 2, height: 10,
-              background: 'var(--b2)',
-              borderRadius: 1,
-            }} />
-          ))}
-        </div>
+        />
 
         {/* End thumb */}
         <div
@@ -236,27 +228,14 @@ export function TimeRangeSlider({
             transform: 'translate(-50%, -50%)',
             width: thumbSize,
             height: thumbSize,
-            background: 'var(--secondary-background)',
+            background: 'var(--main)',
             border: '2px solid var(--border)',
             borderRadius: 'var(--radius-sm)',
-            boxShadow: '3px 3px 0 var(--border)',
             cursor: 'grab',
             touchAction: 'none',
             zIndex: 3,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 2,
           }}
-        >
-          {[0, 1].map(i => (
-            <div key={i} style={{
-              width: 2, height: 10,
-              background: 'var(--b2)',
-              borderRadius: 1,
-            }} />
-          ))}
-        </div>
+        />
       </div>
 
       {/* Pips — sem labels */}

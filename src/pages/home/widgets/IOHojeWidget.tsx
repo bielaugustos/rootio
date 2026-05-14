@@ -24,7 +24,7 @@ export function IOHojeWidget() {
   const statusColor = isComplete ? '#166534' : today.done > 0 ? '#1e40af' : 'var(--t3)'
 
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', padding: 20, marginBottom: '40px', gap: 14 }}>
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', padding: 20, gap: 14 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10}}>
         <div style={{
           width: 44, height: 44, borderRadius: '50%',

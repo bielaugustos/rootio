@@ -21,25 +21,13 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import type { Habit } from '../../engine/habitDB'
+import type { Habit, ReminderConfig } from '../../engine/habitDB'
 import { updateHabit } from '../../engine/habitDB'
-import { Pill } from '../../components/Pill'
 import { Toggle } from '../../components/Toggle'
+import { TimePicker } from '../../components/TimePicker'
+import type { TimeValue } from '../../components/TimePicker'
 
 // ─── Types ─────────────────────────────────────────────────────────────────
-
-export interface ReminderConfig {
-  enabled:          boolean
-  hora:             string            // "HH:MM"
-  nudge_enabled:    boolean
-  nudge_hora:       string            // hora-limite para o nudge (ex: "20:00")
-  freq_mode:        'dias' | 'intervalo'
-  freq_days:        number[]          // dias da semana (0=dom..6=sab)
-  freq_intervalo:   number            // a cada N dias
-  modo_foco:        boolean
-  snooze_active:    boolean
-  snooze_until:     string | null     // ISO timestamp
-}
 
 const snoozeOptions = [
   { l: '+5min',   ms: 5 * 60 * 1000 },
@@ -61,7 +49,7 @@ function getDefaultHora(): string {
 }
 
 const DEFAULT_CONFIG: ReminderConfig = {
-  enabled:        false,
+  enabled:        true,
   hora:           getDefaultHora(),
   nudge_enabled:  false,
   nudge_hora:     '20:00',
@@ -106,6 +94,12 @@ function snoozeLabel(until: string | null): string {
 
 const DAYS_PT = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
 
+const parseTime = (time: string | null): TimeValue | null => {
+  if (!time) return null
+  const [h, m] = time.split(':').map(Number)
+  return { hours: h, minutes: m }
+}
+
 // ─── FrequencyPicker ────────────────────────────────────────────────────────
 
 function FrequencyPicker({
@@ -118,7 +112,7 @@ function FrequencyPicker({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
       {/* Mode toggle */}
-      <div style={{ display: 'flex', gap: 4 }}>
+      <div style={{ display: 'flex', gap: 12 }}>
         {(['dias', 'intervalo'] as const).map(mode => (
           <button
             key={mode}
@@ -129,7 +123,7 @@ function FrequencyPicker({
               borderRadius: 'var(--radius-sm)',
               background: config.freq_mode === mode ? 'var(--main)' : 'var(--bg3)',
               cursor: 'pointer', color: 'var(--t1)',
-              boxShadow: config.freq_mode === mode ? '2px 2px 0 var(--border)' : 'none',
+              boxShadow: config.freq_mode === mode ? 'none' : '2px 2px 0 var(--border)',
               transform: config.freq_mode === mode ? 'translate(2px,2px)' : 'none',
             }}
           >
@@ -140,28 +134,38 @@ function FrequencyPicker({
 
       {/* Days of week */}
       {config.freq_mode === 'dias' && (
-        <div style={{ display: 'flex', gap: 4 }}>
+        <div style={{ display: 'flex', gap: 6 }}>
           {DAYS_PT.map((d, i) => {
-            const on = config.freq_days.includes(i)
+            const isActive = config.freq_days.includes(i)
             return (
               <button
                 key={i}
                 onClick={() => {
-                  const next = on
+                  const next = isActive
                     ? config.freq_days.filter(x => x !== i)
                     : [...config.freq_days, i].sort()
                   onChange({ freq_days: next })
                 }}
                 style={{
-                  flex: 1, padding: '5px 0', fontSize: 9, fontWeight: 500,
-                  border: `2px solid ${on ? 'var(--border)' : 'var(--b2)'}`,
-                  borderRadius: 99,
-                  background: on ? 'var(--border)' : 'var(--bg3)',
-                  color: on ? 'var(--bg)' : 'var(--t3)',
-                  cursor: 'pointer',
+                  flex: 1, height: 40,
+                  borderRadius: 'var(--radius-sm)',
+                  border: '2px solid var(--border)',
+                  background: isActive ? 'var(--main)' : 'var(--bg2)',
+                  color: isActive ? 'var(--main-foreground)' : 'var(--t1)',
+                  cursor: 'pointer', fontSize: 13, fontWeight: 500,
+                  fontFamily: 'var(--font-sans)',
+                  boxShadow: isActive ? 'none' : '2px 2px 0 var(--border)',
+                  transform: isActive ? 'translate(2px, 2px)' : 'none',
+                  transition: 'transform 0.08s, box-shadow 0.08s',
+                }}
+                onMouseEnter={e => {
+                  if (!isActive) { e.currentTarget.style.transform = 'translate(2px,2px)'; e.currentTarget.style.boxShadow = 'none' }
+                }}
+                onMouseLeave={e => {
+                  if (!isActive) { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '2px 2px 0 var(--border)' }
                 }}
               >
-                {d[0]}
+                {d}
               </button>
             )
           })}
@@ -183,6 +187,7 @@ function FrequencyPicker({
                   borderRadius: 'var(--radius-sm)',
                   background: config.freq_intervalo === n ? 'var(--main)' : 'var(--bg3)',
                   cursor: 'pointer', color: 'var(--t1)',
+                  boxShadow: config.freq_intervalo === n ? 'none' : '2px 2px 0 var(--border)',
                 }}
               >
                 {n}
@@ -311,18 +316,21 @@ function ModoFocoCard({
 
 // ─── LembretePanel (main export) ────────────────────────────────────────────
 
+export interface HabitWithConfig extends Habit {
+  reminder_config?: ReminderConfig
+}
+
 export function LembretePanel({
   habit,
   onRefresh,
 }: {
-  habit:     Habit
-  isMobile?: boolean
+  habit:     HabitWithConfig
   onRefresh: () => void
 }) {
   const navigate = useNavigate()
-  const [open,    setOpen]    = useState(false)
+
   const [config,  setConfig]  = useState<ReminderConfig>(() => {
-    const saved = (habit as any).reminder_config ?? {}
+    const saved: Partial<ReminderConfig> = habit.reminder_config ?? {}
     return {
       ...DEFAULT_CONFIG,
       ...saved,
@@ -346,7 +354,7 @@ export function LembretePanel({
 
   const persist = useCallback(async (next: ReminderConfig) => {
     setSaving(true)
-    await updateHabit(habit.id, { ...(habit as any), reminder_config: next })
+    await updateHabit(habit.id, { ...habit, reminder_config: next })
     setSaving(false)
     onRefresh()
   }, [habit, onRefresh])
@@ -395,47 +403,22 @@ export function LembretePanel({
     config.snooze_until != null &&
     new Date(config.snooze_until) > new Date()
 
-  // Badge on pill
-  const pillLabel = !config.enabled
-    ? 'Lembrete'
-    : isSnoozeActive
-      ? `⏱ ${snoozeLabel(config.snooze_until)}`
-      : `🔔 ${config.hora}`
+
 
   return (
     <div>
-      <Pill
-        label={pillLabel}
-        variant={config.enabled ? 'goal' : 'default'}
-        size="sm"
-        selected={open}
-        onClick={() => setOpen(o => !o)}
-        id="pill-lembrete"
-        icon={
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-          </svg>
-        }
-      />
-
-      {open && (
         <div style={{
-          marginTop: 12,
-          border: '2px solid var(--border)',
           borderRadius: 'var(--radius-base)',
-          background: 'var(--bg2)',
           overflow: 'hidden',
-          boxShadow: '4px 4px 0 var(--border)',
         }}>
           {/* ── Header ── */}
           <div style={{
             padding: '10px 14px',
             borderBottom: '2px solid var(--border)',
-            background: 'var(--bg3)',
+            background: 'var(--main)',
             display: 'flex', alignItems: 'center', gap: 8,
           }}>
-            <span style={{ fontSize: 13, fontWeight: 500, flex: 1 }}>Lembrete</span>
+            <span style={{ fontSize: 13, fontWeight: 900, flex: 1, fontFamily: 'Indie Flower' }}>Lembrete</span>
             {saving && <span style={{ fontSize: 10, color: 'var(--t3)' }}>salvando...</span>}
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span style={{ fontSize: 11, color: 'var(--t2)', fontWeight: 400 }}>
@@ -468,16 +451,9 @@ export function LembretePanel({
                 <div style={{ fontSize: 10, fontWeight: 500, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 6 }}>
                   Horário do lembrete
                 </div>
-                <input
-                  type="time"
-                  value={config.hora}
-                  onChange={e => update({ hora: e.target.value })}
-                  style={{
-                    fontSize: 15, fontWeight: 500, fontFamily: 'var(--font-mono)',
-                    border: '2px solid var(--border)', borderRadius: 'var(--radius-sm)',
-                    padding: '6px 10px', background: 'var(--bg2)', color: 'var(--t1)',
-                    boxShadow: '2px 2px 0 var(--border)',
-                  }}
+                <TimePicker
+                  value={parseTime(config.hora)}
+                  onChange={(time) => update({ hora: time ? `${time.hours.toString().padStart(2,'0')}:${time.minutes.toString().padStart(2,'0')}` : '' })}
                 />
               </div>
 
@@ -507,15 +483,9 @@ export function LembretePanel({
                 {config.nudge_enabled && (
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span style={{ fontSize: 12, color: 'var(--t2)' }}>Se não fizer até</span>
-                    <input
-                      type="time"
-                      value={config.nudge_hora}
-                      onChange={e => update({ nudge_hora: e.target.value })}
-                      style={{
-                        fontSize: 13, fontWeight: 500, fontFamily: 'var(--font-mono)',
-                        border: '2px solid var(--border)', borderRadius: 'var(--radius-sm)',
-                        padding: '4px 8px', background: 'var(--bg2)', color: 'var(--t1)',
-                      }}
+                    <TimePicker
+                      value={parseTime(config.nudge_hora)}
+                      onChange={(time) => update({ nudge_hora: time ? `${time.hours.toString().padStart(2,'0')}:${time.minutes.toString().padStart(2,'0')}` : '' })}
                     />
                     <span style={{ fontSize: 12, color: 'var(--t2)' }}>→ me avise</span>
                   </div>
@@ -561,6 +531,15 @@ export function LembretePanel({
                   border: '2px solid var(--border)', borderRadius: 'var(--radius-sm)',
                   background: 'var(--main)', cursor: 'pointer', color: 'var(--t1)',
                   boxShadow: '2px 2px 0 var(--border)',
+                  transition: 'transform 0.08s, box-shadow 0.08s',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.transform = 'translate(2px, 2px)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.transform = 'none';
+                  e.currentTarget.style.boxShadow = '2px 2px 0 var(--border)';
                 }}
               >
                 🔔 Ativar lembrete
@@ -568,7 +547,6 @@ export function LembretePanel({
             </div>
           )}
         </div>
-      )}
     </div>
   )
 }

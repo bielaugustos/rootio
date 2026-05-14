@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect, useId, forwardRef, type ChangeEvent, type KeyboardEvent } from "react"
+import { useState, useRef, useEffect, useId, forwardRef, type ChangeEvent, type KeyboardEvent } from "react"
 
 export interface NumberFieldProps {
   label?: string
@@ -100,11 +100,11 @@ export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(
     const atMin = min !== undefined && current !== null && current <= min
     const atMax = max !== undefined && current !== null && current >= max
     const sm = size === "sm"
-    const xs = size === "xs"
-    const h = xs ? 28 : sm ? 36 : 44
-    const inputFontSize = xs ? 11 : sm ? 13 : 15
-    const padL = prefix ? (xs ? 4 : 6) : (xs ? 8 : 12)
-    const padR = spinner ? 0 : (xs ? 8 : 12)
+
+    const h = sm ? 36 : 44
+    const inputFontSize = sm ? 13 : 15
+    const padL = prefix ? (sm ? 4 : 6) : (sm ? 8 : 12)
+    const padR = spinner ? 0 : (sm ? 8 : 12)
 
     const wrapStyle: React.CSSProperties = {
       display: 'flex', alignItems: 'stretch',

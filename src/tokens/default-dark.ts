@@ -66,6 +66,7 @@ export const DEFAULT_DARK: Record<string, string> = {
   '--border-width': '2px',
   '--shadow-x': '4px',
   '--shadow-y': '4px',
+  '--shadow-color': '#F0EEE8',
   '--section-gap': '40px',
   '--grid-gap': '16px',
   '--time-icon-color': '#FFFFFF',
