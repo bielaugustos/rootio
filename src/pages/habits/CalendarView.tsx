@@ -439,6 +439,7 @@ function DayPanel({
                 onDelete={onDelete}
                 onRefresh={onRefresh}
                 isMobile={isMobile}
+                collapsed={true}
               />
             ))}
           </div>

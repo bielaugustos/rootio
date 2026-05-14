@@ -26,6 +26,7 @@ interface HabitCardProps {
   updateHabit?: (id: string, data: Partial<Habit>) => Promise<Habit>
   isMobile?: boolean
   done?: boolean
+  collapsed?: boolean
   // ── NOVO ──────────────────────────────────────────────
   onPanelOpen?: (habitId: string, type: import('./PanelPortal').PanelType) => void
   activePanelType?: import('./PanelPortal').PanelType
@@ -109,9 +110,9 @@ function GoalPanels({ habit }: { habit: Habit }) {
 
 export function HabitCard({
   habit, onToggle, onEdit, onRefresh,
-  isMobile, onPanelOpen, activePanelType,
+  isMobile, onPanelOpen, activePanelType, collapsed = false,
 }: HabitCardProps) {
-  const [expanded, setExpanded] = useState(false)
+  const [expanded, setExpanded] = useState(!collapsed)
   const [detailsExpanded, setDetailsExpanded] = useState(false)
   const [streak, setStreak] = useState(0)
   const [sprintActive, setSprintActive] = useState(() => localStorage.getItem('sprint-active') === '1')
