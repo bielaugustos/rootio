@@ -461,7 +461,7 @@ export function CalendarView({
   const today = new Date()
   const [year,  setYear]  = useState(today.getFullYear())
   const [month, setMonth] = useState(today.getMonth())
-  const [selectedDate,  setSelectedDate]  = useState<string | null>(todayStr())
+  const [selectedDate,  setSelectedDate]  = useState<string | null>(null)
   const [historyCache,  setHistoryCache]  = useState<Map<string, Set<string>>>(new Map())
   const [contextMenu,   setContextMenu]   = useState<{ x: number; y: number; dateStr: string } | null>(null)
 
