@@ -407,7 +407,7 @@ export function ViewSwitcher({ leftOffset }: ViewSwitcherProps) {
           zIndex: 200,
           width: 28, height: 28,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          background: open ? 'var(--main)' : 'var(--secondary-background)',
+          background: open ? 'var(--main)' : 'var(--background)',
           border: '2px solid var(--border)',
           borderRadius: 'var(--radius-sm)',
           boxShadow: open ? 'none' : '2px 2px 0 var(--border)',
