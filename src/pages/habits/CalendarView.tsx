@@ -152,6 +152,7 @@ function DayCell({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
+        width: '100%',
         padding: isMobile ? '4px 2px' : '6px 4px',
         minHeight: isMobile ? 48 : 72,
         border: isSelected
@@ -670,7 +671,7 @@ export function CalendarView({
               const ds      = dateToStr(d)
               const dayData = buildDayData(d)
               return (
-                <div key={i} style={{ background: 'var(--secondary-background)' }}>
+                <div key={i} style={{ background: 'var(--secondary-background)', padding: 2 }}>
                   <DayCell
                     day={dayData}
                     isSelected={selectedDate === ds}
