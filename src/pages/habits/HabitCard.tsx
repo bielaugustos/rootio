@@ -245,9 +245,11 @@ export function HabitCard({
           <Button size="tiny" variant="ghost" onClick={() => onEdit(habit)}>
             <i className="ph ph-pencil-simple" />
           </Button>
-          <Button size="tiny" variant="ghost" onClick={() => setExpanded(e => !e)}>
-            <i className={`ph ${expanded ? 'ph-caret-up' : 'ph-caret-down'}`} />
-          </Button>
+          {!collapsed && (
+            <Button size="tiny" variant="ghost" onClick={() => setExpanded(e => !e)}>
+              <i className={`ph ${expanded ? 'ph-caret-up' : 'ph-caret-down'}`} />
+            </Button>
+          )}
         </div>
       </div>
 
