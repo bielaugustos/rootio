@@ -197,7 +197,7 @@ function DayCell({
 
       {/* Type dots */}
       {dots.length > 0 && (
-        <div style={{ display: 'flex', gap: 2, flexWrap: 'wrap', justifyContent: 'center' }}>
+        <div style={{ display: 'flex', gap: 2px, flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
           {dots.map(h => (
             <div key={h.id} style={{
               width: isMobile ? 5 : 6,
@@ -213,6 +213,8 @@ function DayCell({
               +{totalCount - dots.length}
             </span>
           )}
+        </div>
+      )}
         </div>
       )}
     </button>
