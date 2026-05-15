@@ -42,9 +42,20 @@ function ToggleBtn({ left, icon, title, active, onClick }: {
 }
 
 export function HomePage() {
-  const [widgetsHidden, setWidgetsHidden] = useState(
-    () => localStorage.getItem(LS_KEY) === '1'
-  )
+  const [widgetsHidden, setWidgetsHidden] = useState(() => {
+    // Para usuários novos (primeira visita), ocultar widgets por padrão
+    const hasVisited = localStorage.getItem('has-visited-dashboard')
+    const savedHidden = localStorage.getItem(LS_KEY) === '1'
+
+    if (!hasVisited) {
+      // Primeira visita - ocultar widgets e marcar como visitado
+      localStorage.setItem('has-visited-dashboard', 'true')
+      localStorage.setItem(LS_KEY, '1') // 1 = hidden
+      return true
+    }
+
+    return savedHidden
+  })
   const [editMode, setEditMode] = useState(false)
 
   useEffect(() => {
@@ -109,12 +120,22 @@ export function HomePage() {
                 textAlign: 'center',
               }}>Aplicativo de produtividade gamificado</p>
             </div>
-            <div style={{ padding: '0 0 40px', textAlign: 'center' }}>
+            <div style={{ padding: '0 0 40px', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 12 }}>
               <Link to="/habits" style={{ textDecoration: 'none' }}>
                 <Button size="lg">
                   Iniciar Hábitos <i className="ph ph-arrow-right" />
                 </Button>
               </Link>
+              <Button
+                variant="neutral"
+                onClick={() => {
+                  localStorage.setItem(LS_KEY, '0') // 0 = show
+                  setWidgetsHidden(false)
+                  window.dispatchEvent(new CustomEvent('widgets-visibility-change'))
+                }}
+              >
+                Ver Dashboard <i className="ph ph-squares-four" />
+              </Button>
             </div>
           </div>
         ) : (
