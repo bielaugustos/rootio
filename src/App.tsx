@@ -57,18 +57,23 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
   const navigate = useNavigate()
   const onboardingCompleted = localStorage.getItem('onboarding-completed') === 'true'
+  const offlineMode = localStorage.getItem('offline-mode') === 'true'
 
   useEffect(() => {
     if (!loading) {
+      if (offlineMode) {
+        // No modo offline, permite acesso direto
+        return
+      }
       if (!user) {
         navigate('/login', { replace: true })
       } else if (!onboardingCompleted) {
         navigate('/onboarding', { replace: true })
       }
     }
-  }, [user, loading, onboardingCompleted, navigate])
+  }, [user, loading, onboardingCompleted, offlineMode, navigate])
 
-  if (loading) {
+  if (loading && !offlineMode) {
     return (
       <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--background)' }}>
         <div style={{ textAlign: 'center' }}>
@@ -79,7 +84,8 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
     )
   }
 
-  if (!user || !onboardingCompleted) {
+  // Permite acesso se estiver no modo offline ou se tiver usuário autenticado e onboarding completo
+  if (!offlineMode && (!user || !onboardingCompleted)) {
     return null // Will redirect
   }
 

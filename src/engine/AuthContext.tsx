@@ -7,7 +7,9 @@ interface AuthContextType {
   user: User | null
   session: Session | null
   loading: boolean
+  offlineMode: boolean
   signOut: () => Promise<void>
+  exitOfflineMode: () => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -28,6 +30,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
+  const [offlineMode, setOfflineMode] = useState(() => localStorage.getItem('offline-mode') === 'true')
 
   useEffect(() => {
     // Get initial session
@@ -58,11 +61,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
     if (error) throw error
   }
 
+  const exitOfflineMode = () => {
+    localStorage.removeItem('offline-mode')
+    setOfflineMode(false)
+    // Redirecionar para login
+    window.location.href = '/login'
+  }
+
   const value: AuthContextType = {
     user,
     session,
     loading,
-    signOut
+    offlineMode,
+    signOut,
+    exitOfflineMode
   }
 
   return (

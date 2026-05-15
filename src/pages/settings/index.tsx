@@ -13,6 +13,7 @@ import { Row } from './Row'
 import { Toggle } from './Toggle'
 import { AvatarPicker, BgColorPicker } from './AvatarPicker'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../../engine/AuthContext'
 
 function NavButton({ onClick }: { onClick: () => void }) {
   return (
@@ -131,6 +132,7 @@ export function SettingsPage() {
   const [isMobile, setIsMobile] = useState(false)
   const [bioFocused, setBioFocused] = useState(false)
   const [editingProfile, setEditingProfile] = useState(false)
+  const { offlineMode, signOut, exitOfflineMode } = useAuth()
   const [stats, setStats] = useState<{ streak: number; done: number; goals: number } | null>(null)
   const { mode, toggleMode } = useTheme()
   const navigate = useNavigate()
@@ -453,11 +455,19 @@ export function SettingsPage() {
           </span>
         </div>
         <Button
-          label="Sair da conta"
+          label={offlineMode ? "Sair do modo offline" : "Sair da conta"}
           variant="destructive"
           onClick={() => {
-            // placeholder — conectar com auth quando Supabase for integrado
-            alert('Logout não disponível na versão local.')
+            if (offlineMode) {
+              exitOfflineMode()
+            } else {
+              signOut().then(() => {
+                navigate('/login', { replace: true })
+              }).catch(err => {
+                console.error('Erro no logout:', err)
+                alert('Erro ao fazer logout')
+              })
+            }
           }}
         />
       </div>

@@ -130,7 +130,14 @@ export function LoginPage() {
 
         {/* Skip link */}
         <div style={{ textAlign: 'center', marginTop: 20 }}>
-          <button onClick={() => navigate('/')} style={{ background: 'none', border: 'none', fontSize: 13, color: 'var(--t3)', cursor: 'pointer', fontFamily: 'var(--font-sans)' }}>
+          <button
+            onClick={() => {
+              localStorage.setItem('offline-mode', 'true')
+              localStorage.setItem('onboarding-completed', 'true')
+              navigate('/', { replace: true })
+            }}
+            style={{ background: 'none', border: 'none', fontSize: 13, color: 'var(--t3)', cursor: 'pointer', fontFamily: 'var(--font-sans)' }}
+          >
             Pular login e usar offline →
           </button>
         </div>
