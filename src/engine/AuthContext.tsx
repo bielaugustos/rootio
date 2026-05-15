@@ -35,33 +35,40 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     console.log('🔄 Initializing auth context...')
 
-    // Handle OAuth callback on page load
-    const handleAuthCallback = async () => {
-      const { data, error } = await auth.getSession()
-      if (error) {
-        console.error('❌ Error getting session on callback:', error)
-      } else if (data.session) {
-        console.log('✅ Session found on callback:', data.session.user.email)
-      } else {
-        console.log('ℹ️ No session found on callback')
-      }
-    }
+    // Check if we're returning from OAuth (detect by URL fragments or params)
+    const isOAuthCallback = window.location.hash.includes('access_token') ||
+                           window.location.hash.includes('id_token') ||
+                           window.location.search.includes('code') ||
+                           window.location.search.includes('error')
 
-    // Check if we're returning from OAuth
-    if (window.location.hash.includes('access_token') || window.location.search.includes('code')) {
-      console.log('🔄 Detected OAuth callback, handling...')
-      handleAuthCallback()
+    if (isOAuthCallback) {
+      console.log('🔄 Detected OAuth callback URL, will handle session...')
     }
 
     // Get initial session
     auth.getSession().then(({ session, error }) => {
       if (error) {
         console.error('❌ Error getting initial session:', error)
+        console.error('Error details:', {
+          message: error.message,
+          status: error.status,
+          name: error.name
+        })
       } else {
         console.log('📋 Initial session check:', session ? `Active (${session.user.email})` : 'None')
+        if (session) {
+          console.log('Session details:', {
+            userId: session.user.id,
+            email: session.user.email,
+            expiresAt: new Date(session.expires_at! * 1000).toISOString()
+          })
+        }
       }
       setSession(session)
       setUser(session?.user ?? null)
+      setLoading(false)
+    }).catch(err => {
+      console.error('❌ Unexpected error getting session:', err)
       setLoading(false)
     })
 
@@ -71,7 +78,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         hasSession: !!session,
         userEmail: session?.user?.email,
         userId: session?.user?.id,
-        url: window.location.href
+        url: window.location.href,
+        timestamp: new Date().toISOString()
       })
 
       setSession(session)
@@ -82,7 +90,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
         console.log('👋 User signed out')
         // Clear any local data if needed
       } else if (event === 'SIGNED_IN') {
-        console.log('✅ User signed in:', session?.user?.email)
+        console.log('✅ User signed in successfully:', session?.user?.email)
+        if (session) {
+          console.log('Session established:', {
+            provider: session.user.app_metadata?.provider,
+            userId: session.user.id
+          })
+        }
+      } else if (event === 'TOKEN_REFRESHED') {
+        console.log('🔄 Token refreshed')
       }
     })
 
