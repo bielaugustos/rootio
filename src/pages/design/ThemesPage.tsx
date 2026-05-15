@@ -21,7 +21,7 @@ import type { TimeValue } from '../../components/TimePicker'
 import { NumberField } from '../../components/NumberField'
 
 import { Slider as NewcompSlider } from '../../components/Slider'
-import { Timeline, TimelineItem, TimelineSeparator, TimelineConnector, TimelineDot, TimelineContent, TimelineOppositeContent } from '../../../public/newcomp/TimeLine.tsx'
+import { Timeline, TimelineItem, TimelineSeparator, TimelineConnector, TimelineDot, TimelineContent, TimelineOppositeContent } from '../../components/TimeLine'
 
 
 const icons = [

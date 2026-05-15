@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getHabits, getHistoryRange } from '../engine/habitDB'
 import type { Habit } from '../engine/habitDB'
-import { Timeline, TimelineItem, TimelineSeparator, TimelineConnector, TimelineDot, TimelineContent, TimelineOppositeContent } from '../../public/newcomp/TimeLine.tsx'
+import { Timeline, TimelineItem, TimelineSeparator, TimelineConnector, TimelineDot, TimelineContent, TimelineOppositeContent } from './TimeLine'
 import { Badge } from './Badge'
 import { LIST_LABELS, PRIORITY_COLORS } from '../pages/habits/habitConstants'
 

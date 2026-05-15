@@ -2,12 +2,14 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, Input } from '../../components'
 import { auth } from '../../engine/supabase'
-import { ToastIO } from '../../components/ToastIO'
+import { useToast } from '../../components/useToast'
+import { ToastContainer } from '../../components/Toast'
 
 type AuthMode = 'login' | 'signup'
 
 export function LoginPage() {
   const navigate = useNavigate()
+  const { toast, toasts, remove } = useToast()
   const [mode, setMode] = useState<AuthMode>('login')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -24,14 +26,14 @@ export function LoginPage() {
       if (mode === 'signup') {
         const { error } = await auth.signUp(email, password, { name })
         if (error) throw error
-        ToastIO.show('Conta criada! Verifique seu email.', 'success')
+        toast('Conta criada! Verifique seu email.', 'success')
       } else {
         const { error } = await auth.signIn(email, password)
         if (error) throw error
         navigate('/', { replace: true })
       }
     } catch (error) {
-      ToastIO.show(error.message || 'Erro na autenticação', 'error')
+      toast((error as Error).message || 'Erro na autenticação', 'error')
     } finally {
       setLoading(false)
     }
@@ -123,6 +125,7 @@ export function LoginPage() {
           </button>
         </div>
       </div>
+      <ToastContainer toasts={toasts} onRemove={remove} />
     </div>
   )
 }
