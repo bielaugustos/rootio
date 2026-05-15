@@ -32,6 +32,31 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [loading, setLoading] = useState(true)
   const [offlineMode, setOfflineMode] = useState(() => localStorage.getItem('offline-mode') === 'true')
 
+  // Listen for offline mode changes
+  useEffect(() => {
+    const checkOfflineMode = () => {
+      const newOfflineMode = localStorage.getItem('offline-mode') === 'true'
+      if (newOfflineMode !== offlineMode) {
+        console.log('🔄 Offline mode changed:', newOfflineMode)
+        setOfflineMode(newOfflineMode)
+      }
+    }
+
+    // Check immediately
+    checkOfflineMode()
+
+    // Listen for storage events
+    window.addEventListener('storage', checkOfflineMode)
+
+    // Also check periodically (for same-tab changes)
+    const interval = setInterval(checkOfflineMode, 1000)
+
+    return () => {
+      window.removeEventListener('storage', checkOfflineMode)
+      clearInterval(interval)
+    }
+  }, [offlineMode])
+
   useEffect(() => {
     console.log('🔄 Initializing auth context...')
 
@@ -52,6 +77,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setTimeout(() => {
         console.log('⏰ OAuth callback timeout reached, checking session...')
         auth.getSession().then(({ session, error }) => {
+          if (error) console.error('❌ OAuth callback session error:', error)
           console.log('🔍 OAuth callback session check:', session ? `Found (${session.user.email})` : 'None')
         })
       }, 2000)

@@ -119,25 +119,6 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   return <>{children}</>
 }
 
-  if (loading && !offlineMode) {
-    return (
-      <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--background)' }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 32, marginBottom: 16 }}>🌱</div>
-          <div style={{ fontSize: 18, color: 'var(--t1)' }}>Carregando...</div>
-        </div>
-      </div>
-    )
-  }
-
-  // Permite acesso se estiver no modo offline ou se tiver usuário autenticado e onboarding completo
-  if (!offlineMode && (!user || !onboardingCompleted)) {
-    return null // Will redirect
-  }
-
-  return <>{children}</>
-}
-
 function AppWithNav() {
   const navigate = useNavigate()
   const [showEditor, setShowEditor] = useState(false)

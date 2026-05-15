@@ -117,16 +117,16 @@ export function StreakTimeline() {
                    {habit.pts > 0 && <Badge label={`+${habit.pts} IO`} variant="destructive" />}
                  </div>
 
-                 {/* Priority shield and time */}
-                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                   <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 8px', border: '2px solid var(--border)', borderRadius: 'var(--radius-sm)', background: PRIORITY_COLORS[habit.priority] }}>
-                     <span style={{ width: 6, height: 6, borderRadius: '50%', border: '2px solid var(--foreground)', background: PRIORITY_COLORS[habit.priority] }} />
-                     <span style={{ fontSize: 10, fontWeight: 500, color: '#000', textTransform: 'capitalize' }}>{habit.priority === 'media' ? 'média' : habit.priority}</span>
-                   </div>
-                   <span style={{ fontSize: 10, color: 'var(--t3)' }}>
-                     {new Date(habit.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                   </span>
-                 </div>
+                  {/* Priority shield and time */}
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 4 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 8px', border: '2px solid var(--border)', borderRadius: 'var(--radius-sm)', background: PRIORITY_COLORS[habit.priority] }}>
+                      <span style={{ width: 6, height: 6, borderRadius: '50%', border: '2px solid var(--foreground)', background: PRIORITY_COLORS[habit.priority] }} />
+                      <span style={{ fontSize: 10, fontWeight: 500, color: '#000', textTransform: 'capitalize' }}>{habit.priority === 'media' ? 'média' : habit.priority}</span>
+                    </div>
+                    <span style={{ fontSize: 10, color: 'var(--t3)' }}>
+                      {new Date(habit.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
                </div>
              </TimelineContent>
            </TimelineItem>
