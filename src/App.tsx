@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom'
 import { ThemeProvider } from './engine/ThemeContext'
+import { AuthProvider, useAuth } from './engine/AuthContext'
 import { Sidebar } from './components/Sidebar'
 import { PaletteEditor } from './editor/PaletteEditor'
 import { CommandK } from './components/CommandK'
@@ -51,6 +53,39 @@ import { SprintSettingsPage } from './pages/sprint/settings'
 
 
 const HABITS_CHANGE_EVENT = 'habits-changed'
+
+function AuthGuard({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth()
+  const navigate = useNavigate()
+  const onboardingCompleted = localStorage.getItem('onboarding-completed') === 'true'
+
+  useEffect(() => {
+    if (!loading) {
+      if (!user) {
+        navigate('/login', { replace: true })
+      } else if (!onboardingCompleted) {
+        navigate('/onboarding', { replace: true })
+      }
+    }
+  }, [user, loading, onboardingCompleted, navigate])
+
+  if (loading) {
+    return (
+      <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--background)' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: 32, marginBottom: 16 }}>🌱</div>
+          <div style={{ fontSize: 18, color: 'var(--t1)' }}>Carregando...</div>
+        </div>
+      </div>
+    )
+  }
+
+  if (!user || !onboardingCompleted) {
+    return null // Will redirect
+  }
+
+  return <>{children}</>
+}
 
 function AppWithNav() {
   const navigate = useNavigate()
@@ -103,8 +138,11 @@ function AppWithNav() {
           <Routes>
             <Route path="/onboarding"     element={<OnboardingPage />} />
             <Route path="/login"          element={<LoginPage />} />
-            {/* ── Core ── */}
-            <Route path="/"               element={<HomePage />} />
+            {/* ── Authenticated routes ── */}
+            <Route path="/*" element={
+              <AuthGuard>
+                <Routes>
+                  <Route path="/"               element={<HomePage />} />
             <Route path="/habits"         element={<HabitsPage />} />
             <Route path="/hub"            element={<HubPage />} />
             <Route path="/notifications"  element={<NotificationsPage />} />
@@ -137,6 +175,9 @@ function AppWithNav() {
             <Route path="/shop/settings"       element={<ShopSettingsPage />} />
             <Route path="/sprint"              element={<SprintPage />} />
             <Route path="/sprint/settings"     element={<SprintSettingsPage />} />
+                </Routes>
+              </AuthGuard>
+            } />
           </Routes>
         </div>
       </div>
@@ -152,9 +193,11 @@ export default function App() {
   return (
     <ThemeProvider>
       <BrowserRouter>
-        <ViewProvider>
-          <AppWithNav />
-        </ViewProvider>
+        <AuthProvider>
+          <ViewProvider>
+            <AppWithNav />
+          </ViewProvider>
+        </AuthProvider>
       </BrowserRouter>
     </ThemeProvider>
   )

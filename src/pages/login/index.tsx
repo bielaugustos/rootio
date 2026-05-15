@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, Input } from '../../components'
+import { auth } from '../../engine/supabase'
+import { ToastIO } from '../../components/ToastIO'
 
 type AuthMode = 'login' | 'signup'
 
@@ -10,8 +12,30 @@ export function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
+  const [loading, setLoading] = useState(false)
 
   const toggleMode = () => setMode(m => m === 'login' ? 'signup' : 'login')
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+
+    try {
+      if (mode === 'signup') {
+        const { error } = await auth.signUp(email, password, { name })
+        if (error) throw error
+        ToastIO.show('Conta criada! Verifique seu email.', 'success')
+      } else {
+        const { error } = await auth.signIn(email, password)
+        if (error) throw error
+        navigate('/', { replace: true })
+      }
+    } catch (error) {
+      ToastIO.show(error.message || 'Erro na autenticação', 'error')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--background)', padding: '2rem' }}>
@@ -33,22 +57,22 @@ export function LoginPage() {
         </div>
 
         {/* Form */}
-        <div style={{ background: 'var(--secondary-background)', border: '2px solid var(--border)', borderRadius: 'var(--radius-lg)', boxShadow: '6px 6px 0 var(--border)', padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <form onSubmit={handleSubmit} style={{ background: 'var(--secondary-background)', border: '2px solid var(--border)', borderRadius: 'var(--radius-lg)', boxShadow: '6px 6px 0 var(--border)', padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
           {mode === 'signup' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               <label style={{ fontSize: 10, fontWeight: 700, color: '#666', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Nome</label>
-              <Input placeholder="Seu nome" value={name} onChange={setName} />
+              <Input placeholder="Seu nome" value={name} onChange={setName} disabled={loading} />
             </div>
           )}
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             <label style={{ fontSize: 10, fontWeight: 700, color: '#666', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Email</label>
-            <Input placeholder="seu@email.com" value={email} onChange={setEmail} type="email" />
+            <Input placeholder="seu@email.com" value={email} onChange={setEmail} type="email" disabled={loading} />
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             <label style={{ fontSize: 10, fontWeight: 700, color: '#666', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Senha</label>
-            <Input placeholder="••••••••" value={password} onChange={setPassword} type="password" />
+            <Input placeholder="••••••••" value={password} onChange={setPassword} type="password" disabled={loading} />
           </div>
 
           {mode === 'login' && (
@@ -59,8 +83,8 @@ export function LoginPage() {
             </div>
           )}
 
-          <Button variant="default" style={{ width: '100%' }}>
-            {mode === 'login' ? 'Entrar' : 'Criar conta'}
+          <Button variant="default" style={{ width: '100%' }} disabled={loading}>
+            {loading ? 'Carregando...' : (mode === 'login' ? 'Entrar' : 'Criar conta')}
           </Button>
 
           <div style={{ textAlign: 'center', fontSize: 13, color: 'var(--t3)' }}>
@@ -90,7 +114,7 @@ export function LoginPage() {
               </button>
             ))}
           </div>
-        </div>
+        </form>
 
         {/* Skip link */}
         <div style={{ textAlign: 'center', marginTop: 20 }}>
