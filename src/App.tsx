@@ -118,13 +118,6 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   console.log('✅ Access granted - rendering children')
   return <>{children}</>
 }
-      if (!user) {
-        navigate('/login', { replace: true })
-      } else if (!onboardingCompleted) {
-        navigate('/onboarding', { replace: true })
-      }
-    }
-  }, [user, loading, onboardingCompleted, offlineMode, navigate])
 
   if (loading && !offlineMode) {
     return (
