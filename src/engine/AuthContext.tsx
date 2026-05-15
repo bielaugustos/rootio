@@ -33,9 +33,33 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [offlineMode, setOfflineMode] = useState(() => localStorage.getItem('offline-mode') === 'true')
 
   useEffect(() => {
+    console.log('🔄 Initializing auth context...')
+
+    // Handle OAuth callback on page load
+    const handleAuthCallback = async () => {
+      const { data, error } = await auth.getSession()
+      if (error) {
+        console.error('❌ Error getting session on callback:', error)
+      } else if (data.session) {
+        console.log('✅ Session found on callback:', data.session.user.email)
+      } else {
+        console.log('ℹ️ No session found on callback')
+      }
+    }
+
+    // Check if we're returning from OAuth
+    if (window.location.hash.includes('access_token') || window.location.search.includes('code')) {
+      console.log('🔄 Detected OAuth callback, handling...')
+      handleAuthCallback()
+    }
+
     // Get initial session
     auth.getSession().then(({ session, error }) => {
-      if (error) console.error('Error getting session:', error)
+      if (error) {
+        console.error('❌ Error getting initial session:', error)
+      } else {
+        console.log('📋 Initial session check:', session ? `Active (${session.user.email})` : 'None')
+      }
       setSession(session)
       setUser(session?.user ?? null)
       setLoading(false)
@@ -43,13 +67,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     // Listen for auth changes
     const { data: { subscription } } = auth.onAuthStateChange((event, session) => {
-      console.log('Auth state changed:', event, session?.user?.email)
+      console.log('🔐 Auth state changed:', event, {
+        hasSession: !!session,
+        userEmail: session?.user?.email,
+        userId: session?.user?.id,
+        url: window.location.href
+      })
+
       setSession(session)
       setUser(session?.user ?? null)
       setLoading(false)
 
       if (event === 'SIGNED_OUT') {
+        console.log('👋 User signed out')
         // Clear any local data if needed
+      } else if (event === 'SIGNED_IN') {
+        console.log('✅ User signed in:', session?.user?.email)
       }
     })
 
