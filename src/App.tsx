@@ -128,6 +128,8 @@ function AppWithNav() {
     ...habitItems,
   ]
 
+  const isAuthPage = window.location.pathname === '/login' || window.location.pathname === '/onboarding'
+
   return (
     <>
       <div style={{ display: 'flex', minHeight: '100dvh' }}>
@@ -180,7 +182,7 @@ function AppWithNav() {
           </Routes>
         </div>
       </div>
-      <ViewSwitcher />
+      {!isAuthPage && <ViewSwitcher />}
       {showEditor && <PaletteEditor />}
       <CommandK items={commandItems} />
       <ToastIO />
