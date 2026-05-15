@@ -1,4 +1,5 @@
 import { openDB, type IDBPDatabase, type DBSchema } from 'idb'
+import { supabase } from './supabase'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -164,14 +165,34 @@ export async function getGoals(): Promise<FinancialGoal[]> {
 }
 
 export async function saveGoal(data: Omit<FinancialGoal, 'id' | 'user_id' | 'created_at'>): Promise<FinancialGoal> {
-  const db = await getWalletDB()
+  const { data: { session } } = await supabase.auth.getSession()
+  const userId = session?.user?.id || LOCAL_USER
+
   const goal: FinancialGoal = {
     id: crypto.randomUUID(),
-    user_id: LOCAL_USER,
+    user_id: userId,
     created_at: new Date().toISOString(),
     ...data,
   }
-  await db.put('financial_goals', goal)
+
+  if (session?.user) {
+    // Save to Supabase
+    const { error } = await supabase
+      .from('wallet_goals')
+      .insert(goal)
+
+    if (error) {
+      console.error('Error saving wallet goal to Supabase:', error)
+      // Fallback to local storage
+      const db = await getWalletDB()
+      await db.put('financial_goals', goal)
+    }
+  } else {
+    // Save locally
+    const db = await getWalletDB()
+    await db.put('financial_goals', goal)
+  }
+
   return goal
 }
 

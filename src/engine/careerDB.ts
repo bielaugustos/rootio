@@ -1,4 +1,5 @@
 import { openDB, type IDBPDatabase, type DBSchema } from 'idb'
+import { supabase } from './supabase'
 
 const LOCAL_USER = 'local-user'
 
@@ -70,16 +71,35 @@ export async function getActiveGoals(): Promise<CareerGoal[]> {
 }
 
 export async function saveGoal(goal: Omit<CareerGoal, 'id' | 'user_id' | 'created_at' | 'updated_at'>): Promise<void> {
-  const db = await getCareerDB()
+  const { data: { session } } = await supabase.auth.getSession()
+  const userId = session?.user?.id || LOCAL_USER
+
   const now = new Date().toISOString()
   const fullGoal: CareerGoal = {
     ...goal,
     id: crypto.randomUUID(),
     created_at: now,
     updated_at: now,
-    user_id: LOCAL_USER,
+    user_id: userId,
   }
-  await db.put('goals', fullGoal)
+
+  if (session?.user) {
+    // Save to Supabase
+    const { error } = await supabase
+      .from('career_goals')
+      .insert(fullGoal)
+
+    if (error) {
+      console.error('Error saving career goal to Supabase:', error)
+      // Fallback to local storage
+      const db = await getCareerDB()
+      await db.put('goals', fullGoal)
+    }
+  } else {
+    // Save locally
+    const db = await getCareerDB()
+    await db.put('goals', fullGoal)
+  }
 }
 
 export async function updateGoal(id: string, updates: Partial<CareerGoal>): Promise<void> {

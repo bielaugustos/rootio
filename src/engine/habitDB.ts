@@ -1,4 +1,5 @@
 import { openDB, type IDBPDatabase, type DBSchema } from 'idb'
+import { supabase } from './supabase'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -152,6 +153,26 @@ function newId(): string {
 // ── Habits CRUD ───────────────────────────────────────────────────────────────
 
 export async function getHabits(list?: HabitList): Promise<Habit[]> {
+  const { data: { session } } = await supabase.auth.getSession()
+
+  if (session?.user) {
+    // Get from Supabase
+    let query = supabase
+      .from('habits')
+      .select('*')
+      .eq('user_id', session.user.id)
+      .eq('hidden', false)
+      .order('order')
+
+    const { data, error } = await query
+
+    if (!error && data) {
+      const habits = data as Habit[]
+      return list ? habits.filter(h => h.list === list) : habits
+    }
+  }
+
+  // Fallback to local IndexedDB
   const db = await getHabitDB()
   const all = await db.getAllFromIndex('habits', 'by-user', LOCAL_USER)
   const visible = all.filter(h => !h.hidden).sort((a, b) => a.order - b.order)
@@ -165,11 +186,13 @@ export async function getHabitById(id: string): Promise<Habit | undefined> {
 }
 
 export async function createHabit(data: Partial<Omit<Habit, 'id' | 'user_id' | 'created_at' | 'updated_at'>>): Promise<Habit> {
-  const db = await getHabitDB()
+  const { data: { session } } = await supabase.auth.getSession()
   const now = new Date().toISOString()
+  const userId = session?.user?.id || LOCAL_USER
+
   const habit: Habit = {
     id: newId(),
-    user_id: LOCAL_USER,
+    user_id: userId,
     name: data.name ?? 'Novo hábito',
     list: data.list ?? 'habit',
     done: false,
@@ -196,7 +219,24 @@ export async function createHabit(data: Partial<Omit<Habit, 'id' | 'user_id' | '
     created_at: now,
     updated_at: now,
   }
-  await db.put('habits', habit)
+
+  if (session?.user) {
+    // Save to Supabase
+    const { error } = await supabase
+      .from('habits')
+      .insert(habit)
+
+    if (error) {
+      console.error('Error saving habit to Supabase:', error)
+      // Fallback to local storage
+      const db = await getHabitDB()
+      await db.put('habits', habit)
+    }
+  } else {
+    // Save locally
+    const db = await getHabitDB()
+    await db.put('habits', habit)
+  }
 
   // Dispatch event to notify other components
   window.dispatchEvent(new CustomEvent('habits-changed'))

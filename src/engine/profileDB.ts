@@ -1,4 +1,5 @@
 import { getDB } from './db'
+import { supabase } from './supabase'
 import type { Layout } from 'react-grid-layout'
 
 export interface Profile {
@@ -44,6 +45,40 @@ let currentProfile: Profile | null = null
 const listeners: Set<() => void> = new Set()
 
 export async function getProfile(): Promise<Profile> {
+  // Check if user is authenticated with Supabase
+  const { data: { session } } = await supabase.auth.getSession()
+  if (session?.user) {
+    // User is authenticated, try to get from Supabase
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', session.user.id)
+      .single()
+
+    if (!error && data) {
+      currentProfile = data as Profile
+      return currentProfile
+    }
+
+    // If no profile in Supabase, create one
+    const newProfile: Profile = {
+      ...DEFAULT_PROFILE,
+      id: session.user.id,
+      username: session.user.user_metadata?.name || null,
+      handle: session.user.user_metadata?.name ? `@${session.user.user_metadata.name.toLowerCase().replace(/\s/g, '')}` : null,
+    }
+
+    const { error: insertError } = await supabase
+      .from('profiles')
+      .insert(newProfile)
+
+    if (!insertError) {
+      currentProfile = newProfile
+      return newProfile
+    }
+  }
+
+  // Fallback to local IndexedDB
   if (currentProfile) return currentProfile
   const db = await getDB()
   const profile = await db.get('profiles', 'local-user')
@@ -57,6 +92,25 @@ export async function getProfile(): Promise<Profile> {
 }
 
 export async function updateProfile(data: Partial<Omit<Profile, 'id' | 'created_at'>>): Promise<Profile> {
+  const { data: { session } } = await supabase.auth.getSession()
+
+  if (session?.user) {
+    // Update in Supabase
+    const current = currentProfile ?? await getProfile()
+    const updated = { ...current, ...data, updated_at: new Date().toISOString() }
+
+    const { error } = await supabase
+      .from('profiles')
+      .upsert(updated)
+
+    if (!error) {
+      currentProfile = updated
+      listeners.forEach(fn => fn())
+      return updated
+    }
+  }
+
+  // Fallback to local IndexedDB
   const db = await getDB()
   const current = currentProfile ?? await getProfile()
   const updated = { ...current, ...data, updated_at: new Date().toISOString() }
