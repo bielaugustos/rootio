@@ -9,12 +9,30 @@ import { Badge } from '../../components/Badge'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 
-import { TimerPanel } from './panels/TimerPanel'
-import { AnexosPanel } from './panels/AnexosPanel'
-import { AgendarPanel } from './panels/AgendarPanel'
-import { ParticipantesPanel, TabelaPanel } from './panels/ParticipantesPanel'
+import type { PanelType } from './PanelPortal'
 
 const progressoIcon = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M3 3v18h18"/><path d="M18 9v9"/><path d="M12 9v9"/><path d="M6 9v9"/><path d="M21 9H3"/></svg>
+
+// Action definitions
+const ACTION_CONFIG: Record<string, { icon: React.ReactNode; label: string; variant: 'default' | 'habit' | 'goal' | 'task' | 'event' }> = {
+  streaks: { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>, label: 'Streaks', variant: 'habit' },
+  historico: { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/></svg>, label: 'Histórico', variant: 'default' },
+  lembrete: { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>, label: 'Lembrete', variant: 'default' },
+  timer: { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>, label: 'Timer', variant: 'task' },
+  anexos: { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14,2 14,8 20,8"/></svg>, label: 'Anexos', variant: 'task' },
+  progresso: { icon: progressoIcon, label: 'Progresso', variant: 'goal' },
+  agendar: { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>, label: 'Agendar', variant: 'event' },
+  participantes: { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>, label: 'Participantes', variant: 'event' },
+  tabela: { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M3 3h18v18H3z"/><path d="M3 9h18"/><path d="M9 21V3"/></svg>, label: 'Tabela', variant: 'goal' },
+}
+
+// Available actions per habit type
+const AVAILABLE_ACTIONS: Record<string, PanelType[]> = {
+  habit: ['streaks', 'historico', 'lembrete'],
+  task: ['lembrete', 'timer', 'anexos'],
+  event: ['agendar', 'participantes', 'historico', 'lembrete', 'timer'],
+  goal: ['streaks', 'progresso', 'tabela', 'anexos'],
+}
 
 
 interface HabitCardProps {
@@ -36,81 +54,11 @@ interface HabitCardProps {
 
 
 
-function GoalPanels({ habit }: { habit: Habit }) {
-  const [active, setActive] = useState<'progress' | null>(null)
 
-  const current = habit.goal_current ?? 0
-  const target  = habit.goal_target ?? 0
-  const unit    = habit.goal_unit ?? ''
-  const period  = habit.goal_period
-  const pct     = target > 0 ? Math.min(100, Math.round((current / target) * 100)) : 0
-  const done    = pct >= 100
-
-  const toggle = (panel: 'progress') =>
-    setActive(prev => prev === panel ? null : panel)
-
-  return (
-    <div style={{ width: '100%', padding: '8px 16px' }}>
-      <div style={{ display: 'flex', gap: 8 }}>
-      <Pill label="Progresso" variant="goal" selected={active === 'progress'} onClick={() => toggle('progress')} id="pill-progress"
-        icon={progressoIcon}
-        style={{ background: '#FBBF24', border: `2px solid var(--foreground)` }}
-        disableHover
-      />
-      </div>
-
-      {active && (
-        <div style={{
-          marginTop: 10, padding: '10px 12px',
-          background: 'var(--bg3, #e8e4dc)', border: '1.5px solid var(--b2)',
-          borderRadius: 'var(--radius-sm)', display: 'flex', flexDirection: 'column', gap: 8,
-          minHeight: '140px',
-        }}>
-          {active === 'progress' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {period && (
-                <div style={{ fontSize: 12, color: 'var(--t3)' }}>
-                  Meta detectada. Acompanhamento {period} ativo.
-                </div>
-              )}
-              {target > 0 ? (
-                <>
-                  {/* Barra de progresso */}
-                  <div style={{ height: 6, background: 'var(--b2)', borderRadius: 3, overflow: 'hidden', border: '1px solid var(--b2)' }}>
-                    <div style={{ height: '100%', width: `${pct}%`, background: done ? '#22c55e' : 'var(--c-goal, #F59E0B)', borderRadius: 3, transition: 'width 0.4s' }} />
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: 11, fontWeight: 500, color: done ? '#22c55e' : 'var(--c-goal, #F59E0B)' }}>
-                      {unit} {current.toLocaleString('pt-BR')}
-                    </span>
-                    <span style={{ fontSize: 11, color: 'var(--t3)' }}>
-                      {pct}% · meta {unit} {target.toLocaleString('pt-BR')}
-                    </span>
-                  </div>
-
-                  {done && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 500, color: '#22c55e' }}>
-                      <i className="ph ph-check-circle" style={{ fontSize: 14 }} />
-                      Meta concluída! 🎉
-                    </div>
-                  )}
-                </>
-              ) : (
-                <span style={{ fontSize: 12, color: 'var(--t3)', fontStyle: 'italic' }}>
-                  Defina um valor alvo no formulário para ver o progresso.
-                </span>
-              )}
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  )
-}
 
 export function HabitCard({
   habit, onToggle, onEdit, onRefresh,
-  isMobile, onPanelOpen, activePanelType, collapsed = false,
+  onPanelOpen, activePanelType, collapsed = false,
 }: HabitCardProps) {
   const [expanded, setExpanded] = useState(!collapsed)
   const [detailsExpanded, setDetailsExpanded] = useState(false)
@@ -214,7 +162,7 @@ export function HabitCard({
             <Badge label={habit.list === 'habit' ? 'Hábito' : habit.list === 'task' ? 'Tarefa' : habit.list === 'goal' ? 'Meta' : habit.list === 'event' ? 'Evento' : LIST_LABELS[habit.list]} variant="default" style={habit.list === 'habit' ? { background: '#FEF3C7', color: 'black' } : habit.list === 'task' ? { background: '#6FB8FF', color: 'black' } : habit.list === 'goal' ? { color: 'black' } : habit.list === 'event' ? { background: '#9B7BFF', color: 'black' } : undefined} />
             {habit.pts > 0 && <Badge label={`+${habit.pts} IO`} variant="destructive" />}
             {/* Streak dots */}
-            <div style={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: 2, alignItems: 'center' }} title="Pontos representam os últimos 7 dias. Preenchidos em amarelo se o hábito foi concluído naquele dia da streak atual.">
               {Array.from({ length: 7 }).map((_, i) => {
                 const hoje = new Date().getDay()
                 const daysAgo = (hoje - i + 7) % 7
@@ -298,42 +246,20 @@ export function HabitCard({
               borderTop: '1px solid var(--b2)',
             }}>
               <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'flex-start' }}>
-                {(habit.list === 'habit' || habit.list === 'task') && (
-                  <Pill label={`${streak}d streak`} variant="default" size="sm"
-                    icon={<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>}
-                  />
-                )}
-
-                {habit.list === 'habit' && (
-                  <>
-                    <Pill label="Histórico" variant="default" size="sm" selected={activePanelType === 'historico'}
-                      icon={<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/></svg>}
-                      onClick={() => onPanelOpen?.(habit.id, 'historico')}
+                {AVAILABLE_ACTIONS[habit.list]?.map(action => {
+                  const config = ACTION_CONFIG[action]
+                  return (
+                    <Pill
+                      key={action}
+                      label={config.label}
+                      variant={config.variant}
+                      size="sm"
+                      selected={activePanelType === action}
+                      icon={config.icon}
+                      onClick={() => onPanelOpen?.(habit.id, action as PanelType)}
                     />
-                    <Pill label="Lembrete" variant="default" size="sm" selected={activePanelType === 'lembrete'}
-                      icon={<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>}
-                      onClick={() => onPanelOpen?.(habit.id, 'lembrete')}
-                    />
-                  </>
-                )}
-
-                {habit.list === 'task' && (
-                  <>
-                    <TimerPanel habit={habit} isMobile={isMobile} onRefresh={onRefresh} />
-                    <AnexosPanel habit={habit} isMobile={isMobile} onRefresh={onRefresh} />
-                  </>
-                )}
-
-                {habit.list === 'event' && (
-                  <>
-                    <AgendarPanel habit={habit} isMobile={isMobile} onRefresh={onRefresh} />
-                    <ParticipantesPanel habit={habit} onRefresh={onRefresh} />
-                  </>
-                )}
-
-                {habit.list === 'goal' && (
-                     <TabelaPanel habit={habit} />
-                )}
+                  )
+                })}
               </div>
             </div>
           )}
@@ -377,12 +303,7 @@ export function HabitCard({
             </div>
           )}
 
-          {/* Goal panels if applicable */}
-          {habit.list === 'goal' && (
-            <div style={{ borderTop: '1px solid var(--b2)' }}>
-              <GoalPanels habit={habit} />
-            </div>
-          )}
+
 
           {/* Details toggle */}
           {hasDetails && (
@@ -447,7 +368,7 @@ export function HabitCard({
           {/* Badges */}
           <div style={{ padding: '8px 16px', borderTop: '1px solid var(--b2)', display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
             {/* Priority shield */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 8px', border: '2px solid var(--border)', borderRadius: 'var(--radius-sm)', background: PRIORITY_COLORS[habit.priority || 'media'], boxShadow: '2px 2px 0 var(--border)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 8px', border: '2px solid var(--border)', borderRadius: 'var(--radius-sm)', background: PRIORITY_COLORS[habit.priority || 'media'] }}>
               <span style={{ width: 6, height: 6, borderRadius: '50%', border: '2px solid var(--foreground)', background: PRIORITY_COLORS[habit.priority || 'media'] }} />
               <span style={{ fontSize: 10, fontWeight: 500, color: '#000', textTransform: 'capitalize' }}>{habit.priority === 'media' ? 'média' : habit.priority}</span>
             </div>

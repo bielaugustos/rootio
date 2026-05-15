@@ -202,7 +202,7 @@ function DayPanel({
       <div style={{
         padding: '12px 16px',
         borderBottom: '2px solid var(--border)',
-        background: 'var(--bg3, #eeebe2)',
+        background: 'var(--background, #eeebe2)',
         display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0,
       }}>
         <div style={{ flex: 1 }}>
@@ -213,17 +213,7 @@ function DayPanel({
             {day.habits.length} {day.habits.length === 1 ? 'entrada' : 'entradas'}
           </div>
         </div>
-        <button
-          onClick={() => openCreate()}
-          style={{
-            width: 28, height: 28, border: '2px solid var(--border)',
-            borderRadius: 'var(--radius-sm)', background: 'var(--main)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            cursor: 'pointer', boxShadow: '2px 2px 0 var(--border)',
-            fontSize: 16, fontWeight: 900, flexShrink: 0,
-            color: 'var(--main-foreground)',
-          }}
-        >+</button>
+       
         <button
           onClick={onClose}
           style={{

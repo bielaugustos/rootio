@@ -326,14 +326,12 @@ function SegmentedPick<T extends string>({
 }
 
 function WidgetsToggleItem() {
-  const [tick, setTick] = useState(0)
   const hidden = localStorage.getItem(WIDGETS_LS_KEY) === '1'
 
   const toggle = () => {
     const next = !hidden
     localStorage.setItem(WIDGETS_LS_KEY, next ? '1' : '0')
     window.dispatchEvent(new Event('widgets-visibility-change'))
-    setTick(t => t + 1)
   }
 
   return (

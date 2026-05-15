@@ -14,8 +14,8 @@ export function StreaksPanel({ habit, onClose }: { habit: Habit; onClose: () => 
 
   return (
     <div style={{ padding: 16, display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, borderBottom: '2px solid var(--border)', paddingBottom: 12, marginBottom: 16, background: 'var(--bg3)', margin: '-16px -16px 16px', padding: '12px 16px' }}>
-        <span style={{ fontWeight: 700, fontSize: 13, flex: 1 }}>Streaks — {habit.name}</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, borderBottom: '2px solid var(--border)', paddingBottom: 12, marginBottom: 16, background: 'var(--main)', margin: '-16px -16px 16px', padding: '12px 16px' }}>
+        <span style={{ fontWeight: 700, fontSize: 13, flex: 1, fontFamily: 'var(--font-title)' }}>Streaks • {habit.name}</span>
         <button onClick={onClose} style={{ width: 28, height: 28, border: '1.5px solid var(--b2)', borderRadius: 'var(--radius-sm)', background: 'var(--secondary-background)', cursor: 'pointer', fontSize: 13, color: 'var(--t2)' }}>✕</button>
       </div>
 
@@ -31,10 +31,6 @@ export function StreaksPanel({ habit, onClose }: { habit: Habit; onClose: () => 
         ))}
         {days.map(d => {
           const date = new Date(d.date + 'T12:00:00')
-          const dayOfWeek = date.getDay()
-          const offset = days.length < 7 ? Array.from({ length: 7 - days.length }).map((_, i) => (
-            <div key={`empty-${i}`} />
-          )) : null
           return (
             <div key={d.date} style={{
               width: '100%', aspectRatio: '1', borderRadius: 'var(--radius-sm)',

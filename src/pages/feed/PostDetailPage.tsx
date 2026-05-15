@@ -16,7 +16,7 @@ export function PostDetailPage() {
 
   const mood = getMoodLabel(entry.mood)
   const date = new Date(entry.date + 'T12:00:00')
-  const day = date.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+
 
   const handleDelete = () => {
     if (!confirm('Excluir esta entrada?')) return

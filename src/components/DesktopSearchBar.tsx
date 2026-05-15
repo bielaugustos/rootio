@@ -97,8 +97,8 @@ export function DesktopSearchBar({
           border: `2px solid ${focused ? 'var(--main)' : 'var(--border)'}`,
           borderRadius: 'var(--radius-base)',
           background: 'var(--secondary-background)',
-          boxShadow: focused ? 'none' : '3px 3px 0 var(--border)',
           transition: 'border-color 0.1s, box-shadow 0.1s',
+          boxShadow: focused ? '3px 3px 0 var(--border)' : 'none',
         }}>
           <i className="ph ph-magnifying-glass" style={{ fontSize: 16, color: 'var(--t3)', flexShrink: 0 }} />
 
@@ -163,9 +163,9 @@ export function DesktopSearchBar({
                   color: isActive ? 'var(--main-foreground)' : 'var(--t2)',
                   cursor: 'pointer', fontSize: 12, fontWeight: 500,
                   fontFamily: 'var(--font-sans)',
-                  boxShadow: isActive ? 'none' : '2px 2px 0 var(--border)',
                   transform: isActive ? 'translate(2px, 2px)' : 'none',
                   transition: 'transform 0.08s, box-shadow 0.08s',
+                  marginTop: 6,
                 }}
                 onMouseEnter={e => { if (!isActive) { e.currentTarget.style.transform = 'translate(2px,2px)'; e.currentTarget.style.boxShadow = 'none' } }}
                 onMouseLeave={e => { if (!isActive) { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '2px 2px 0 var(--border)' } }}

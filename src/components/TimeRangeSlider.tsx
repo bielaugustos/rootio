@@ -185,7 +185,7 @@ export function TimeRangeSlider({
             position: 'absolute',
             left: `${startPct}%`,
             width: `${endPct - startPct}%`,
-            top: '50%', transform: 'translateY(-50%)',
+            top: '50%',
             height: 6,
             background: 'var(--main)',
             border: '2px solid var(--border)',

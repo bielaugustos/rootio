@@ -31,6 +31,7 @@ import { useState, useEffect, useMemo } from 'react'
 import type { Habit, HabitList } from '../../engine/habitDB'
 import { getHistoryRange } from '../../engine/habitDB'
 
+
 // ─── Types ────────────────────────────────────────────────────────
 
 type EventType =
@@ -87,14 +88,9 @@ const TYPE_CONFIG: Record<EventType, {
   day_perfect:  { icon: '🌟', color: '#ffbf00', border: '#000',    label: 'Dia perfeito', bg: 'rgba(255,191,0,.08)' },
 }
 
-const LIST_DOT_COLOR: Record<HabitList, string> = {
-  habit: '#D4C9A9',
-  task:  '#3B82F6',
-  goal:  '#D97706',
-  event: '#7C5CDB',
-}
 
-const STREAK_MILESTONES = [7, 14, 21, 30, 60, 90]
+
+
 
 // ─── Helpers ──────────────────────────────────────────────────────
 
@@ -232,27 +228,7 @@ function buildEvents(
     })
 }
 
-/** Call this when a streak milestone is reached */
-export function recordStreakMilestone(habit: Habit, streakDays: number) {
-  if (!STREAK_MILESTONES.includes(streakDays)) return
-  try {
-    const key  = 'rootio-streak-events'
-    const prev = JSON.parse(localStorage.getItem(key) ?? '[]') as TimelineEvent[]
-    const id   = `streak-${habit.id}-${streakDays}`
-    if (prev.some(e => e.id === id)) return   // already recorded
-    const next: TimelineEvent = {
-      id,
-      type:      'streak',
-      date:      todayISO(),
-      habitId:   habit.id,
-      habitName: habit.name,
-      habitIcon: habit.icon,
-      list:      habit.list,
-      meta:      { streakDays },
-    }
-    localStorage.setItem(key, JSON.stringify([next, ...prev].slice(0, 100)))
-  } catch {}
-}
+
 
 // ─── TimelineItem ──────────────────────────────────────────────────
 
@@ -285,13 +261,15 @@ function TimelineItem({
     switch (event.type) {
       case 'created':
         return `Novo ${event.list === 'habit' ? 'hábito' : event.list === 'task' ? 'tarefa' : event.list === 'goal' ? 'meta' : 'evento'} criado`
-      case 'completed':
+      case 'completed': {
         if (event.meta?.doneCount && (event.meta.doneCount > 1)) {
-          return `${event.meta.doneCount} entradas concluídas`
+          return `Concluído: ${event.habitIcon} ${event.habitName}`
         }
-        return event.meta?.pts ? `+${event.meta.pts} IO ganhos` : 'Concluído'
+        const ptsText = event.meta?.pts ? ` (+${event.meta.pts} IO)` : ''
+        return `Concluído: ${event.habitIcon} ${event.habitName}${ptsText}`
+      }
       case 'streak':
-        return `Sequência de ${event.meta?.streakDays} dias!`
+        return `Sequência de ${event.meta?.streakDays} dias no hábito ${event.habitName}!`
       case 'goal_progress':
         return `${event.meta?.pct}% da meta`
       case 'day_perfect':
@@ -308,41 +286,123 @@ function TimelineItem({
   })()
 
   return (
-    <div style={{ display: 'flex', gap: 0, position: 'relative' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, position: 'relative' }}>
 
-      {/* ── Left: date label ── */}
+      {/* ── Top: event card ── */}
       <div style={{
-        width:      52,
-        flexShrink: 0,
-        textAlign:  'right',
-        paddingRight: 12,
-        paddingTop:   2,
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: 10,
       }}>
+        {/* Date label */}
         {showDate && (
-          <span style={{
-            fontSize:    10,
-            fontWeight:  700,
-            color:       isToday ? 'var(--t1)' : 'var(--t3)',
-            background:  isToday ? 'var(--main)' : 'transparent',
-            padding:     isToday ? '1px 5px' : '0',
-            borderRadius: 3,
-            border:      isToday ? '1px solid var(--border)' : 'none',
-            whiteSpace:  'nowrap',
-            display:     'inline-block',
-            lineHeight:  1.4,
+          <div style={{
+            flexShrink: 0,
+            width: 50,
+            textAlign: 'right',
           }}>
-            {formatRelativeDate(event.date)}
-          </span>
+            <span style={{
+              fontSize:    10,
+              fontWeight:  700,
+              color:       isToday ? 'var(--t1)' : 'var(--t3)',
+              background:  isToday ? 'var(--main)' : 'transparent',
+              padding:     isToday ? '1px 5px' : '0',
+              borderRadius: 3,
+              border:      isToday ? '1px solid var(--border)' : 'none',
+              whiteSpace:  'nowrap',
+              display:     'inline-block',
+              lineHeight:  1.4,
+            }}>
+              {formatRelativeDate(event.date)}
+            </span>
+          </div>
         )}
+
+        {/* Event card */}
+        <div style={{
+          flex: 1,
+          paddingLeft: showDate ? 0 : 10,
+        }}>
+          <div style={{
+            background:   cfg.bg !== 'transparent' ? cfg.bg : undefined,
+            borderRadius: 'var(--radius-sm)',
+            padding:      cfg.bg !== 'transparent' ? '7px 10px' : '0 0 0 0',
+            border:       cfg.bg !== 'transparent' ? '1px solid var(--b2, #ccc)' : 'none',
+            maxWidth:     '200px',
+          }}>
+            {/* Type title */}
+            <div style={{
+              fontSize:    12,
+              fontWeight:  700,
+              color:       'var(--t1)',
+              marginBottom: 4,
+            }}>
+              {cfg.icon} {cfg.label}
+            </div>
+
+            {/* Name row */}
+            {event.type !== 'completed' && (
+              <div style={{
+                display:     'flex',
+                alignItems:  'center',
+                gap:         6,
+                marginBottom: 1,
+              }}>
+                {/* Type icon */}
+                <span style={{ fontSize: 13, lineHeight: 1, flexShrink: 0 }}>
+                  {event.habitIcon}
+                </span>
+
+                {/* Name */}
+                <span style={{
+                  fontSize:     12,
+                  fontWeight:   700,
+                  color:        'var(--t1)',
+                  flex:         1,
+                  overflow:     'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace:   'nowrap',
+                }}>
+                  {event.habitName}
+                </span>
+
+                {/* IO / streak badge */}
+                {dotLabel && (
+                  <span style={{
+                    fontSize:     9,
+                    fontWeight:   800,
+                    padding:      '1px 6px',
+                    border:       `1.5px solid ${cfg.border}`,
+                    borderRadius: 99,
+                    background:   cfg.color,
+                    color:        'var(--t1)',
+                    flexShrink:   0,
+                    fontFamily:   'var(--font-mono)',
+
+                  }}>
+                    {dotLabel}
+                  </span>
+                )}
+              </div>
+            )}
+
+            {/* Body text */}
+            <div style={{
+              fontSize:   11,
+              color:      'var(--t2)',
+              lineHeight: 1.3,
+            }}>
+              {bodyText}
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* ── Center: dot + line ── */}
+      {/* ── Bottom: dot + line ── */}
       <div style={{
         display:        'flex',
-        flexDirection:  'column',
-        alignItems:     'center',
+        justifyContent: 'center',
         flexShrink:     0,
-        width:          20,
       }}>
         {/* Dot */}
         <div style={{
@@ -370,115 +430,18 @@ function TimelineItem({
         {/* Connector line */}
         {!isLast && (
           <div style={{
-            flex:             1,
-            width:            2,
-            minHeight:        20,
-            background:       'var(--bg3, #eeebe2)',
-            borderRadius:     1,
-            marginTop:        2,
+            position: 'absolute',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            top: '100%',
+            width: 2,
+            height: 20,
+            background: 'var(--bg3, #eeebe2)',
+            borderRadius: 1,
           }} />
         )}
       </div>
 
-      {/* ── Right: event card ── */}
-      <div style={{
-        flex:          1,
-        paddingLeft:   10,
-        paddingBottom: isLast ? 0 : 14,
-        paddingTop:    0,
-      }}>
-        <div style={{
-          background:   cfg.bg !== 'transparent' ? cfg.bg : undefined,
-          borderRadius: 'var(--radius-sm)',
-          padding:      cfg.bg !== 'transparent' ? '7px 10px' : '0 0 0 0',
-          border:       cfg.bg !== 'transparent' ? '1px solid var(--b2, #ccc)' : 'none',
-        }}>
-          {/* Name row */}
-          <div style={{
-            display:     'flex',
-            alignItems:  'center',
-            gap:         6,
-            marginBottom: 1,
-          }}>
-            {/* Type icon */}
-            <span style={{ fontSize: 13, lineHeight: 1, flexShrink: 0 }}>
-              {event.habitIcon}
-            </span>
-
-            {/* Name */}
-            <span style={{
-              fontSize:     12,
-              fontWeight:   700,
-              color:        'var(--t1)',
-              flex:         1,
-              overflow:     'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace:   'nowrap',
-            }}>
-              {event.habitName}
-            </span>
-
-            {/* IO / streak badge */}
-            {dotLabel && (
-              <span style={{
-                fontSize:     9,
-                fontWeight:   800,
-                padding:      '1px 6px',
-                border:       `1.5px solid ${cfg.border}`,
-                borderRadius: 99,
-                background:   cfg.color,
-                color:        'var(--t1)',
-                flexShrink:   0,
-                fontFamily:   'var(--font-mono)',
-              }}>
-                {dotLabel}
-              </span>
-            )}
-          </div>
-
-          {/* Body text */}
-          <div style={{
-            fontSize:  11,
-            color:     'var(--t3)',
-            fontWeight: 500,
-            lineHeight: 1.4,
-            display:   'flex',
-            alignItems: 'center',
-            gap:        5,
-          }}>
-            {/* List dot */}
-            <span style={{
-              width:        6,
-              height:       6,
-              borderRadius: '50%',
-              background:   LIST_DOT_COLOR[event.list],
-              flexShrink:   0,
-              display:      'inline-block',
-            }} />
-            {bodyText}
-            {event.time && (
-              <span style={{ marginLeft: 'auto', fontSize: 9, color: 'var(--t4)', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>
-                {event.time}
-              </span>
-            )}
-          </div>
-
-          {/* Note content */}
-          {event.type === 'note' && event.meta?.note && (
-            <div style={{
-              marginTop:    5,
-              fontSize:     11,
-              color:        'var(--t2)',
-              fontStyle:    'italic',
-              borderLeft:   '2px solid var(--c-event-b, #7C5CDB)',
-              paddingLeft:  7,
-              lineHeight:   1.5,
-            }}>
-              "{event.meta.note}"
-            </div>
-          )}
-        </div>
-      </div>
     </div>
   )
 }

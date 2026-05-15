@@ -16,6 +16,7 @@ import { useHabitsLayout } from './useHabitsLayout'
 import { DesktopSearchBar } from '../../components/DesktopSearchBar'
 import { MobileSearchBar } from '../../components/MobileSearchBar'
 import { defaultFilter, type FilterState } from '../../components/searchConstants'
+import { StreakTimeline } from '../../components/StreakTimeline'
 import type { PanelType } from './PanelPortal'
 import { CalendarView } from './CalendarView'
 
@@ -42,52 +43,10 @@ import { HistoricoPanel }     from './HistoricoPanel'
 import { LembretePanel }      from './LembretePanel'
 import { StreaksPanel }       from './StreaksPanel'
 import { ProgressoPanel }     from './ProgressoPanel'
-
-// Placeholder genérico para painéis ainda não implementados
-function PanelPlaceholder({ type, habitName, onClose }: {
-  type:      PanelType
-  habitName: string
-  onClose:   () => void
-}) {
-  const LABELS: Record<string, string> = {
-    historico:    'Histórico',
-    lembrete:     'Lembrete',
-    timer:        'Timer',
-    anexos:       'Anexos',
-    local:        'Local',
-    participantes:'Participantes',
-    agendar:      'Agendar',
-    tabela:       'Tabela',
-    progresso:    'Progresso',
-    streaks:      'Streaks',
-  }
-  return (
-    <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 8,
-        borderBottom: '2px solid var(--border)', paddingBottom: 12, marginBottom: 16,
-        background: 'var(--bg3, #eeebe2)', margin: '-16px -16px 16px', padding: '12px 16px',
-      }}>
-        <span style={{ fontWeight: 700, fontSize: 13, flex: 1 }}>
-          {LABELS[type]} — {habitName}
-        </span>
-        <button onClick={onClose} style={{
-          width: 28, height: 28, border: '1.5px solid var(--b2)', borderRadius: 'var(--radius-sm)',
-          background: 'var(--secondary-background)', cursor: 'pointer', fontSize: 13, color: 'var(--t2)',
-        }}>✕</button>
-      </div>
-      <div style={{
-        flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-        flexDirection: 'column', gap: 10,
-        border: '2px dashed var(--b2)', borderRadius: 'var(--radius-base)',
-        color: 'var(--t3)', fontSize: 13, padding: 24, textAlign: 'center',
-      }}>
-        <span style={{ fontSize: 28 }}>🔧</span>
-        <span>Painel <strong>{LABELS[type]}</strong> em implementação.<br/>Importe o componente em index.tsx.</span>
-      </div>
-    </div>
-  )
-}
+import { TimerPanel }         from './panels/TimerPanel'
+import { AnexosPanel }        from './panels/AnexosPanel'
+import { AgendarPanel }       from './panels/AgendarPanel'
+import { ParticipantesPanel, TabelaPanel } from './panels/ParticipantesPanel'
 
 // ─── Col2 panel renderer ──────────────────────────────────────────
 
@@ -111,20 +70,24 @@ function Col2Panel({
   switch (activePanel.type) {
     case 'historico':
       return <HistoricoPanel habit={habit} isMobile={isMobile ?? false} onRefresh={onRefresh} />
-case 'lembrete':
-       return <LembretePanel habit={habit} onRefresh={onRefresh} />
+    case 'lembrete':
+      return <LembretePanel habit={habit} onRefresh={onRefresh} />
     case 'streaks':
       return <StreaksPanel habit={habit} onClose={onClose} />
     case 'progresso':
       return <ProgressoPanel habit={habit} onClose={onClose} />
+    case 'timer':
+      return <TimerPanel habit={habit} isMobile={isMobile ?? false} onRefresh={onRefresh} />
+    case 'anexos':
+      return <AnexosPanel habit={habit} isMobile={isMobile ?? false} onRefresh={onRefresh} />
+    case 'agendar':
+      return <AgendarPanel habit={habit} isMobile={isMobile ?? false} onRefresh={onRefresh} />
+    case 'participantes':
+      return <ParticipantesPanel habit={habit} onRefresh={onRefresh} />
+    case 'tabela':
+      return <TabelaPanel habit={habit} />
     default:
-      return (
-        <PanelPlaceholder
-          type={activePanel.type}
-          habitName={habit.name}
-          onClose={onClose}
-        />
-      )
+      return null
   }
 }
 
@@ -178,7 +141,7 @@ export function HabitsPage() {
   const view = currentView === 'calendario' ? 'calendar' : 'list'
 
   // ── Trash state ──
-  const [showTrash, setShowTrash] = useState(false)
+  const [showTrash] = useState(false)
   const [deletedHabits, setDeletedHabits] = useState<Habit[]>([])
 
   const loadDeletedHabits = useCallback(async () => {
@@ -416,7 +379,7 @@ export function HabitsPage() {
                     filter={filter}
                     onFilterChange={setFilter}
                     onSelectHabit={handleEdit}
-                    onNewEntry={() => openForm(null)}
+                    onNewEntry={() => { setFilter(defaultFilter); openForm(null) }}
                   />
                 ) : (
                   <DesktopSearchBar
@@ -424,7 +387,7 @@ export function HabitsPage() {
                     filter={filter}
                     onFilterChange={setFilter}
                     onSelectHabit={handleEdit}
-                    onNewEntry={() => openForm(null)}
+                    onNewEntry={() => { setFilter(defaultFilter); openForm(null) }}
                   />
                 )}
               </div>
@@ -622,6 +585,9 @@ export function HabitsPage() {
 
         </div>
       </PageWrapper>
+
+      {/* Streak Timeline */}
+      <StreakTimeline />
     </>
   )
 }

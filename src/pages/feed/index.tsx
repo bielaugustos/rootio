@@ -54,7 +54,7 @@ export function FeedPage() {
   const [showOnboarding, setShowOnboarding] = useState(
     () => localStorage.getItem('feed-onboarding-done') !== '1'
   )
-  const [entries, setEntries] = useState<DiaryEntry[]>(loadEntries)
+  const [entries] = useState<DiaryEntry[]>(loadEntries)
   const navigate = useNavigate()
 
   if (showOnboarding) {
