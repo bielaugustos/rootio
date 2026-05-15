@@ -102,40 +102,29 @@ export function LoginPage() {
           </div>
 
           <div style={{ display: 'flex', gap: 8 }}>
-            {[
-              { icon: 'ph-google-logo', label: 'Google', provider: 'google' },
-              { icon: 'ph-apple-logo', label: 'Apple', provider: 'apple' },
-            ].map(p => (
-              <button
-                key={p.label}
-                onClick={async () => {
-                  setLoading(true)
-                  try {
-                    if (p.provider === 'google') {
-                      const { error } = await auth.signInWithGoogle()
-                      if (error) throw error
-                    } else if (p.provider === 'apple') {
-                      const { error } = await auth.signInWithApple()
-                      if (error) throw error
-                    }
-                  } catch (error) {
-                    toast((error as Error).message || 'Erro na autenticação', 'error')
-                    setLoading(false)
-                  }
-                }}
-                disabled={loading}
-                style={{
-                  flex: 1, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                  background: 'var(--secondary-background)', border: '2px solid var(--border)',
-                  borderRadius: 'var(--radius-sm)', boxShadow: '2px 2px 0 var(--border)',
-                  cursor: loading ? 'not-allowed' : 'pointer', color: 'var(--t2)', fontSize: 13, fontFamily: 'var(--font-sans)',
-                  opacity: loading ? 0.7 : 1,
-                }}
-              >
-                <i className={`ph ${p.icon}`} style={{ fontSize: 16 }} />
-                {p.label}
-              </button>
-            ))}
+            <button
+              onClick={async () => {
+                setLoading(true)
+                try {
+                  const { error } = await auth.signInWithGoogle()
+                  if (error) throw error
+                } catch (error) {
+                  toast((error as Error).message || 'Erro na autenticação', 'error')
+                  setLoading(false)
+                }
+              }}
+              disabled={loading}
+              style={{
+                flex: 1, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                background: 'var(--secondary-background)', border: '2px solid var(--border)',
+                borderRadius: 'var(--radius-sm)', boxShadow: '2px 2px 0 var(--border)',
+                cursor: loading ? 'not-allowed' : 'pointer', color: 'var(--t2)', fontSize: 13, fontFamily: 'var(--font-sans)',
+                opacity: loading ? 0.7 : 1,
+              }}
+            >
+              <i className="ph ph-google-logo" style={{ fontSize: 16 }} />
+              Google
+            </button>
           </div>
         </form>
 

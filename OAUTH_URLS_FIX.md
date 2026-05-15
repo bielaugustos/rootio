@@ -27,8 +27,7 @@ No Google Cloud Console, Authorized redirect URIs:
 - Desenvolvimento: `http://localhost:5174/auth/v1/callback`
 - Produção: `https://rootio-eight.vercel.app/auth/v1/callback`
 
-### 4. Para Apple OAuth (se usar)
-No Apple Developer, configure as URLs correspondentes.
+<!-- Apple OAuth removido -->
 
 ## 🧪 Teste
 

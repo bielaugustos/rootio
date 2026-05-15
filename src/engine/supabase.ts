@@ -71,16 +71,6 @@ export const auth = {
     return { data, error }
   },
 
-  signInWithApple: async () => {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'apple',
-      options: {
-        redirectTo: `${window.location.origin}/`
-      }
-    })
-    return { data, error }
-  },
-
   signOut: async () => {
     const { error } = await supabase.auth.signOut()
     return { error }
