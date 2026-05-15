@@ -54,17 +54,70 @@ import { SprintSettingsPage } from './pages/sprint/settings'
 const HABITS_CHANGE_EVENT = 'habits-changed'
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth()
+  const { user, loading, offlineMode } = useAuth()
   const navigate = useNavigate()
   const onboardingCompleted = localStorage.getItem('onboarding-completed') === 'true'
-  const offlineMode = localStorage.getItem('offline-mode') === 'true'
 
   useEffect(() => {
+    console.log('🚪 AuthGuard check:', {
+      loading,
+      hasUser: !!user,
+      userEmail: user?.email,
+      offlineMode,
+      onboardingCompleted,
+      currentPath: window.location.pathname,
+      timestamp: new Date().toISOString()
+    })
+
     if (!loading) {
       if (offlineMode) {
-        // No modo offline, permite acesso direto
+        console.log('✅ Offline mode active - allowing access')
         return
       }
+
+      if (!user) {
+        console.log('❌ No user found - redirecting to login')
+        navigate('/login', { replace: true })
+      } else if (!onboardingCompleted) {
+        console.log('📝 User authenticated but onboarding not completed - redirecting to onboarding')
+        navigate('/onboarding', { replace: true })
+      } else {
+        console.log('✅ User authenticated and onboarding completed - allowing access')
+      }
+    } else {
+      console.log('⏳ Still loading auth state...')
+    }
+  }, [user, loading, onboardingCompleted, offlineMode, navigate])
+
+  if (loading && !offlineMode) {
+    console.log('🔄 Showing loading screen...')
+    return (
+      <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--background)' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: 32, marginBottom: 16 }}>🌱</div>
+          <div style={{ fontSize: 18, color: 'var(--t1)' }}>Carregando...</div>
+        </div>
+      </div>
+    )
+  }
+
+  // Permite acesso se estiver no modo offline ou se tiver usuário autenticado e onboarding completo
+  const shouldAllowAccess = offlineMode || (user && onboardingCompleted)
+  console.log('🎯 AuthGuard decision:', {
+    shouldAllowAccess,
+    offlineMode,
+    hasUser: !!user,
+    onboardingCompleted
+  })
+
+  if (!shouldAllowAccess) {
+    console.log('🚫 Access denied - will redirect')
+    return null // Will redirect via useEffect
+  }
+
+  console.log('✅ Access granted - rendering children')
+  return <>{children}</>
+}
       if (!user) {
         navigate('/login', { replace: true })
       } else if (!onboardingCompleted) {

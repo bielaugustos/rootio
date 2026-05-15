@@ -39,38 +39,63 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const isOAuthCallback = window.location.hash.includes('access_token') ||
                            window.location.hash.includes('id_token') ||
                            window.location.search.includes('code') ||
-                           window.location.search.includes('error')
+                           window.location.search.includes('error') ||
+                           window.location.hash.includes('#')
 
     if (isOAuthCallback) {
-      console.log('🔄 Detected OAuth callback URL, will handle session...')
+      console.log('🔄 Detected OAuth callback URL, waiting for session...', {
+        hash: window.location.hash.substring(0, 50) + '...',
+        search: window.location.search
+      })
+
+      // Add a small delay for OAuth callback processing
+      setTimeout(() => {
+        console.log('⏰ OAuth callback timeout reached, checking session...')
+        auth.getSession().then(({ session, error }) => {
+          console.log('🔍 OAuth callback session check:', session ? `Found (${session.user.email})` : 'None')
+        })
+      }, 2000)
     }
 
-    // Get initial session
-    auth.getSession().then(({ session, error }) => {
-      if (error) {
-        console.error('❌ Error getting initial session:', error)
-        console.error('Error details:', {
-          message: error.message,
-          status: error.status,
-          name: error.name
-        })
-      } else {
-        console.log('📋 Initial session check:', session ? `Active (${session.user.email})` : 'None')
-        if (session) {
-          console.log('Session details:', {
-            userId: session.user.id,
-            email: session.user.email,
-            expiresAt: new Date(session.expires_at! * 1000).toISOString()
-          })
+    // Get initial session with retry logic
+    const getSessionWithRetry = async (retries = 3) => {
+      for (let i = 0; i < retries; i++) {
+        try {
+          const { session, error } = await auth.getSession()
+          if (error) {
+            console.error(`❌ Error getting session (attempt ${i + 1}):`, error)
+            if (i === retries - 1) {
+              setLoading(false)
+              return
+            }
+            await new Promise(resolve => setTimeout(resolve, 1000))
+            continue
+          }
+
+          console.log('📋 Initial session check:', session ? `Active (${session.user.email})` : 'None')
+          if (session) {
+            console.log('Session details:', {
+              userId: session.user.id,
+              email: session.user.email,
+              provider: session.user.app_metadata?.provider,
+              expiresAt: new Date(session.expires_at! * 1000).toISOString()
+            })
+          }
+
+          setSession(session)
+          setUser(session?.user ?? null)
+          setLoading(false)
+          return
+        } catch (err) {
+          console.error(`❌ Unexpected error getting session (attempt ${i + 1}):`, err)
+          if (i === retries - 1) {
+            setLoading(false)
+          }
         }
       }
-      setSession(session)
-      setUser(session?.user ?? null)
-      setLoading(false)
-    }).catch(err => {
-      console.error('❌ Unexpected error getting session:', err)
-      setLoading(false)
-    })
+    }
+
+    getSessionWithRetry()
 
     // Listen for auth changes
     const { data: { subscription } } = auth.onAuthStateChange((event, session) => {
@@ -79,26 +104,50 @@ export function AuthProvider({ children }: AuthProviderProps) {
         userEmail: session?.user?.email,
         userId: session?.user?.id,
         url: window.location.href,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        currentUserState: !!user,
+        currentSessionState: !!session
       })
 
+      // Force update state immediately
       setSession(session)
       setUser(session?.user ?? null)
-      setLoading(false)
 
       if (event === 'SIGNED_OUT') {
         console.log('👋 User signed out')
-        // Clear any local data if needed
+        setLoading(false)
       } else if (event === 'SIGNED_IN') {
         console.log('✅ User signed in successfully:', session?.user?.email)
         if (session) {
-          console.log('Session established:', {
+          console.log('Session details:', {
             provider: session.user.app_metadata?.provider,
-            userId: session.user.id
+            userId: session.user.id,
+            expiresAt: session.expires_at
           })
+        }
+        setLoading(false)
+
+        // Force navigation after successful sign in
+        if (session && !offlineMode) {
+          console.log('🔄 Triggering navigation after sign in...')
+          // Clear any OAuth URL fragments
+          if (window.location.hash.includes('access_token')) {
+            window.history.replaceState({}, document.title, window.location.pathname)
+          }
+
+          // Small delay to ensure state is updated
+          setTimeout(() => {
+            const onboardingCompleted = localStorage.getItem('onboarding-completed') === 'true'
+            const targetUrl = onboardingCompleted ? '/' : '/onboarding'
+            console.log('🚀 Navigating to:', targetUrl)
+            window.location.href = targetUrl
+          }, 200)
         }
       } else if (event === 'TOKEN_REFRESHED') {
         console.log('🔄 Token refreshed')
+      } else {
+        // For other events, ensure loading is false
+        setLoading(false)
       }
     })
 
