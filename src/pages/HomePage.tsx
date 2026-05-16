@@ -5,8 +5,8 @@ import { Button } from '../components/Button'
 
 const LS_KEY = 'dashboard-widgets-hidden'
 
-function ToggleBtn({ left, icon, title, active, onClick }: {
-  left: string; icon: string; title: string; active?: boolean; onClick: () => void
+function ToggleBtn({ left, icon, title, onClick }: {
+  left: string; icon: string; title: string; onClick: () => void
 }) {
   return (
     <button
@@ -75,7 +75,6 @@ export function HomePage() {
             left="calc(var(--sidebar-w, 56px) + 8px + 28px + 6px + 28px + 6px)"
             icon={editMode ? 'ph-check' : 'ph-squares-four'}
             title={editMode ? 'Salvar layout' : 'Editar dashboard'}
-            active={editMode}
             onClick={() => setEditMode(e => !e)}
           />
           {editMode && (

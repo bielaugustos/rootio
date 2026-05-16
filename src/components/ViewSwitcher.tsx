@@ -297,37 +297,6 @@ function ToggleSwitch({
   )
 }
 
-function SegmentedPick<T extends string>({
-  options, value, onChange,
-}: {
-  options: { label: string; value: T }[]
-  value:   T
-  onChange: (v: T) => void
-}) {
-  return (
-    <div style={{ display: 'flex', gap: 3 }}>
-      {options.map(opt => (
-        <button
-          key={opt.value}
-          onClick={() => onChange(opt.value)}
-          style={{
-            padding: '3px 8px', fontSize: 11, fontWeight: 600,
-            border: '2px solid var(--border)',
-            borderRadius: 'var(--radius-sm)',
-            background: value === opt.value ? 'var(--main)' : 'var(--bg3)',
-            color: 'var(--t1)',
-            cursor: 'pointer',
-            transform: value === opt.value ? 'translate(2px,2px)' : 'none',
-            transition: 'all 0.1s',
-          }}
-        >
-          {opt.label}
-        </button>
-      ))}
-    </div>
-  )
-}
-
 function WidgetsToggleItem() {
   const hidden = localStorage.getItem(WIDGETS_LS_KEY) === '1'
 
@@ -389,7 +358,7 @@ export function ViewSwitcher({ leftOffset }: ViewSwitcherProps) {
 
   if (!ctx) return null
 
-  const { page, state, setView, setDisplay } = ctx
+  const { page, state, setView } = ctx
   const availableViews = PAGE_VIEWS[page] ?? PAGE_VIEWS.default
   const activeViewMeta = VIEWS.find(v => v.id === state.view)
 

@@ -34,7 +34,6 @@ import type { Habit } from '../../../engine/habitDB'
 import { updateHabit } from '../../../engine/habitDB'
 import { getProfile } from '../../../engine/profileDB'
 import type { Profile } from '../../../engine/profileDB'
-import { Pill } from '../../../components/Pill'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
