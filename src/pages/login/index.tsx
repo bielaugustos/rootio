@@ -102,8 +102,7 @@ export function LoginPage() {
           <button
             onClick={() => {
               localStorage.setItem('offline-mode', 'true')
-              localStorage.setItem('onboarding-completed', 'true')
-              navigate('/', { replace: true })
+              navigate('/onboarding', { replace: true })
             }}
             style={{ background: 'none', border: 'none', fontSize: 13, color: 'var(--t3)', cursor: 'pointer', fontFamily: 'var(--font-sans)' }}
           >
