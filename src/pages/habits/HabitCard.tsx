@@ -21,17 +21,16 @@ const ACTION_CONFIG: Record<string, { icon: React.ReactNode; label: string; vari
   timer: { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>, label: 'Timer', variant: 'task' },
   anexos: { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14,2 14,8 20,8"/></svg>, label: 'Anexos', variant: 'task' },
   progresso: { icon: progressoIcon, label: 'Progresso', variant: 'goal' },
-  agendar: { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>, label: 'Agendar', variant: 'event' },
   participantes: { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>, label: 'Participantes', variant: 'event' },
   tabela: { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M3 3h18v18H3z"/><path d="M3 9h18"/><path d="M9 21V3"/></svg>, label: 'Tabela', variant: 'goal' },
 }
 
 // Available actions per habit type
 const AVAILABLE_ACTIONS: Record<string, PanelType[]> = {
-  habit: ['streaks', 'historico', 'lembrete'],
+  habit: ['streaks', 'historico', 'lembrete', 'tabela'],
   task: ['lembrete', 'timer', 'anexos'],
-  event: ['agendar', 'participantes', 'historico', 'lembrete', 'timer'],
-  goal: ['streaks', 'progresso', 'tabela', 'anexos'],
+  event: ['participantes', 'historico', 'lembrete', 'timer'],
+  goal: ['streaks', 'historico', 'progresso', 'tabela', 'anexos'],
 }
 
 
@@ -58,7 +57,7 @@ interface HabitCardProps {
 
 export function HabitCard({
   habit, onToggle, onEdit, onRefresh,
-  onPanelOpen, activePanelType, collapsed = false,
+  onPanelOpen, activePanelType, collapsed = false, isMobile = false,
 }: HabitCardProps) {
   const [expanded, setExpanded] = useState(!collapsed)
   const [detailsExpanded, setDetailsExpanded] = useState(false)
@@ -132,7 +131,7 @@ export function HabitCard({
             background: 'var(--secondary-background)',
             cursor: 'grab',
             boxShadow: '2px 2px 0 var(--border)',
-            color: 'var(--foreground)', fontSize: 16,
+            color: 'var(--foreground)', fontSize: isMobile ? 20 : 16,
             transition: 'transform 0.1s, box-shadow 0.1s',
           }}
           onMouseEnter={e => { e.currentTarget.style.transform = 'translate(2px,2px)'; e.currentTarget.style.boxShadow = 'none' }}
@@ -190,11 +189,11 @@ export function HabitCard({
               ⚡
             </Button>
           )}
-          <Button size="tiny" variant="ghost" onClick={() => onEdit(habit)}>
+          <Button size={isMobile ? 'sm' : 'tiny'} variant="ghost" onClick={() => onEdit(habit)}>
             <i className="ph ph-pencil-simple" />
           </Button>
           {!collapsed && (
-            <Button size="tiny" variant="ghost" onClick={() => setExpanded(e => !e)}>
+            <Button size={isMobile ? 'sm' : 'tiny'} variant="ghost" onClick={() => setExpanded(e => !e)}>
               <i className={`ph ${expanded ? 'ph-caret-up' : 'ph-caret-down'}`} />
             </Button>
           )}
@@ -242,10 +241,10 @@ export function HabitCard({
           {/* ActionZone */}
           {(habit.list === 'habit' || habit.list === 'task' || habit.list === 'event' || habit.list === 'goal') && (
             <div style={{
-              padding: '8px 16px',
+              padding: isMobile ? '12px 16px' : '8px 16px',
               borderTop: '1px solid var(--b2)',
             }}>
-              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'flex-start' }}>
+              <div style={{ display: 'flex', gap: isMobile ? 12 : 10, flexWrap: 'wrap', alignItems: 'flex-start' }}>
                 {AVAILABLE_ACTIONS[habit.list]?.map(action => {
                   const config = ACTION_CONFIG[action]
                   return (
@@ -253,7 +252,7 @@ export function HabitCard({
                       key={action}
                       label={config.label}
                       variant={config.variant}
-                      size="sm"
+                      size={isMobile ? 'default' : 'sm'}
                       selected={activePanelType === action}
                       icon={config.icon}
                       onClick={() => onPanelOpen?.(habit.id, action as PanelType)}
@@ -277,14 +276,14 @@ export function HabitCard({
                   </span>
                 </div>
                 {habit.subtasks.map(sub => (
-                  <div key={sub.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div key={sub.id} style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 12 : 8, minHeight: isMobile ? 44 : undefined }}>
                     <button
                       onClick={async () => { await toggleSubtask(habit.id, sub.id); onRefresh() }}
                       style={{
-                        width: 18, height: 18, borderRadius: 4,
+                        width: isMobile ? 28 : 18, height: isMobile ? 28 : 18, borderRadius: 4,
                         border: sub.done ? '1.5px solid var(--main)' : '1.5px solid var(--b2)',
                         background: sub.done ? 'var(--main)' : 'transparent',
-                        cursor: 'pointer', fontSize: 9, color: 'var(--main-foreground)',
+                        cursor: 'pointer', fontSize: isMobile ? 14 : 9, color: 'var(--main-foreground)',
                         flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
                         transition: 'all 0.15s',
                       }}

@@ -27,7 +27,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import type { Habit } from '../../../engine/habitDB'
 import { updateHabit } from '../../../engine/habitDB'
-import { Pill } from '../../../components/Pill'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -157,15 +156,14 @@ function AttachmentItem({
         >
           ✕
         </button>
-      </div>
-    </div>
+          </div>
+        </div>
   )
 }
 
 // ─── AnexosPanel ─────────────────────────────────────────────────────────────
 
 export function AnexosPanel({ habit, onRefresh }: PanelProps) {
-  const [open,        setOpen]        = useState(false)
   const [attachments, setAttachments] = useState<Attachment[]>(() =>
     (habit as any).attachments ?? []
   )
@@ -239,48 +237,27 @@ export function AnexosPanel({ habit, onRefresh }: PanelProps) {
   }
 
   const count = attachments.length
-  const pillLabel = count > 0 ? `Anexos · ${count}` : 'Anexos'
 
   return (
-    <div>
-      <Pill
-        label={pillLabel}
-        variant="task"
-        size="sm"
-        selected={open || count > 0}
-        onClick={() => setOpen(o => !o)}
-        id="pill-anexos"
-        icon={
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-            <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
-          </svg>
-        }
-      />
+    <div style={{
+      borderRadius: 'var(--radius-base)',
+      overflow: 'hidden',
+      boxShadow: '4px 4px 0 var(--border)',
+    }}>
+      {/* ── Header ── */}
+      <div style={{
+        padding: '10px 14px',
+        borderBottom: '2px solid var(--border)',
+        display: 'flex', alignItems: 'center', gap: 8,
+      }}>
+        <span style={{ fontSize: 13, fontWeight: 900, flex: 1, fontFamily: 'Indie Flower' }}>Anexos</span>
+        {saving && <span style={{ fontSize: 10, color: 'var(--t2)' }}>salvando...</span>}
+        <span style={{ fontSize: 11, color: 'var(--t2)', fontWeight: 400 }}>
+          {count}/{MAX_FILES}
+        </span>
+      </div>
 
-      {open && (
-        <div style={{
-          marginTop: 12,
-          border: '2px solid var(--border)',
-          borderRadius: 'var(--radius-base)',
-          background: 'var(--bg2, #fff)',
-          overflow: 'hidden',
-          boxShadow: '4px 4px 0 var(--border)',
-        }}>
-          {/* ── Header ── */}
-          <div style={{
-            padding: '10px 14px',
-            borderBottom: '2px solid var(--border)',
-            background: 'var(--c-task, #6FB8FF)',
-            display: 'flex', alignItems: 'center', gap: 8,
-          }}>
-            <span style={{ fontSize: 13, fontWeight: 500, flex: 1 }}>Anexos</span>
-            {saving && <span style={{ fontSize: 10, color: 'var(--t2)' }}>salvando...</span>}
-            <span style={{ fontSize: 11, color: 'var(--t2)', fontWeight: 400 }}>
-              {count}/{MAX_FILES}
-            </span>
-          </div>
-
-          <div style={{ padding: '14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ padding: '14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
 
             {/* ── Dropzone ── */}
             {count < MAX_FILES && (
@@ -351,7 +328,5 @@ export function AnexosPanel({ habit, onRefresh }: PanelProps) {
             )}
           </div>
         </div>
-      )}
-    </div>
   )
 }

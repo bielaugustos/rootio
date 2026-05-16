@@ -95,37 +95,6 @@ export function LoginPage() {
               {mode === 'login' ? 'Cadastre-se' : 'Entrar'}
             </button>
           </div>
-
-          <div style={{ position: 'relative', textAlign: 'center' }}>
-            <div style={{ height: 1, background: 'var(--b2)', position: 'absolute', inset: '12px 0' }} />
-            <span style={{ position: 'relative', background: 'var(--secondary-background)', padding: '0 8px', fontSize: 11, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>ou</span>
-          </div>
-
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button
-              onClick={async () => {
-                setLoading(true)
-                try {
-                  const { error } = await auth.signInWithGoogle()
-                  if (error) throw error
-                } catch (error) {
-                  toast((error as Error).message || 'Erro na autenticação', 'error')
-                  setLoading(false)
-                }
-              }}
-              disabled={loading}
-              style={{
-                flex: 1, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                background: 'var(--secondary-background)', border: '2px solid var(--border)',
-                borderRadius: 'var(--radius-sm)', boxShadow: '2px 2px 0 var(--border)',
-                cursor: loading ? 'not-allowed' : 'pointer', color: 'var(--t2)', fontSize: 13, fontFamily: 'var(--font-sans)',
-                opacity: loading ? 0.7 : 1,
-              }}
-            >
-              <i className="ph ph-google-logo" style={{ fontSize: 16 }} />
-              Google
-            </button>
-          </div>
         </form>
 
         {/* Skip link */}

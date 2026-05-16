@@ -415,7 +415,6 @@ export function LembretePanel({
           <div style={{
             padding: '10px 14px',
             borderBottom: '2px solid var(--border)',
-            background: 'var(--main)',
             display: 'flex', alignItems: 'center', gap: 8,
           }}>
             <span style={{ fontSize: 13, fontWeight: 900, flex: 1, fontFamily: 'Indie Flower' }}>Lembrete</span>

@@ -36,7 +36,7 @@ function FormLabel({ children, tooltip }: { children: ReactNode; tooltip?: strin
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
       <span style={{
-        fontSize: 10, fontWeight: 500, color: 'var(--t3)',
+        fontSize: 10, fontWeight: 600, color: 'var(--t2)',
         textTransform: 'uppercase', letterSpacing: '0.08em',
       }}>
         {children}
@@ -265,7 +265,7 @@ interface EntryFormProps {
 }
 
 const labelStyle: CSSProperties = {
-  fontSize: 10, fontWeight: 500, color: 'var(--t3)',
+  fontSize: 10, fontWeight: 600, color: 'var(--t2)',
   textTransform: 'uppercase', letterSpacing: '0.08em',
   marginBottom: 8, display: 'block',
   fontFamily: 'var(--font-sans)',
@@ -376,7 +376,7 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
   const totalPts = form.pts ?? 10
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: '32px', background: 'var(--background)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: '32px' }}>
 
       {/* ── Header ── */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingBottom: 12 }}>
@@ -635,7 +635,7 @@ export function EntryForm({ habit, onSave, onClose, habits, streak, onDelete }: 
               <>
                 <div style={{ margin: '12px 0px 0', borderTop: '2px solid var(--b2)' }} />
                 <div style={{ display: 'flex', justifyContent: 'left', alignItems: 'center', gap: 8, marginTop: 12 }}>
-                  <span style={{ fontSize: 13, color: 'var(--t3)', fontFamily: 'var(--font-sans)' }}>Horário</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--t2)', fontFamily: 'var(--font-sans)' }}>Horário</span>
                   <TimePicker
                     value={parseTime(form.reminder_time) || { hours: 8, minutes: 0 }}
                     onChange={(time) => set('reminder_time', time ? `${time.hours.toString().padStart(2,'0')}:${time.minutes.toString().padStart(2,'0')}` : null)}

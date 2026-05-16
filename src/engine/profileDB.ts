@@ -18,6 +18,8 @@ export interface Profile {
   updated_at: string
   show_editor: boolean
   dashboard_layout?: Layout | null
+  mobile_widget_heights?: Record<string, number> | null
+  mobile_widget_order?: string[] | null
 
 }
 

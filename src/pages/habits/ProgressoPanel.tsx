@@ -10,9 +10,24 @@ export function ProgressoPanel({ habit, onClose }: { habit: Habit; onClose: () =
 
   return (
     <div style={{ padding: 16, display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, borderBottom: '2px solid var(--border)', paddingBottom: 12, marginBottom: 16, background: 'var(--bg3)', margin: '-16px -16px 16px', padding: '12px 16px' }}>
-        <span style={{ fontWeight: 700, fontSize: 13, flex: 1 }}>Progresso — {habit.name}</span>
-        <button onClick={onClose} style={{ width: 28, height: 28, border: '1.5px solid var(--b2)', borderRadius: 'var(--radius-sm)', background: 'var(--secondary-background)', cursor: 'pointer', fontSize: 13, color: 'var(--t2)' }}>✕</button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, borderBottom: '2px solid var(--border)', paddingBottom: 12, marginBottom: 16, margin: '-16px -16px 16px', padding: '12px 16px' }}>
+        <span style={{ fontWeight: 700, fontSize: 13, flex: 1, fontFamily: 'Indie Flower' }}>Progresso — {habit.name}</span>
+        <button
+          onClick={onClose}
+          style={{
+            width: 28, height: 28, flexShrink: 0,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            border: '2px solid var(--border)',
+            borderRadius: 'var(--radius-sm)',
+            background: 'var(--secondary-background)',
+            cursor: 'pointer',
+            boxShadow: '2px 2px 0 var(--border)',
+            color: 'var(--t2)', fontSize: 13,
+            transition: 'transform 0.08s, box-shadow 0.08s',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'translate(2px,2px)'; e.currentTarget.style.boxShadow = 'none' }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '2px 2px 0 var(--border)' }}
+        >✕</button>
       </div>
 
       {target > 0 ? (

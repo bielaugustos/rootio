@@ -81,16 +81,15 @@ export function useHabitsLayout({ formOpen, panelOpen }: LayoutInput): HabitsLay
   // PageWrapper maxWidth:
   // - nothing open → 760px (single column, focused reading)
   // - col2 open → 1100px (two columns, no overflow)
-  const pageMaxWidth = col2Open && isDesktop ? 1100 : 760
+  const pageMaxWidth = 900
 
   // Col2 width: fixed 400px on desktop
   const col2Width = 400
 
   // Col1 style
   const col1Style: React.CSSProperties = {
-    flex: 1,
+    width: '100%',
     minWidth: 0,
-    // On mobile with drawer open, slightly dim the list
     transition: 'opacity .2s',
     opacity: col2IsDrawer && col2Open ? 0.4 : 1,
     pointerEvents: col2IsDrawer && col2Open ? 'none' : undefined,
@@ -98,38 +97,45 @@ export function useHabitsLayout({ formOpen, panelOpen }: LayoutInput): HabitsLay
 
   // Col2 wrapper style
   const col2Style: React.CSSProperties = isDesktop ? {
-    // Desktop: sticky sidebar
     width:        col2Width,
     flexShrink:   0,
-    position:     'sticky',
+    position:     'fixed',
+    right:        col2Open ? 24 : -col2Width,
+    top:          14,
     alignSelf:    'flex-start',
     maxHeight:    'calc(100vh - 48px)',
     display:      'flex',
     flexDirection:'column',
-     background:   'var(--bg)',
+    background:   'rgba(255,255,255,0.06)',
+    backdropFilter: 'blur(12px)',
+    WebkitBackdropFilter: 'blur(12px)',
     border:       '2px solid var(--border)',
     borderRadius: 'var(--radius-base)',
     boxShadow:    '4px 4px 0 var(--border)',
     overflowY:    'auto',
-    // Animate in/out
-    animation:    col2Open ? 'col2SlideIn .2s ease' : undefined,
+    zIndex:       300,
+    transition:   'right .22s ease',
   } : {
-    // Mobile/Tablet: bottom drawer
     position:     'fixed',
     bottom:       0,
     left:         0,
     right:        0,
     zIndex:       400,
-    height:       '80vh',
-     background:   'var(--bg)',
+    maxHeight:    '85vh',
+    background:   'rgba(255,255,255,0.06)',
+    backdropFilter: 'blur(12px)',
+    WebkitBackdropFilter: 'blur(12px)',
     borderTop:    '3px solid var(--border)',
-    borderRadius: '12px 12px 0 0',
-    boxShadow:    '0 -4px 24px rgba(0,0,0,.15)',
+    borderRadius: '14px 14px 0 0',
+    boxShadow:    '0 -4px 24px rgba(0,0,0,.2)',
     display:      'flex',
     flexDirection:'column',
     overflow:     'hidden',
+    overscrollBehavior: 'contain',
+    WebkitOverflowScrolling: 'touch',
+    paddingBottom: 'env(safe-area-inset-bottom, 16px)',
     transform:    col2Open ? 'translateY(0)' : 'translateY(100%)',
-    transition:   'transform .28s cubic-bezier(.32,0,.67,0)',
+    transition:   'transform .3s cubic-bezier(.4,0,.2,1)',
   }
 
   return {

@@ -29,8 +29,11 @@
  *   <ParticipantesPanel habit={habit} isMobile={isMobile} onRefresh={onRefresh} />
  */
 
-import { useState } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import type { Habit } from '../../../engine/habitDB'
+import { updateHabit } from '../../../engine/habitDB'
+import { getProfile } from '../../../engine/profileDB'
+import type { Profile } from '../../../engine/profileDB'
 import { Pill } from '../../../components/Pill'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -52,21 +55,58 @@ interface PanelProps {
   onRefresh: () => void
 }
 
-// ─── Mock data (remover quando auth estiver pronto) ───────────────────────────
-
-const MOCK_PARTICIPANTS: Participant[] = [
-  { id: '1', name: 'Você', handle: '@voce', avatar: '🧑', role: 'owner', status: 'accepted', seen_at: new Date().toISOString(), done_at: null },
-]
-
-
-
 // ─── ParticipantesPanel ──────────────────────────────────────────────────────
 
-export function ParticipantesPanel({ habit }: PanelProps) {
+export function ParticipantesPanel({ habit, onRefresh }: PanelProps) {
   const [open, setOpen] = useState(false)
+  const [profile, setProfile] = useState<Profile | null>(null)
+  const [participants, setParticipants] = useState<Participant[]>(() =>
+    (habit as any).participants ?? []
+  )
+  const [email, setEmail] = useState('')
 
-  const participants = MOCK_PARTICIPANTS
-  const onlineCount = participants.filter(p => p.status === 'accepted').length
+  useEffect(() => {
+    getProfile().then(setProfile)
+  }, [])
+
+  const persistParticipants = async (list: Participant[]) => {
+    await updateHabit(habit.id, { ...(habit as any), participants: list })
+    onRefresh()
+  }
+
+  const owner: Participant | null = profile
+    ? { id: profile.id, name: profile.username ?? 'Você', handle: profile.handle ? `@${profile.handle}` : '@voce',
+        avatar: profile.avatar, role: 'owner', status: 'accepted',
+        seen_at: new Date().toISOString(), done_at: null }
+    : null
+
+  const allParticipants = owner ? [owner, ...participants.filter(p => p.role !== 'owner')] : participants
+  const onlineCount = allParticipants.filter(p => p.status === 'accepted').length
+
+  const handleAdd = async () => {
+    const name = email.trim()
+    if (!name) return
+    const newParticipant: Participant = {
+      id: crypto.randomUUID(),
+      name,
+      handle: '',
+      avatar: ['🧑', '👩', '👨', '🧔', '👱', '👴', '👵', '🧑‍🦰'][Math.floor(Math.random() * 8)],
+      role: 'editor',
+      status: 'invited',
+      seen_at: null,
+      done_at: null,
+    }
+    const next = [...participants, newParticipant]
+    setParticipants(next)
+    setEmail('')
+    await persistParticipants(next)
+  }
+
+  const handleRemove = async (id: string) => {
+    const next = participants.filter(p => p.id !== id)
+    setParticipants(next)
+    await persistParticipants(next)
+  }
 
   return (
     <div>
@@ -78,14 +118,15 @@ export function ParticipantesPanel({ habit }: PanelProps) {
           padding: '4px 8px', borderRadius: 'var(--radius-sm)',
           border: '2px solid var(--border)',
           background: open ? 'var(--main)' : 'var(--bg3)',
-          cursor: 'pointer', width: '100%', textAlign: 'left',
+          cursor: 'pointer', width: 'calc(100% - 24px)', textAlign: 'left',
+          margin: '0 12px',
           transition: 'background 0.15s',
           boxShadow: open ? '4px 4px 0 var(--border)' : '2px 2px 0 var(--border)',
         }}
       >
         {/* Stacked avatars */}
         <div style={{ display: 'flex' }}>
-          {participants.slice(0, 3).map((p, i) => (
+          {allParticipants.slice(0, 3).map((p, i) => (
             <div key={p.id} style={{
               width: 24, height: 24, borderRadius: '50%',
               background: ['#EEEDFE', '#EAF3DE', '#FAEEDA'][i % 3], color: ['#3C3489', '#27500A', '#633806'][i % 3],
@@ -113,21 +154,19 @@ export function ParticipantesPanel({ habit }: PanelProps) {
       {/* Panel expansível */}
       {open && (
         <div style={{
-          marginTop: 10,
+          margin: '10px 12px 0',
           border: '2px solid var(--border)',
           borderRadius: 'var(--radius-base)',
-          background: 'var(--bg2)',
           overflow: 'hidden',
           boxShadow: '4px 4px 0 var(--border)',
         }}>
           {/* Header */}
           <div style={{
-            padding: '10px 14px',
+            padding: '12px 20px',
             borderBottom: '2px solid var(--border)',
-            background: 'var(--c-event, #9B7BFF)',
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           }}>
-            <span style={{ fontSize: 13, fontWeight: 500 }}>Participantes</span>
+            <span style={{ fontSize: 13, fontWeight: 900, fontFamily: 'Indie Flower' }}>Participantes</span>
             <span style={{
               display: 'inline-flex', alignItems: 'center', gap: 4,
               padding: '2px 8px', borderRadius: 20,
@@ -147,13 +186,13 @@ export function ParticipantesPanel({ habit }: PanelProps) {
             🔧 Preview — aguarda @rootio-data (auth + Supabase)
           </div> */}
 
-          <div style={{ padding: '14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
             {/* Lista de participantes */}
-            {participants.map((p, i) => (
+            {allParticipants.map((p, i) => (
               <div key={p.id} style={{
-                display: 'flex', alignItems: 'center', gap: 10,
-                padding: '8px 0',
-                borderBottom: i < participants.length - 1 ? '0.5px solid var(--b2)' : 'none',
+                display: 'flex', alignItems: 'center', gap: 12,
+                padding: '12px 0',
+                borderBottom: i < allParticipants.length - 1 ? '1px solid var(--b2)' : 'none',
               }}>
                 <div style={{
                   width: 36, height: 36, borderRadius: '50%',
@@ -170,12 +209,15 @@ export function ParticipantesPanel({ habit }: PanelProps) {
                   </div>
                 </div>
                 {p.role !== 'owner' && (
-                  <button style={{
-                    width: 28, height: 28, borderRadius: 'var(--radius-sm)',
-                    border: '0.5px solid var(--b2)', background: '#FCEBEB',
-                    color: '#A32D2D', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    cursor: 'pointer', fontSize: 13,
-                  }}>
+                  <button
+                    onClick={() => handleRemove(p.id)}
+                    style={{
+                      width: 28, height: 28, borderRadius: 'var(--radius-sm)',
+                      border: '1.5px solid #fca5a5', background: '#fef2f2',
+                      color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      cursor: 'pointer', fontSize: 13,
+                    }}
+                  >
                     <i className="ph-bold ph-x" />
                   </button>
                 )}
@@ -184,42 +226,66 @@ export function ParticipantesPanel({ habit }: PanelProps) {
 
             {/* Preview de conteúdo */}
             <div style={{
-              marginTop: 10, padding: '10px 12px',
+              marginTop: 6, padding: '14px 16px',
               background: 'var(--bg3)', borderRadius: 'var(--radius-sm)',
-              border: '0.5px solid var(--b2)',
+              border: '1.5px solid var(--b2)',
             }}>
-              <p style={{ fontSize: 11, color: 'var(--t3)', marginBottom: 6 }}>
+              <p style={{ fontSize: 11, color: 'var(--t3)', marginBottom: 8 }}>
                 conteúdo visível para todos
               </p>
-              {[
-                { key: 'local', val: habit.deadline ? 'Agendado' : 'Sem local' },
-                { key: 'nota', val: habit.notes || 'Sem notas' },
-              ].map(({ key, val }) => (
-                <div key={key} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 12, marginBottom: 4 }}>
-                  <span style={{ color: 'var(--t3)', minWidth: 40 }}>{key}</span>
-                  <span style={{ color: 'var(--t1)' }}>{val}</span>
+              {habit.notes && (
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 12, marginBottom: 8 }}>
+                  <span style={{ color: 'var(--t3)', minWidth: 54, flexShrink: 0 }}>Nota</span>
+                  <span style={{ color: 'var(--t1)' }}>{habit.notes}</span>
                 </div>
-              ))}
+              )}
+              {(habit.subtasks ?? []).length > 0 && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 8 }}>
+                  <span style={{ color: 'var(--t3)', fontSize: 11 }}>Subtarefas</span>
+                  {habit.subtasks.map(s => (
+                    <div key={s.id} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12 }}>
+                      <span style={{ color: s.done ? '#22c55e' : 'var(--t3)' }}>{s.done ? '✓' : '○'}</span>
+                      <span style={{ color: 'var(--t1)' }}>{s.title}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {(habit.session_logs ?? []).length > 0 && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12 }}>
+                  <span style={{ color: 'var(--t3)', minWidth: 54, flexShrink: 0 }}>Sessões</span>
+                  <span style={{ color: 'var(--t1)' }}>{(habit.session_logs ?? []).length} registro(s)</span>
+                </div>
+              )}
+              {!habit.notes && (habit.subtasks ?? []).length === 0 && (habit.session_logs ?? []).length === 0 && (
+                <div style={{ fontSize: 12, color: 'var(--t3)', fontStyle: 'italic' }}>Nenhum conteúdo adicional</div>
+              )}
             </div>
 
             {/* Convidar */}
-            <div style={{ display: 'flex', gap: 6, marginTop: 10 }}>
+            <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
               <input
-                type="email"
-                placeholder="email@exemplo.com"
+                type="text"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAdd() } }}
+                placeholder="Nome do participante..."
                 style={{
-                  flex: 1, height: 32, fontSize: 12, padding: '0 10px',
-                  borderRadius: 'var(--radius-sm)', border: '0.5px solid var(--b2)',
+                  flex: 1, height: 40, fontSize: 13, padding: '0 12px',
+                  borderRadius: 'var(--radius-sm)', border: '2px solid var(--b2)',
                   background: 'var(--bg2)', color: 'var(--t1)',
                 }}
               />
-              <button style={{
-                height: 32, padding: '0 12px', fontSize: 12, fontWeight: 500,
-                borderRadius: 'var(--radius-sm)', border: '0.5px solid var(--b2)',
-                background: 'var(--bg2)', color: 'var(--t1)', cursor: 'pointer',
-              }}>
-                <i className="ph-bold ph-user-plus" style={{ fontSize: 13 }} />
-                Convidar
+              <button
+                onClick={handleAdd}
+                style={{
+                  height: 40, padding: '0 16px', fontSize: 12, fontWeight: 500,
+                  borderRadius: 'var(--radius-sm)', border: '2px solid var(--b2)',
+                  background: 'var(--bg2)', color: 'var(--t1)', cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', gap: 6,
+                }}
+              >
+                <i className="ph-bold ph-user-plus" style={{ fontSize: 14 }} />
+                Adicionar
               </button>
             </div>
           </div>
@@ -270,16 +336,22 @@ function buildMockLogs(): SessionLog[] {
 
 // ─── TabelaPanel ─────────────────────────────────────────────────────────────
 
-export function TabelaPanel({ habit }: { habit: Habit }) {
-  const [open, setOpen] = useState(false)
-
-  // Real data from habit, fallback to mock for preview
-  const rawLogs: SessionLog[] = habit.session_logs ?? []
-  const hasMock = rawLogs.length === 0
-  const logs = hasMock ? buildMockLogs() : rawLogs
+export function TabelaPanel({ habit, onRefresh }: { habit: Habit; onRefresh?: () => void }) {
+  const [logs, setLogs] = useState<SessionLog[]>(() => {
+    const saved: SessionLog[] = (habit as any).session_logs ?? []
+    return saved.length > 0 ? saved : buildMockLogs()
+  })
+  const isMock = !(habit as any).session_logs?.length
 
   const totalMins = logs.reduce((s, l) => s + (l.mins || 0), 0)
   const doneCount = logs.length
+
+  const handleDelete = useCallback(async (date: string) => {
+    const next = logs.filter(l => l.date !== date)
+    setLogs(next)
+    await updateHabit(habit.id, { ...(habit as any), session_logs: next })
+    onRefresh?.()
+  }, [logs, habit, onRefresh])
 
   function exportCSV() {
     const header = 'Data,Concluído,Minutos,Insight,Retroativo'
@@ -295,57 +367,41 @@ export function TabelaPanel({ habit }: { habit: Habit }) {
     URL.revokeObjectURL(url)
   }
 
-  const pillLabel = doneCount > 0 ? `Tabela · ${doneCount}` : 'Tabela'
-
   return (
     <div>
-      <Pill
-        label={pillLabel}
-        variant="goal"
-        size="sm"
-        selected={open}
-        onClick={() => setOpen(o => !o)}
-        id="pill-tabela"
-        icon={
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-            <rect x="3" y="3" width="18" height="18" rx="1"/>
-            <path d="M3 9h18M3 15h18M9 3v18M15 3v18"/>
-          </svg>
-        }
-      />
-
-      {open && (
+      <div style={{
+        borderRadius: 'var(--radius-base)',
+        overflow: 'hidden',
+        boxShadow: '4px 4px 0 var(--border)',
+      }}>
+        {/* ── Header ── */}
         <div style={{
-          marginTop: 12,
-          border: '2px solid var(--border)',
-          borderRadius: 'var(--radius-base)',
-          background: 'var(--bg2, #fff)',
-          overflow: 'hidden',
-          boxShadow: '4px 4px 0 var(--border)',
+          padding: '10px 14px',
+          borderBottom: '2px solid var(--border)',
+          display: 'flex', alignItems: 'center', gap: 8,
         }}>
-          {/* ── Header ── */}
-          <div style={{
-            padding: '10px 14px',
-            borderBottom: '2px solid var(--border)',
-            background: 'var(--c-goal, #F59E0B)',
-            display: 'flex', alignItems: 'center', gap: 8,
-          }}>
-            <span style={{ fontSize: 13, fontWeight: 500, flex: 1 }}>Tabela de sessões</span>
-            <button
+          <span style={{ fontSize: 13, fontWeight: 900, flex: 1, fontFamily: 'Indie Flower' }}>Tabela de sessões</span>
+          <button
               onClick={exportCSV}
               style={{
-                fontSize: 10, fontWeight: 500, padding: '3px 8px',
+                display: 'flex', alignItems: 'center', gap: 4,
+                padding: '4px 10px', fontSize: 11, fontWeight: 500,
                 border: '2px solid var(--border)', borderRadius: 'var(--radius-sm)',
-                background: 'var(--bg2)', cursor: 'pointer', color: 'var(--t1)',
-                boxShadow: '2px 2px 0 var(--border)', fontFamily: 'var(--font-sans)',
+                background: 'var(--secondary-background)',
+                boxShadow: '2px 2px 0 var(--border)',
+                cursor: 'pointer', color: 'var(--t2)',
+                fontFamily: 'var(--font-sans)',
+                transition: 'transform 0.08s, box-shadow 0.08s',
               }}
+              onMouseEnter={e => { e.currentTarget.style.transform = 'translate(2px,2px)'; e.currentTarget.style.boxShadow = 'none' }}
+              onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '2px 2px 0 var(--border)' }}
             >
               ↓ CSV
             </button>
           </div>
 
           {/* ── Mock warning ── */}
-          {hasMock && (
+          {isMock && (
             <div style={{
               padding: '8px 14px',
               background: '#fef9c3', borderBottom: '1.5px solid #f59e0b',
@@ -379,14 +435,14 @@ export function TabelaPanel({ habit }: { habit: Habit }) {
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
               <thead>
-                <tr style={{ background: 'var(--bg3)' }}>
-                  {['Data', 'Status', 'Tempo', 'Insight'].map(h => (
+                <tr style={{ background: 'rgba(0,0,0,0.05)' }}>
+                  {['Data', 'Tempo', 'Insight', ''].map(h => (
                     <th key={h} style={{
-                      padding: '7px 12px', textAlign: 'left',
+                      padding: '7px 12px', textAlign: h ? 'left' : 'center',
                       fontSize: 10, fontWeight: 500, color: 'var(--t3)',
                       textTransform: 'uppercase', letterSpacing: '.07em',
                       borderBottom: '1.5px solid var(--b2)',
-                      whiteSpace: 'nowrap',
+                      whiteSpace: 'nowrap', width: h ? undefined : 40,
                     }}>
                       {h}
                     </th>
@@ -400,13 +456,6 @@ export function TabelaPanel({ habit }: { habit: Habit }) {
                       {new Date(log.date + 'T12:00:00').toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' })}
                       {log.retroativo && <span style={{ marginLeft: 5, fontSize: 9, color: 'var(--t3)' }}>retro</span>}
                     </td>
-                    <td style={{ padding: '7px 12px' }}>
-                      <span style={{
-                        fontSize: 10, fontWeight: 500, padding: '2px 6px',
-                        border: '1.5px solid #22c55e', borderRadius: 3,
-                        background: '#dcfce7', color: '#15803d',
-                      }}>✓ Feito</span>
-                    </td>
                     <td style={{ padding: '7px 12px', fontFamily: 'var(--font-mono)', fontWeight: 500, color: 'var(--t1)', whiteSpace: 'nowrap' }}>
                       {log.mins ? `${log.mins}min` : '—'}
                     </td>
@@ -415,13 +464,24 @@ export function TabelaPanel({ habit }: { habit: Habit }) {
                         {log.insight || '—'}
                       </div>
                     </td>
+                    <td style={{ padding: '7px 12px', textAlign: 'center' }}>
+                      <button
+                        onClick={() => handleDelete(log.date)}
+                        title="Apagar sessão"
+                        style={{
+                          width: 26, height: 26,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          border: '1.5px solid #fca5a5', borderRadius: 4,
+                          background: '#fef2f2', fontSize: 11, cursor: 'pointer', color: '#ef4444',
+                        }}
+                      >✕</button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
         </div>
-      )}
     </div>
   )
 }

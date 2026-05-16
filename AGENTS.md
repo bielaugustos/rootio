@@ -74,8 +74,8 @@ Cada agente tem um escopo bem definido e deve ser acionado conforme o contexto.
 
 | # | Prioridade | Tarefa | Status |
 |---|-----------|--------|--------|
-| 1 | 🔴 Crítico | Onboarding: 4 informações de exemplo inciais do step 2 ao 5 (Perfil, Hábitos, Finanças, Carreira) | Pendente | o concluido=step6 - dados reutilizados
-| 2 | 🔴 Crítico | Página Habits ( 9 forms de action pills: Streaks, Histórico, Lembrete, Timer, Anexos, Tabela, Progresso, Agendar, Participantes ) | Pendente | - refinar
+| 1 | 🔴 Crítico | Onboarding: 4 informações de exemplo inciais do step 2 ao 5 (Perfil, Hábitos, Finanças, Carreira) | Concluído |
+| 2 | 🔴 Crítico | Página Habits ( 9 forms de action pills: Streaks, Histórico, Lembrete, Timer, Anexos, Tabela, Progresso, Agendar, Participantes ) | Em andamento | - refinar mobile experience
 | 3 | 🔴 Crítico | Página Wallet: 3 tabs funcionais com responsividade e integração com dashboard | Pendente |
 | 4 | 🟡 Importante | Empty states com ilustrações em todas as seções ativas | Pendente |
 | 5 | 🟡 Importante | Tela de Login/Cadastro (UI apenas — integração é com @rootio-data) | Pendente |

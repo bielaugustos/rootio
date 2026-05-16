@@ -53,6 +53,7 @@ export interface Habit {
   reminder_time?: string
   reminder_config?: ReminderConfig
   session_logs?: any[]   // logs de sessão (opcional — preenchido em memória)
+  participants?: any[]   // participantes do evento/tarefa (opcional)
   created_at: string
   updated_at: string
 }

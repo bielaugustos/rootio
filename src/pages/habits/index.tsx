@@ -45,7 +45,6 @@ import { StreaksPanel }       from './StreaksPanel'
 import { ProgressoPanel }     from './ProgressoPanel'
 import { TimerPanel }         from './panels/TimerPanel'
 import { AnexosPanel }        from './panels/AnexosPanel'
-import { AgendarPanel }       from './panels/AgendarPanel'
 import { ParticipantesPanel, TabelaPanel } from './panels/ParticipantesPanel'
 
 // ─── Col2 panel renderer ──────────────────────────────────────────
@@ -80,12 +79,10 @@ function Col2Panel({
       return <TimerPanel habit={habit} isMobile={isMobile ?? false} onRefresh={onRefresh} />
     case 'anexos':
       return <AnexosPanel habit={habit} isMobile={isMobile ?? false} onRefresh={onRefresh} />
-    case 'agendar':
-      return <AgendarPanel habit={habit} isMobile={isMobile ?? false} onRefresh={onRefresh} />
     case 'participantes':
       return <ParticipantesPanel habit={habit} onRefresh={onRefresh} />
     case 'tabela':
-      return <TabelaPanel habit={habit} />
+      return <TabelaPanel habit={habit} onRefresh={onRefresh} />
     default:
       return null
   }
@@ -95,13 +92,15 @@ function Col2Panel({
 
 function DrawerOverlay({ visible, onClick }: { visible: boolean; onClick: () => void }) {
   if (!visible) return null
+  const isMobile = window.innerWidth < 640
   return (
     <div
       onClick={onClick}
       style={{
         position: 'fixed', inset: 0, zIndex: 399,
         background: 'rgba(0,0,0,.4)',
-        backdropFilter: 'blur(2px)',
+        backdropFilter: isMobile ? undefined : 'blur(2px)',
+        WebkitBackdropFilter: isMobile ? undefined : 'blur(2px)',
         animation: 'fadeIn .2s ease',
       }}
     />
@@ -111,17 +110,49 @@ function DrawerOverlay({ visible, onClick }: { visible: boolean; onClick: () => 
 // ─── Drawer handle ────────────────────────────────────────────────
 
 function DrawerHandle({ onClose }: { onClose: () => void }) {
+  const [touchStart, setTouchStart] = useState(0)
+  const [dragging, setDragging] = useState(false)
+  const handleRef = useRef<HTMLDivElement>(null)
+
+  const onTouchStartHandler = (e: React.TouchEvent) => {
+    setTouchStart(e.touches[0].clientY)
+    setDragging(true)
+  }
+
+  const onTouchMoveHandler = (e: React.TouchEvent) => {
+    if (!dragging) return
+    const diff = e.touches[0].clientY - touchStart
+    if (diff > 100) {
+      setDragging(false)
+      onClose()
+    }
+  }
+
+  const onTouchEndHandler = () => {
+    setDragging(false)
+  }
+
   return (
-    <div style={{
-      padding: '10px 16px 0',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      flexShrink: 0,
-    }}>
+    <div
+      ref={handleRef}
+      onTouchStart={onTouchStartHandler}
+      onTouchMove={onTouchMoveHandler}
+      onTouchEnd={onTouchEndHandler}
+      style={{
+        padding: '14px 16px 8px',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        flexShrink: 0, cursor: 'grab',
+        touchAction: 'none',
+        minHeight: 44,
+      }}
+    >
       <button
         onClick={onClose}
+        aria-label="Fechar painel"
         style={{
-          width: 40, height: 4, borderRadius: 2,
+          width: 48, height: 6, borderRadius: 3,
           background: 'var(--b2, #ccc)', cursor: 'pointer',
+          border: 'none', padding: 0,
         }}
       />
     </div>
@@ -324,10 +355,9 @@ export function HabitsPage() {
       <PageWrapper maxWidth={view === 'calendar' ? 900 : layout.pageMaxWidth}>
         <div style={{
           display:        'flex',
-          gap:            layout.isDesktop ? 20 : 0,
+          gap:            0,
           alignItems:     'flex-start',
           flexDirection:  layout.flexDir,
-          position:       'relative',
         }}>
 
           {/* ══════════════════ COL 1 — LISTA ══════════════════ */}
@@ -351,7 +381,7 @@ export function HabitsPage() {
                   </p>
                 )}
               </div>
-              {!(layout.isMobile === false && view === 'list') && (
+              {!(layout.isMobile && view === 'calendar') && !(layout.isMobile === false && view === 'list') && (
                 <Button
                   onClick={col2Open && formOpen ? closeCol2 : () => openForm(null)}
                   variant={col2Open && formOpen ? 'neutral' : 'default'}
@@ -557,10 +587,18 @@ export function HabitsPage() {
 
           {/* Mobile: rendered as fixed drawer */}
           {layout.isMobile && (
-            <div ref={formRef} style={{ ...layout.col2Style, marginBottom: 20 }}>
+            <div ref={formRef} style={{
+              ...layout.col2Style,
+              marginBottom: 0,
+              WebkitOverflowScrolling: 'touch',
+            }}>
               <DrawerHandle onClose={closeCol2} />
               {formOpen ? (
-                <div style={{ flex: 1, overflow: 'auto' }}>
+                <div style={{
+                  flex: 1, overflow: 'auto',
+                  WebkitOverflowScrolling: 'touch',
+                  paddingBottom: 16,
+                }}>
                   <EntryForm
                     habit={editingHabit}
                     onSave={handleSave}
@@ -570,7 +608,11 @@ export function HabitsPage() {
                   />
                 </div>
               ) : (
-                <div style={{ flex: 1, overflow: 'auto' }}>
+                <div style={{
+                  flex: 1, overflow: 'auto',
+                  WebkitOverflowScrolling: 'touch',
+                  paddingBottom: 16,
+                }}>
                   <Col2Panel
                     habits={habits}
                     activePanel={activePanel}

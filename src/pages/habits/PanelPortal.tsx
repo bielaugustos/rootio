@@ -19,7 +19,7 @@ import { createContext, useContext, useState, useCallback, type ReactNode } from
 
 // ─── Types ────────────────────────────────────────────────────────
 
-export type PanelType = 'historico' | 'lembrete' | 'timer' | 'anexos' | 'local' | 'participantes' | 'agendar' | 'tabela' | 'progresso' | 'streaks'
+export type PanelType = 'historico' | 'lembrete' | 'timer' | 'anexos' | 'local' | 'participantes' | 'tabela' | 'progresso' | 'streaks'
 
 export interface ActivePanel {
   habitId:  string

@@ -18,7 +18,6 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import type { Habit } from '../../../engine/habitDB'
-import { Pill } from '../../../components/Pill'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -105,7 +104,6 @@ function TimerRing({
 // ─── TimerPanel ──────────────────────────────────────────────────────────────
 
 export function TimerPanel({ habit, isMobile: _isMobile = false, onRefresh: _onRefresh }: PanelProps) {
-  const [open,      setOpen]      = useState(false)
   const [mode,      setMode]      = useState<TimerMode>('foco')
   const [state,     setState]     = useState<TimerState>('idle')
   const [remaining, setRemaining] = useState(DURATIONS.foco)
@@ -214,62 +212,31 @@ export function TimerPanel({ habit, isMobile: _isMobile = false, onRefresh: _onR
   const isFocus    = mode === 'foco'
   const accentColor = isFocus ? 'var(--c-task-b, #3B82F6)' : 'var(--c-habit-b, #b8a97a)'
 
-  // Pill label: show countdown when running
-  const pillLabel = state === 'running'
-    ? fmt(remaining)
-    : state === 'paused'
-      ? `⏸ ${fmt(remaining)}`
-      : pomodoros > 0
-        ? `Timer · ${pomodoros}🍅`
-        : 'Timer'
-
   return (
-    <div>
-      <Pill
-        label={pillLabel}
-        variant="task"
-        size="sm"
-        selected={open}
-        onClick={() => setOpen(o => !o)}
-        id="pill-timer"
-        icon={
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-            <circle cx="12" cy="13" r="8"/>
-            <path d="M12 9v4l2 2"/>
-            <path d="M5 3 2 6m20 0-3-3"/>
-          </svg>
-        }
-      />
-
-      {open && (
-        <div style={{
-          marginTop: 12,
-          border: '2px solid var(--border)',
-          borderRadius: 'var(--radius-base)',
-          background: 'var(--bg2, #fff)',
-          overflow: 'hidden',
-          boxShadow: '4px 4px 0 var(--border)',
-        }}>
-          {/* ── Header ── */}
-          <div style={{
-            padding: '10px 14px',
-            borderBottom: '2px solid var(--border)',
-            background: 'var(--c-task, #6FB8FF)',
-            display: 'flex', alignItems: 'center', gap: 8,
+    <div style={{
+      borderRadius: 'var(--radius-base)',
+      overflow: 'hidden',
+      boxShadow: '4px 4px 0 var(--border)',
+    }}>
+      {/* ── Header ── */}
+      <div style={{
+        padding: '10px 14px',
+        borderBottom: '2px solid var(--border)',
+        display: 'flex', alignItems: 'center', gap: 8,
+      }}>
+        <span style={{ fontSize: 13, fontWeight: 900, flex: 1, fontFamily: 'Indie Flower' }}>
+          {habit.icon} Timer · {habit.name}
+        </span>
+        {pomodoros > 0 && (
+          <span style={{
+            fontSize: 11, fontWeight: 500, padding: '2px 8px',
+            border: '1.5px solid var(--border)', borderRadius: 99,
+            background: 'var(--bg2, #fff)',
           }}>
-            <span style={{ fontSize: 13, fontWeight: 500, flex: 1 }}>
-              {habit.icon} Timer · {habit.name}
-            </span>
-            {pomodoros > 0 && (
-              <span style={{
-                fontSize: 11, fontWeight: 500, padding: '2px 8px',
-                border: '1.5px solid var(--border)', borderRadius: 99,
-                background: 'var(--bg2, #fff)',
-              }}>
-                {pomodoros} 🍅
-              </span>
-            )}
-          </div>
+            {pomodoros} 🍅
+          </span>
+        )}
+      </div>
 
           {/* ── Mode selector ── */}
           <div style={{
@@ -388,7 +355,5 @@ export function TimerPanel({ habit, isMobile: _isMobile = false, onRefresh: _onR
             </div>
           )}
         </div>
-      )}
-    </div>
   )
 }

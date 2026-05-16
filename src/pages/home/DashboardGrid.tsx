@@ -1,23 +1,14 @@
-import { useMemo, useEffect, useState } from 'react'
+import { useMemo, useEffect, useState, useCallback } from 'react'
 import { useContainerWidth } from 'react-grid-layout'
 import ReactGridLayout from 'react-grid-layout'
 import { GridBackground } from 'react-grid-layout/extras'
 import { useDashboardLayout } from './useDashboardLayout'
+import { MobileSortableWidgets } from './MobileSortableWidgets'
 import { StreakWidget } from './widgets/StreakWidget'
 import { IOHojeWidget } from './widgets/IOHojeWidget'
 import { ProgressoWidget } from './widgets/ProgressoWidget'
 import { HabitosWidget } from './widgets/HabitosWidget'
 import { CarteiraWidget } from './widgets/CarteiraWidget'
-
-const MOBILE_HEIGHTS: Record<string, number> = {
-  streak: 170,
-  'io-hoje': 210,
-  progresso: 230,
-  habitos: 220,
-  carteira: 310,
-}
-
-const MOBILE_ORDER = ['streak', 'io-hoje', 'progresso', 'habitos', 'carteira']
 
 const LAYOUTS = {
   lg: [
@@ -46,7 +37,7 @@ function useWindowWidth() {
   return windowWidth
 }
 
-function Widget({ children, editMode }: { children: React.ReactNode; editMode: boolean }) {
+function Widget({ children, editMode }: { children: React.ReactNode; editMode?: boolean }) {
   return (
     <div style={{
       height: '100%',
@@ -85,12 +76,16 @@ export function DashboardGrid({ editMode, onToggleEdit }: {
   editMode: boolean
   onToggleEdit: () => void
 }) {
-  const { layout, saveLayout, resetLayout, loaded } = useDashboardLayout()
+  const { layout, saveLayout, resetLayout, loaded, mobileHeights, saveMobileHeights, mobileOrder, saveMobileOrder } = useDashboardLayout()
   const { width, containerRef, mounted } = useContainerWidth()
   const windowWidth = useWindowWidth()
 
-  // Usa windowWidth para detectar mobile de forma confiável
-  // (o containerRef pode demorar um frame para medir corretamente)
+  useEffect(() => {
+    const handler = () => { resetLayout(); onToggleEdit() }
+    window.addEventListener('reset-dashboard-layout', handler)
+    return () => window.removeEventListener('reset-dashboard-layout', handler)
+  }, [resetLayout, onToggleEdit])
+
   const isMobile = windowWidth < 768
   const isTablet = windowWidth >= 768 && windowWidth < 1200
 
@@ -107,6 +102,14 @@ export function DashboardGrid({ editMode, onToggleEdit }: {
     <div key="carteira"><Widget editMode={editMode}><CarteiraWidget /></Widget></div>,
   ], [editMode])
 
+  const handleMobileOrderChange = useCallback((order: string[]) => {
+    saveMobileOrder(order)
+  }, [saveMobileOrder])
+
+  const handleMobileHeightChange = useCallback((id: string, height: number) => {
+    saveMobileHeights({ ...mobileHeights, [id]: height })
+  }, [mobileHeights, saveMobileHeights])
+
   if (!loaded) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '40vh', color: 'var(--t3)', fontSize: 13 }}>
       Carregando...
@@ -115,39 +118,17 @@ export function DashboardGrid({ editMode, onToggleEdit }: {
 
   return (
     <div>
-      {/* Botão Redefinir — só aparece no modo edição */}
-      {editMode && !isMobile && (
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
-          <button
-            onClick={() => { resetLayout(); onToggleEdit() }}
-            style={{
-              display: 'flex', alignItems: 'center', gap: 6,
-              padding: '6px 14px',
-              fontSize: 12, fontWeight: 700, fontFamily: 'var(--font-sans)',
-              border: '2px solid var(--border)', borderRadius: 'var(--radius-sm)',
-              background: 'var(--secondary-background)',
-              boxShadow: '2px 2px 0 var(--border)',
-              cursor: 'pointer', color: 'var(--t3)',
-              transition: 'all .1s',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.transform = 'translate(2px,2px)'; e.currentTarget.style.boxShadow = 'none' }}
-            onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '2px 2px 0 var(--border)' }}
-          >
-            <i className="ph ph-arrow-counter-clockwise" style={{ fontSize: 14 }} />
-            Redefinir
-          </button>
-        </div>
-      )}
 
-      {/* ── MOBILE: flex column, sem RGL ── */}
+      {/* ── MOBILE: sortable + resize ── */}
       {isMobile && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {MOBILE_ORDER.map(key => (
-            <div key={key} style={{ width: '100%', height: MOBILE_HEIGHTS[key] }}>
-              <Widget editMode={false}>{WIDGETS[key]}</Widget>
-            </div>
-          ))}
-        </div>
+        <MobileSortableWidgets
+          order={mobileOrder}
+          heights={mobileHeights}
+          editMode={editMode}
+          widgets={WIDGETS}
+          onOrderChange={handleMobileOrderChange}
+          onHeightChange={handleMobileHeightChange}
+        />
       )}
 
       {/* ── DESKTOP / TABLET: RGL ── */}

@@ -30,33 +30,36 @@ export interface ViewState {
   display: DisplaySettings
 }
 
-export type PageKey = 'habits' | 'wallet' | 'projects' | 'sprint' | 'career' | 'finance' | 'feed' | 'progress' | 'default'
+export type PageKey = 'home' | 'habits' | 'wallet' | 'projects' | 'sprint' | 'career' | 'finance' | 'feed' | 'progress' | 'default'
 
 const PAGE_VIEWS: Record<PageKey, ViewId[]> = {
-  habits:   ['lista',  'tabela',    'quadro',    'calendario', 'cronograma', 'galeria', 'grafico', 'painel'],
-  wallet:   ['lista',  'tabela',    'grafico',   'calendario', 'painel'],
-  projects: ['quadro', 'lista',     'tabela',    'cronograma', 'calendario', 'galeria', 'painel'],
-  sprint:   ['quadro', 'lista',     'cronograma', 'painel'],
-  career:   ['lista',  'tabela',    'quadro',    'cronograma', 'galeria', 'painel'],
-  finance:  ['lista',  'tabela',    'grafico',   'calendario', 'painel'],
-  feed:     ['feed',   'lista',     'galeria',   'painel'],
-  progress: ['painel', 'grafico',   'cronograma', 'lista'],
-  default:  ['lista',  'tabela',    'quadro',    'painel'],
+  home:     ['lista'],
+  habits:   ['lista', 'calendario'],
+  wallet:   ['lista', 'calendario'],
+  projects: ['lista', 'calendario'],
+  sprint:   ['lista'],
+  career:   ['lista'],
+  finance:  ['lista', 'calendario'],
+  feed:     ['feed', 'lista'],
+  progress: ['lista'],
+  default:  ['lista'],
 }
 
 const PAGE_DEFAULT_VIEW: Record<PageKey, ViewId> = {
+  home:     'lista',
   habits:   'lista',
   wallet:   'lista',
-  projects: 'quadro',
-  sprint:   'quadro',
+  projects: 'lista',
+  sprint:   'lista',
   career:   'lista',
-  finance:  'tabela',
+  finance:  'lista',
   feed:     'feed',
-  progress: 'painel',
+  progress: 'lista',
   default:  'lista',
 }
 
 const ROUTE_PAGE: Record<string, PageKey> = {
+  '/':         'home',
   '/habits':   'habits',
   '/wallet':   'wallet',
   '/projects': 'projects',
@@ -405,15 +408,25 @@ export function ViewSwitcher({ leftOffset }: ViewSwitcherProps) {
           zIndex: 200,
           width: 28, height: 28,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          background: open ? 'var(--main)' : 'var(--background)',
+          background: open ? 'var(--main)' : 'rgba(255,255,255,0.1)',
+          backdropFilter: open ? 'none' : 'blur(8px)',
+          WebkitBackdropFilter: open ? 'none' : 'blur(8px)',
           border: '2px solid var(--border)',
           borderRadius: 'var(--radius-sm)',
           boxShadow: open ? 'none' : '2px 2px 0 var(--border)',
           transform: open ? 'translate(2px,2px)' : 'none',
           cursor: 'pointer',
           color: 'var(--t1)',
-          transition: 'left 0.22s ease, background 0.1s, transform 0.1s, box-shadow 0.1s',
+          transition: 'left 0.22s ease, background 0.1s, transform 0.08s, box-shadow 0.08s',
           padding: 0,
+        }}
+        onMouseEnter={e => {
+          e.currentTarget.style.transform = 'translate(2px,2px)'
+          e.currentTarget.style.boxShadow = 'none'
+        }}
+        onMouseLeave={e => {
+          e.currentTarget.style.transform = open ? 'translate(2px,2px)' : 'none'
+          e.currentTarget.style.boxShadow = open ? 'none' : '2px 2px 0 var(--border)'
         }}
       >
         <span style={{ width: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: open ? 1 : 0.7 }}>
@@ -524,45 +537,8 @@ export function ViewSwitcher({ leftOffset }: ViewSwitcherProps) {
           )}
 
           {tab === 'display' && (
-            <div style={{ padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 0 }}>
+            <div style={{ padding: '12px 14px' }}>
               <WidgetsToggleItem />
-              {([
-                { key: 'linhasVerticais',  label: 'Linhas verticais',    desc: 'Mostra grade na tabela' },
-                { key: 'exibirIcone',      label: 'Ícone da página',     desc: 'Emojis dos itens' },
-                { key: 'envolverConteudo', label: 'Envolver conteúdo',   desc: 'Quebra texto longo' },
-              ] as const).map((row, i, arr) => (
-                <div
-                  key={row.key}
-                  style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
-                    padding: '10px 0',
-                    borderBottom: i < arr.length - 1 ? '1px solid var(--bg3)' : 'none',
-                  }}
-                >
-                  <div>
-                    <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--t1)' }}>{row.label}</div>
-                    <div style={{ fontSize: 10, color: 'var(--t3)', marginTop: 1 }}>{row.desc}</div>
-                  </div>
-                  <ToggleSwitch
-                    value={state.display[row.key as keyof DisplaySettings] as boolean}
-                    onChange={v => setDisplay({ [row.key]: v })}
-                  />
-                </div>
-              ))}
-              <div style={{ paddingTop: 10, borderTop: '1px solid var(--bg3)', marginTop: 2 }}>
-                <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--t1)', marginBottom: 6 }}>
-                  Abrir páginas em
-                </div>
-                <SegmentedPick
-                  options={[
-                    { label: 'Completo', value: 'completo' },
-                    { label: 'Lateral',  value: 'lateral'  },
-                    { label: 'Central',  value: 'central'  },
-                  ]}
-                  value={state.display.abrirEm}
-                  onChange={v => setDisplay({ abrirEm: v })}
-                />
-              </div>
             </div>
           )}
 

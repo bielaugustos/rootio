@@ -47,12 +47,14 @@ export interface SessionLog {
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 function todayISO() {
-  return new Date().toISOString().slice(0, 10)
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
 function formatDate(iso: string) {
-  const d = new Date(iso + 'T12:00:00')
-  return d.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' })
+  const [y, m, d] = iso.split('-').map(Number)
+  const date = new Date(y, m - 1, d)
+  return date.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' })
 }
 
 function formatMins(mins: number) {
@@ -67,7 +69,7 @@ function buildDaysRange(n: number): string[] {
   for (let i = n - 1; i >= 0; i--) {
     const d = new Date()
     d.setDate(d.getDate() - i)
-    dates.push(d.toISOString().slice(0, 10))
+    dates.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`)
   }
   return dates
 }
@@ -84,34 +86,33 @@ function StreakDotGrid({
   streak: number
 }) {
   const grid = buildDaysRange(28)
-  const doneSet = new Set(days7.map(d => d.date))
+  const doneSet = new Set(days7.filter(d => d.done).map(d => d.date))
   const today   = todayISO()
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'center' }}>
       {/* Day labels row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 3 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4, width: '100%', maxWidth: 460 }}>
         {DAY_LABELS.map((l, i) => (
-          <div key={i} style={{ fontSize: 9, fontWeight: 500, color: 'var(--t3)', textAlign: 'center' }}>
+          <div key={i} style={{ fontSize: 9, fontWeight: 600, color: 'var(--t3)', textAlign: 'center' }}>
             {l}
           </div>
         ))}
       </div>
       {/* 4-week grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 3 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4, width: '100%', maxWidth: 460 }}>
         {grid.map(date => {
           const done    = doneSet.has(date)
           const isToday = date === today
           const isPast  = date < today && !done
 
-          let bg        = 'var(--bg3, #e8e4dc)'
-          let border    = '1.5px solid transparent'
-          let scale     = 'scale(1)'
+          let bg     = 'transparent'
+          let border = '1.5px solid transparent'
 
-          if (done && isToday)  { bg = '#22c55e'; border = '1.5px solid #15803d' }
-          else if (done)        { bg = 'var(--main, #ffbf00)'; border = '1.5px solid var(--main-darker, #D4A800)' }
-          else if (isToday)     { bg = 'var(--main, #ffbf00)'; border = '2px solid var(--border, #000)'; scale = 'scale(1.2)' }
-          else if (isPast)      { bg = 'var(--bg3)' }
+          if (done && isToday)  { bg = '#22c55e'; border = '1px solid #15803d' }
+          else if (done)        { bg = 'var(--main)'; border = '1px solid var(--main)' }
+          else if (isToday)     { border = '1.5px solid var(--main)' }
+          else if (isPast)      { /* vazio — sem marcacao */ }
 
           return (
             <div
@@ -120,10 +121,9 @@ function StreakDotGrid({
               style={{
                 width: '100%',
                 aspectRatio: '1',
-                borderRadius: 4,
+                borderRadius: 2,
                 background: bg,
                 border,
-                transform: scale,
                 transition: 'all .15s',
               }}
             />
@@ -131,15 +131,34 @@ function StreakDotGrid({
         })}
       </div>
       {/* Streak summary */}
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 2 }}>
-        <span style={{ fontSize: 22, fontWeight: 700, color: 'var(--t1)', lineHeight: 1 }}>
-          {streak}
-        </span>
-        <span style={{ fontSize: 12, color: 'var(--t3)' }}>
-          dias seguidos
-          {streak >= 7  && ' · 🔥 Semana perfeita!'}
-          {streak >= 30 && ' · 💎 Mês perfeito!'}
-        </span>
+      {streak > 0 && (
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 0 }}>
+          <span style={{ fontSize: 18, fontWeight: 700, color: 'var(--t1)', lineHeight: 1 }}>
+            {streak}
+          </span>
+          <span style={{ fontSize: 11, color: 'var(--t3)' }}>
+            dias seguidos
+            {streak >= 7  && ' · 🔥'}
+            {streak >= 30 && ' · 💎'}
+          </span>
+        </div>
+      )}
+      {/* Legend */}
+      <div style={{ display: 'flex', gap: 10, justifyContent: 'center', marginTop: 4, flexWrap: 'wrap' }}>
+        {[
+          { color: '#22c55e', label: 'Hoje (feito)' },
+          { color: 'var(--main)', label: 'Feito' },
+          { border: '1.5px solid var(--main)', label: 'Pendente' },
+        ].map(item => (
+          <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <div style={{
+              width: 10, height: 10, borderRadius: 2,
+              background: item.color ?? 'transparent',
+              border: item.border ?? 'none',
+            }} />
+            <span style={{ fontSize: 9, color: 'var(--t3)' }}>{item.label}</span>
+          </div>
+        ))}
       </div>
     </div>
   )
@@ -150,10 +169,12 @@ function StreakDotGrid({
 function SessionLogItem({
   log,
   onUpdate,
+  onDelete,
   isToday,
 }: {
   log:       SessionLog
   onUpdate:  (updated: Partial<SessionLog>) => void
+  onDelete:  () => void
   isToday:   boolean
 }) {
   const [editingInsight, setEditingInsight] = useState(false)
@@ -167,23 +188,23 @@ function SessionLogItem({
 
   return (
     <div style={{
-      padding: '10px 12px',
+      padding: '8px 10px',
       border: `1.5px solid ${isToday ? 'var(--main)' : 'var(--b2, #ccc)'}`,
       borderRadius: 'var(--radius-sm)',
-      background: isToday ? 'color-mix(in srgb, var(--main) 8%, var(--background))' : 'var(--background)',
+      background: isToday ? 'color-mix(in srgb, var(--main) 8%, transparent)' : 'rgba(255,255,255,0.06)',
       display: 'flex',
       flexDirection: 'column',
-      gap: 8,
+      gap: 6,
     }}>
       {/* Header row */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
         <div style={{
-          width: 8, height: 8, borderRadius: '50%',
+          width: 6, height: 6, borderRadius: '50%',
           background: log.retroativo ? 'var(--t3)' : 'var(--main)',
           border: '1.5px solid var(--border)',
           flexShrink: 0,
         }} />
-        <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--t2)', flex: 1 }}>
+        <span style={{ fontSize: 10, fontWeight: 500, color: 'var(--t2)', flex: 1 }}>
           {formatDate(log.date)}
           {isToday && (
             <span style={{
@@ -232,6 +253,16 @@ function SessionLogItem({
             {formatMins(mins)}
           </button>
         )}
+        <button
+          onClick={onDelete}
+          title="Apagar sessão"
+          style={{
+            width: 22, height: 22, flexShrink: 0,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            border: '1.5px solid #fca5a5', borderRadius: 4,
+            background: '#fef2f2', fontSize: 10, cursor: 'pointer', color: '#ef4444',
+          }}
+        >✕</button>
       </div>
 
       {/* Insight field */}
@@ -445,6 +476,12 @@ export function HistoricoPanel({
     persistLogs(next)
   }
 
+  const handleDeleteLog = async (date: string) => {
+    const next = logs.filter(l => l.date !== date)
+    setLogs(next)
+    await persistLogs(next)
+  }
+
   const today = todayISO()
 
   // Only show logs for days the habit was actually done (days7) + retroactive entries
@@ -455,46 +492,51 @@ export function HistoricoPanel({
 
    return (
      <div>
-       <div style={{
-         borderRadius: 'var(--radius-base)',
-         overflow: 'hidden',
-         boxShadow: '4px 4px 0 var(--border)',
-         background: 'var(--background)',
-       }}>
+        <div style={{
+          borderRadius: 'var(--radius-base)',
+          overflow: 'hidden',
+          boxShadow: '4px 4px 0 var(--border)',
+        }}>
 {/* ── Header ── */}
-           <div style={{
-             padding: '6px 14px',
-             borderBottom: '2px solid var(--border)',
-             background: 'var(--main)',
-            display: 'flex', alignItems: 'center', gap: 8,
-          }}>
-            <span style={{ fontSize: 13, fontWeight: 900, flex: 1, fontFamily: 'Indie Flower' }}>Histórico</span>
-            {saving && <span style={{ fontSize: 10, color: 'var(--t3)' }}>salvando...</span>}
+            <div style={{
+              padding: '6px 14px',
+              borderBottom: '2px solid var(--border)',
+             display: 'flex', alignItems: 'center', gap: 8,
+           }}>
+             <span style={{ fontSize: 13, fontWeight: 900, flex: 1, fontFamily: 'Indie Flower' }}>Histórico</span>
+             {saving && <span style={{ fontSize: 10, color: 'var(--t3)' }}>salvando...</span>}
         <button
           onClick={handleEdit}
           style={{
-            fontSize: 10, padding: '2px 6px',
-            border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)',
-            background: 'var(--main)', color: 'var(--main-foreground)',
-            cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            gap: 4, padding: '4px 10px', fontSize: 11, fontWeight: 500,
+            border: '2px solid var(--border)', borderRadius: 'var(--radius-sm)',
+            background: 'var(--secondary-background)',
+            boxShadow: '2px 2px 0 var(--border)',
+            cursor: 'pointer', color: 'var(--t2)',
+            fontFamily: 'var(--font-sans)',
+            transition: 'transform 0.08s, box-shadow 0.08s',
           }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'translate(2px,2px)'; e.currentTarget.style.boxShadow = 'none' }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '2px 2px 0 var(--border)' }}
         >
           Editar
         </button>
           </div>
 
 {/* ── Dot grid ── */}
-           <div style={{ padding: '8px 14px 6px' }}>
-            <div style={{ fontSize: 10, fontWeight: 500, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 8 }}>
-              Últimas 4 semanas
+            <div style={{ padding: '10px 14px 8px' }}>
+             <div style={{ fontSize: 9, fontWeight: 600, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 8, textAlign: 'center' }}>
+               Últimas 4 semanas
             </div>
             <StreakDotGrid days7={days7} streak={streak} />
           </div>
 
-          {/* ── Session logs ── */}
+           {/* ── Session logs ── */}
           {visibleLogs.length > 0 && (
-            <div style={{ padding: '0 14px 14px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <div style={{ fontSize: 10, fontWeight: 500, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 2 }}>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <div style={{ padding: '0 14px 14px', display: 'flex', flexDirection: 'column', gap: 5, width: '100%', maxWidth: 460 }}>
+              <div style={{ fontSize: 9, fontWeight: 500, color: 'var(--t3)', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 1 }}>
                  Sessões recentes
               </div>
 
@@ -506,8 +548,10 @@ export function HistoricoPanel({
                   log={log}
                   isToday={log.date === today}
                   onUpdate={delta => handleLogUpdate(log.date, delta)}
+                  onDelete={() => handleDeleteLog(log.date)}
                 />
               ))}
+            </div>
             </div>
           )}
 
